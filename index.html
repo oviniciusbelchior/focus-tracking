@@ -291,6 +291,40 @@ pre.code{white-space:pre;margin:0;flex:1;min-width:0;line-height:1.5;max-height:
 .prog i{display:block;height:100%;background:#25d366;width:0}
 .dgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:1000px){.dgrid{grid-template-columns:1fr}}
+/* Empresa compacta */
+.co-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+.basic{padding:18px;position:sticky;top:20px}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ch h2{font-size:16px;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ch h2 .pm{width:20px;height:20px}
+.mini{border:0;background:var(--brand-soft);color:var(--brand);font-size:12.5px;font-weight:700;padding:7px 11px;border-radius:6px}
+.mini:hover{filter:brightness(.96)}
+.bv{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.logo-box.round{width:64px;height:64px;border-radius:50%;border-style:solid;font-size:20px;align-self:center}
+.bv .logo-row .logo-box.round{align-self:auto}
+.kv{display:flex;flex-direction:column;gap:2px;font-size:12.5px;color:var(--muted)}
+.kv b{color:var(--fg);font-size:14px;overflow-wrap:anywhere}
+.kv.c{align-items:center;text-align:center}
+.kv.c b{font-size:16px}
+.wa-box{border-radius:8px;padding:16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.wa-box.on{background:var(--accent-soft);color:var(--accent)}
+.wa-box.off{background:var(--surface-2);color:var(--muted)}
+.wa-box.qr{background:var(--surface-2);color:var(--fg)}
+.wa-box .qr{width:150px;height:150px}
+.wa-box small{font-weight:400;font-size:12px;color:var(--muted)}
+.danger{width:100%;border:0;background:#fdecec;color:#c0392b;font-weight:700;font-size:13px;padding:10px;border-radius:7px}
+.icard{padding:20px;display:flex;flex-direction:column;gap:14px}
+.icard .hint{font-size:12.5px;color:var(--muted)}
+.hintbar{background:#fff8e1;border:1px solid #f6e3a1;border-radius:7px;padding:10px 12px;font-size:13px}
+.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 24px}
+.vgrid .full{grid-column:1/-1}
+.yn{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:5px;width:max-content}
+.yn.y{background:var(--accent-soft);color:var(--accent)}.yn.n{background:#fdecec;color:#c0392b}
+.tokbox{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:var(--surface-2);border-radius:6px;padding:10px 12px;overflow-wrap:anywhere;color:var(--fg)}
+.btn2.sm{padding:6px 10px;font-size:12.5px}
+details.more summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--muted)}
+details.more summary:hover{color:var(--fg)}
+@media (max-width:900px){.co-layout{grid-template-columns:1fr}.basic{position:static}.vgrid{grid-template-columns:1fr}}
 @media (max-width:1180px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.inner{margin:0 auto}}
 @media (max-width:900px){.how{grid-template-columns:1fr}}
 @media (max-width:780px){
@@ -553,90 +587,83 @@ pre.code{white-space:pre;margin:0;flex:1;min-width:0;line-height:1.5;max-height:
 
   <!-- EMPRESA -->
   <section class="view" id="v-empresa" hidden>
-    <div class="head"><div><h1>Informações da empresa</h1><p class="sub">Dados da empresa, conexão do WhatsApp e envio de eventos para as campanhas.</p></div><span class="saved" id="co-saved" hidden>Alterações salvas</span></div>
-    <div class="egrid">
-      <div class="panel card-pad">
-        <h2>Dados da empresa</h2>
-        <div class="logo-row">
-          <div class="logo-box" id="logo-box"></div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <div style="display:flex;gap:8px;flex-wrap:wrap"><label class="btn2" for="logo-file" style="cursor:pointer">Enviar logo</label><button class="btn2" id="logo-rm" type="button">Remover</button></div>
-            <span style="font-size:12px;color:var(--muted)">PNG, JPG ou SVG, até 1 MB</span>
-            <input type="file" id="logo-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
-          </div>
+    <div class="head"><div><h1>Informações da empresa</h1><p class="sub">Dados da empresa, WhatsApp e integrações com as plataformas de anúncio.</p></div><span class="saved" id="co-saved" hidden>Alterações salvas</span></div>
+    <div class="co-layout">
+      <aside class="panel basic">
+        <div class="ch"><h2><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Informações básicas</h2><button class="mini" type="button" id="basic-btn">Editar</button></div>
+        <div id="basic-view" class="bv">
+          <div class="logo-box round" id="logo-box"></div>
+          <div class="kv c"><span>Nome da empresa</span><b id="bv-name"></b></div>
+          <div class="wa-box" id="wa-box"></div>
+          <div class="kv"><span>WhatsApp de atendimento</span><b class="mono" id="bv-phone"></b></div>
+          <div class="kv"><span>Segmento</span><b id="bv-seg"></b></div>
+          <div class="kv"><span>Site</span><b id="bv-site"></b></div>
+          <div id="wa-off-wrap"></div>
         </div>
-        <div class="field"><label for="co-name">Nome da empresa</label><input class="inp" id="co-name" data-k="name"></div>
-        <div class="row2">
+        <div id="basic-edit" class="bv" hidden>
+          <div class="logo-row">
+            <div class="logo-box round" id="logo-box2"></div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;gap:6px;flex-wrap:wrap"><label class="btn2 sm" for="logo-file" style="cursor:pointer">Enviar logo</label><button class="btn2 sm" id="logo-rm" type="button">Remover</button></div>
+              <span style="font-size:11.5px;color:var(--muted)">PNG, JPG ou SVG, até 1 MB</span>
+              <input type="file" id="logo-file" accept="image/png,image/jpeg,image/svg+xml,image/webp" hidden>
+            </div>
+          </div>
+          <div class="field"><label for="co-name">Nome da empresa</label><input class="inp" id="co-name" data-k="name"></div>
+          <div class="field"><label for="co-phone">WhatsApp de atendimento</label><input class="inp mono" id="co-phone" data-k="phone" inputmode="tel" placeholder="+55 11 9 0000-0000"></div>
           <div class="field"><label for="co-seg">Segmento</label><input class="inp" id="co-seg" data-k="seg"></div>
           <div class="field"><label for="co-site">Site</label><input class="inp" id="co-site" data-k="site"></div>
+          <button class="btn" type="button" id="basic-done">Concluir</button>
         </div>
-      </div>
+      </aside>
 
-      <div class="panel card-pad">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>WhatsApp</h2><span class="status" id="wa-st"><i></i><span></span></span></div>
-        <div class="field"><label for="co-phone">Número que será conectado</label><input class="inp mono" id="co-phone" data-k="phone" inputmode="tel" placeholder="+55 11 9 0000-0000"></div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap" id="wa-actions"></div>
-        <div class="qrwrap" id="qr-wrap" hidden>
-          <svg class="qr" viewBox="0 0 29 29" id="qr" aria-label="QR code ilustrativo"></svg>
-          <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
-            <ol class="steps">
-              <li>Abra o WhatsApp no celular deste número.</li>
-              <li>Toque em <b>Aparelhos conectados</b> e depois em <b>Conectar um aparelho</b>.</li>
-              <li>Aponte a câmera para o código.</li>
-            </ol>
-            <span style="font-size:12.5px;color:var(--muted)" id="qr-exp"></span>
-            <div><button class="btn2" id="qr-done" type="button">Simular leitura do código</button></div>
+      <div class="jcol">
+        <div class="panel icard">
+          <div class="ch"><h2><svg class="pm" viewBox="0 0 24 24"><rect x="9.5" y="2" width="6" height="19" rx="3" transform="rotate(30 12.5 11.5)" fill="#4285f4"/><rect x="3.5" y="5" width="6" height="15" rx="3" transform="rotate(-30 6.5 12.5)" fill="#fbbc04"/><circle cx="5.5" cy="18.5" r="3" fill="#34a853"/></svg> Google Ads <span class="status" id="g-st"><i></i><span></span></span></h2><div id="g-btns"></div></div>
+          <div id="g-area"></div>
+          <div class="hintbar" id="g-hint">Conecte seu Google Ads para puxar as ações de conversão e enviar conversões offline pelo gclid de cada conversa.</div>
+        </div>
+
+        <div class="panel icard">
+          <div class="ch"><h2><svg class="pm" viewBox="0 0 24 24"><path d="M3.5 15.5c0-4 2-8 4.4-8 2.6 0 4.2 4.5 6 7.3 1.3 2 2.4 2.7 3.6 2.7 1.8 0 3-1.6 3-4.1 0-3.4-1.8-5.9-3.8-5.9-2.4 0-4.2 3.3-5.5 5.6-1.6 2.8-2.9 4.4-4.6 4.4-1.8 0-3.1-1.6-3.1-2z" fill="none" stroke="#1877f2" stroke-width="2.2" stroke-linejoin="round"/></svg> Meta Ads <span class="status" id="fb-st"><i></i><span></span></span></h2><button class="mini" type="button" id="meta-btn">Editar</button></div>
+          <div class="vgrid" id="meta-view"></div>
+          <div id="meta-edit" hidden>
+            <div class="steps-meta">
+              <div class="mstep" id="ms1"><span class="snum">1</span><div><h3>Perfil do Facebook</h3><p>Use um perfil com acesso de administrador à BM.</p><div id="fb-area"></div></div></div>
+              <div class="mstep" id="ms2"><span class="snum">2</span><div><h3>Business Manager e contas de anúncio</h3><p>Escolha a BM e marque as contas que vão receber os eventos.</p>
+                <div class="row2"><div class="field"><label for="fb-bm">Business Manager</label><select class="sel" id="fb-bm"></select></div><div class="field"><label for="fb-pixel">Pixel / conjunto de dados</label><select class="sel" id="fb-pixel"></select></div></div>
+                <div class="acc-list" id="fb-accs" style="margin-top:12px"></div></div></div>
+              <div class="mstep" id="ms3"><span class="snum">3</span><div><h3>Pixel e token</h3><p>O token da API de Conversões é gerado no Gerenciador de Eventos, em Configurações do pixel.</p>
+                <div class="row2"><div class="field"><label for="co-pixel">ID do pixel</label><input class="inp mono" id="co-pixel" data-k="pixel" inputmode="numeric"></div>
+                <div class="field"><label for="co-token">Token de acesso (API de Conversões)</label><div class="pw"><input class="inp mono" type="password" id="co-token" data-k="token" autocomplete="off"><button class="btn2" type="button" id="tk-show">Mostrar</button></div></div></div></div></div>
+              <div class="mstep" id="ms4"><span class="snum">4</span><div><h3>Envio de eventos</h3><p>Os eventos de cada etapa são configurados em Jornada de compra.</p>
+                <div class="tg-row"><div><b>Enviar eventos quando a conversa mudar de etapa</b><span>Ex.: Em atendimento envia Lead, Venda realizada envia Purchase.</span></div><input type="checkbox" class="sw-tg" id="co-auto" data-k="auto"></div>
+                <div class="tg-row"><div><b>Enviar o valor da venda no fechamento</b><span>O valor informado na conversa vai no evento, em reais (BRL).</span></div><input type="checkbox" class="sw-tg" id="co-value" data-k="value"></div>
+                <div class="tg-row"><div><b>Disparar pixel para conversas não rastreadas</b><span>Envia os eventos também para quem chegou sem anúncio.</span></div><input type="checkbox" class="sw-tg" id="co-untr" data-k="untr"></div>
+                <div class="row2" style="margin-top:6px"><div class="field"><label for="co-test">Código de teste (opcional)</label><input class="inp mono" id="co-test" data-k="test" placeholder="TEST12345"></div>
+                <div class="field" style="justify-content:flex-end"><button class="btn2" type="button" id="fb-test" style="align-self:flex-start">Enviar evento de teste</button></div></div>
+                <div class="result" id="fb-res" hidden style="margin-top:10px"></div>
+              </div></div>
+            </div>
+            <button class="btn" type="button" id="meta-done" style="margin-top:6px">Concluir</button>
+          </div>
+          <details class="more"><summary>Últimos eventos enviados</summary>
+            <div class="tbl-wrap" style="margin-top:8px"><table class="log"><thead><tr><th>Quando</th><th>Contato</th><th>Etapa</th><th>Evento</th><th class="n">Valor</th><th>Status</th></tr></thead><tbody id="fb-log"></tbody></table></div>
+          </details>
+        </div>
+
+        <div class="panel icard">
+          <div class="ch"><h2><svg class="pm" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="#111"/><rect x="7" y="7" width="10" height="10" rx="2" fill="#ff5a1f"/></svg> Pixel do Focus Tracking <span class="status" id="px-st"><i></i><span></span></span></h2><div style="display:flex;gap:6px"><button class="mini" type="button" id="px-check">Verificar instalação</button><button class="mini" type="button" id="px-toggle">Ver código</button></div></div>
+          <p class="hint" style="margin:0">Instale em todas as páginas do site para os links rastreados levarem gclid, fbclid e UTMs. Código da conta: <span class="mono" id="px-acc"></span></p>
+          <div id="px-body" hidden style="display:flex;flex-direction:column;gap:12px">
+            <div class="seg" id="px-tab" style="align-self:flex-start">
+              <button data-t="site" aria-pressed="true">Direto no site</button>
+              <button data-t="gtm" aria-pressed="false">Google Tag Manager</button>
+            </div>
+            <p style="margin:0;font-size:13px" id="px-how"></p>
+            <div class="copyrow"><pre class="code" id="px-code" style="max-height:none"></pre><button class="btn2" type="button" data-copy="px-code" style="align-self:flex-start">Copiar</button></div>
           </div>
         </div>
-        <div class="warn">A conexão por QR code usa uma biblioteca não oficial e pode levar ao banimento do número. A alternativa oficial é a WhatsApp Cloud API.</div>
-      </div>
-
-      <div class="panel card-pad full">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Pixel do Focus Tracking</h2><span class="status" id="px-st"><i></i><span></span></span></div>
-        <p class="hint">Instale em todas as páginas do site. Ele guarda gclid, fbclid e UTMs de quem chega pelo anúncio e passa essas informações para os seus links rastreados, para cada conversa sair com a origem certa.</p>
-        <div class="seg" id="px-tab" style="align-self:flex-start">
-          <button data-t="site" aria-pressed="true">Direto no site</button>
-          <button data-t="gtm" aria-pressed="false">Google Tag Manager</button>
-        </div>
-        <p style="margin:0;font-size:13px" id="px-how"></p>
-        <div class="copyrow"><pre class="code" id="px-code" style="max-height:none"></pre><button class="btn2" type="button" data-copy="px-code" style="align-self:flex-start">Copiar</button></div>
-        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><button class="btn2" type="button" id="px-check">Verificar instalação</button><span style="font-size:12.5px;color:var(--muted)">Código da conta: <span class="mono" id="px-acc"></span></span></div>
-      </div>
-
-      <div class="panel card-pad full" style="flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap">
-        <div><h2>Mensagens rastreadas</h2><p style="margin:4px 0 0;color:var(--muted);font-size:13px">As mensagens modelo e os links de WhatsApp com código oculto ficam em Mensagens rastreadas. Elas usam o número acima.</p></div>
-        <button class="btn2" type="button" onclick="location.hash='links'">Abrir Mensagens rastreadas</button>
-      </div>
-
-      <div class="panel card-pad full">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="display:flex;align-items:center;gap:8px"><svg class="pm" viewBox="0 0 24 24"><path d="M3.5 15.5c0-4 2-8 4.4-8 2.6 0 4.2 4.5 6 7.3 1.3 2 2.4 2.7 3.6 2.7 1.8 0 3-1.6 3-4.1 0-3.4-1.8-5.9-3.8-5.9-2.4 0-4.2 3.3-5.5 5.6-1.6 2.8-2.9 4.4-4.6 4.4-1.8 0-3.1-1.6-3.1-2z" fill="none" stroke="#1877f2" stroke-width="2.2" stroke-linejoin="round"/></svg> Meta Ads e API de Conversões</h2><span class="status" id="fb-st"><i></i><span></span></span></div>
-        <p class="hint">Conecte o perfil do Facebook para liberar as BMs, contas e pixels. Assim cada etapa da jornada envia o evento ligado a ela para a campanha, com o valor da venda no fechamento.</p>
-        <div class="steps-meta">
-          <div class="mstep" id="ms1"><span class="snum">1</span><div><h3>Perfil do Facebook</h3><p>Use um perfil com acesso de administrador à BM.</p><div id="fb-area"></div></div></div>
-          <div class="mstep" id="ms2"><span class="snum">2</span><div><h3>Business Manager e contas de anúncio</h3><p>Escolha a BM e marque as contas que vão receber os eventos.</p>
-            <div class="row2"><div class="field"><label for="fb-bm">Business Manager</label><select class="sel" id="fb-bm"></select></div><div class="field"><label for="fb-pixel">Pixel / conjunto de dados</label><select class="sel" id="fb-pixel"></select></div></div>
-            <div class="acc-list" id="fb-accs" style="margin-top:12px"></div></div></div>
-          <div class="mstep" id="ms3"><span class="snum">3</span><div><h3>Pixel e token</h3><p>O token da API de Conversões é gerado no Gerenciador de Eventos, em Configurações do pixel.</p>
-            <div class="row2"><div class="field"><label for="co-pixel">ID do pixel</label><input class="inp mono" id="co-pixel" data-k="pixel" inputmode="numeric"></div>
-            <div class="field"><label for="co-token">Token de acesso (API de Conversões)</label><div class="pw"><input class="inp mono" type="password" id="co-token" data-k="token" autocomplete="off"><button class="btn2" type="button" id="tk-show">Mostrar</button></div></div></div></div></div>
-          <div class="mstep" id="ms4"><span class="snum">4</span><div><h3>Envio de eventos</h3><p>Os eventos de cada etapa são configurados em Jornada de compra.</p>
-            <div class="tg-row"><div><b>Enviar eventos quando a conversa mudar de etapa</b><span>Ex.: Em atendimento envia Lead, Venda realizada envia Purchase.</span></div><input type="checkbox" class="sw-tg" id="co-auto" data-k="auto"></div>
-            <div class="tg-row"><div><b>Enviar o valor da venda no fechamento</b><span>O valor informado na conversa vai no evento, em reais (BRL).</span></div><input type="checkbox" class="sw-tg" id="co-value" data-k="value"></div>
-            <div class="row2" style="margin-top:6px"><div class="field"><label for="co-test">Código de teste (opcional)</label><input class="inp mono" id="co-test" data-k="test" placeholder="TEST12345"></div>
-            <div class="field" style="justify-content:flex-end"><button class="btn" type="button" id="fb-test" style="align-self:flex-start">Enviar evento de teste</button></div></div>
-            <div class="result" id="fb-res" hidden></div>
-          </div></div>
-        </div>
-        <div>
-          <span class="flabel2">Últimos eventos enviados</span>
-          <div class="tbl-wrap" style="margin-top:8px"><table class="log"><thead><tr><th>Quando</th><th>Contato</th><th>Etapa</th><th>Evento</th><th class="n">Valor</th><th>Status</th></tr></thead><tbody id="fb-log"></tbody></table></div>
-        </div>
-      </div>
-
-      <div class="panel card-pad full">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2 style="display:flex;align-items:center;gap:8px"><svg class="pm" viewBox="0 0 24 24"><rect x="9.5" y="2" width="6" height="19" rx="3" transform="rotate(30 12.5 11.5)" fill="#4285f4"/><rect x="3.5" y="5" width="6" height="15" rx="3" transform="rotate(-30 6.5 12.5)" fill="#fbbc04"/><circle cx="5.5" cy="18.5" r="3" fill="#34a853"/></svg> Google Ads</h2><span class="status" id="g-st"><i></i><span></span></span></div>
-        <p class="hint">Conecte a conta Google para puxar as ações de conversão e enviar conversões offline pelo gclid de cada conversa.</p>
-        <div id="g-area"></div>
       </div>
     </div>
     <p class="note">Protótipo: as conexões são simuladas e os dados ficam salvos só neste navegador.</p>
@@ -929,34 +956,52 @@ function doSync(pl,btn){btn.disabled=true;btn.textContent="Sincronizando…";set
 $("#sync-meta").onclick=e=>doSync("meta",e.currentTarget);$("#sync-google").onclick=e=>doSync("google",e.currentTarget);
 
 // ---------- empresa ----------
-const DEF_CO={name:"Clínica Focus",seg:"Estética",site:"clinicafocus.com.br",phone:"+55 11 9 4821-3307",tpl:"Olá! Vim pelo site e quero saber mais sobre a avaliação. {codigo}",pixel:"",token:"",auto:true,value:true,test:"",wa:"off",fb:false,bm:"",accs:[],px:"",g:false,gacc:"",logo:""};
+const DEF_CO={name:"Clínica Focus",seg:"Estética",site:"clinicafocus.com.br",phone:"+55 11 9 4821-3307",tpl:"Olá! Vim pelo site e quero saber mais sobre a avaliação. {codigo}",pixel:"",token:"",auto:true,value:true,untr:false,test:"",wa:"off",fb:false,bm:"",accs:[],px:"",g:false,gacc:"",logo:""};
 let co;try{co=Object.assign({},DEF_CO,JSON.parse(localStorage.getItem("ft-company")||"{}"))}catch(e){co=Object.assign({},DEF_CO)}
 let coT;const saveCo=()=>{try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}const sv=$("#co-saved");sv.hidden=false;clearTimeout(coT);coT=setTimeout(()=>sv.hidden=true,1500)};
 const BMS=[{id:"bm1",n:"Focus Assessoria (BM principal)",accs:[["act_1029384756","Clínica Focus | Conta 01"],["act_5647382910","Clínica Focus | Remarketing"]],px:[["1234567890123456","Pixel Clínica Focus"],["6543210987654321","Pixel Site Antigo"]]},{id:"bm2",n:"Clínica Focus Ltda",accs:[["act_8899001122","Conta reserva"]],px:[["1122334455667788","Conjunto de dados Clínica"]]}];
 let qrTimer;
 function setSt(id,cls,txt){const el=$(id);el.className="status "+cls;el.querySelector("span").textContent=txt}
+const initials=()=>esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
+function logoUI(){["#logo-box","#logo-box2"].forEach(id=>$(id).innerHTML=co.logo?`<img src="${co.logo}" alt="Logo da empresa">`:initials())}
+function basicUI(){$("#bv-name").textContent=co.name||"Sem nome";$("#bv-phone").textContent=co.phone||"Não informado";$("#bv-seg").textContent=co.seg||"—";$("#bv-site").textContent=co.site||"—"}
+function basicEdit(on){$("#basic-view").hidden=on;$("#basic-edit").hidden=!on;$("#basic-btn").hidden=on;if(on)$("#co-name").focus();else{basicUI();waUI()}}
+$("#basic-btn").onclick=()=>basicEdit(true);$("#basic-done").onclick=()=>basicEdit(false);
+function metaEdit(on){$("#meta-view").hidden=on;$("#meta-edit").hidden=!on;$("#meta-btn").hidden=on;if(!on)metaSum()}
+$("#meta-btn").onclick=()=>metaEdit(true);$("#meta-done").onclick=()=>metaEdit(false);
+function metaSum(){const bm=BMS.find(b=>b.id===co.bm)||BMS[0];const accs=bm.accs.filter(a=>co.accs.includes(a[0]));
+  const yn=v=>`<span class="yn ${v?"y":"n"}">${v?"Sim":"Não"}</span>`;
+  const tok=co.token?(co.token.length>24?co.token.slice(0,14)+"••••••••"+co.token.slice(-6):co.token.replace(/./g,"•")):"";
+  $("#meta-view").innerHTML=`<div class="kv"><span>Pixel do Meta Ads</span><b class="mono">${esc(co.pixel||"Não configurado")}</b></div>
+   <div class="kv"><span>Disparar pixel para conversas não rastreadas</span>${yn(co.untr)}</div>
+   <div class="kv"><span>Enviar eventos ao mudar de etapa</span>${yn(co.auto)}</div>
+   <div class="kv"><span>Enviar valor da venda no fechamento</span>${yn(co.value)}</div>
+   <div class="kv full"><span>Token de conversão da API</span>${tok?`<div class="tokbox">${esc(tok)}</div>`:"<b>Não informado</b>"}</div>
+   <div class="kv full"><span>Contas de anúncio associadas</span>${co.fb?(accs.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">${accs.map(a=>`<span class="chip">${PM}${esc(a[1])}</span>`).join("")}</div>`:"<b>Nenhuma conta marcada ainda.</b>"):`<b>O Meta Ads não está conectado a esta conta.</b><button class="mini" type="button" id="meta-connect" style="margin-top:8px;width:max-content">Conectar Meta Ads</button>`}</div>`;
+  const mc=$("#meta-connect");if(mc)mc.onclick=()=>{metaEdit(true);$("#fb-on")&&$("#fb-on").click()}}
 function company(){
   document.querySelectorAll("#v-empresa [data-k]").forEach(el=>{const k=el.dataset.k;if(el.type==="checkbox")el.checked=!!co[k];else el.value=co[k]||""});
-  $("#logo-box").innerHTML=co.logo?`<img src="${co.logo}" alt="Logo da empresa">`:esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
-  waUI();fbUI();gUI();pxUI();
+  logoUI();waUI();fbUI();gUI();pxUI();basicUI();
 }
 document.querySelectorAll("#v-empresa [data-k]").forEach(el=>{el.addEventListener(el.type==="checkbox"?"change":"input",()=>{co[el.dataset.k]=el.type==="checkbox"?el.checked:el.value;saveCo();
-if(el.dataset.k==="name"&&!co.logo)$("#logo-box").textContent=(co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();if(el.dataset.k==="phone")waUI()})});
+if(el.dataset.k==="name"&&!co.logo)logoUI()})});
 $("#logo-file").onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.size>1048576){$("#logo-file").value="";$("#logo-box").textContent="1 MB+";return}
   const r=new FileReader();r.onload=()=>{co.logo=r.result;saveCo();company()};r.readAsDataURL(f)};
 $("#logo-rm").onclick=()=>{co.logo="";$("#logo-file").value="";saveCo();company()};
-function waUI(){clearInterval(qrTimer);const a=$("#wa-actions");
-  if(co.wa==="on"){setSt("#wa-st","ok","Conectado");$("#qr-wrap").hidden=true;a.innerHTML=`<span style="font-size:13px;align-self:center">Conectado a <b class="mono">${esc(co.phone)}</b></span><button class="btn2" id="wa-off" type="button">Desconectar</button>`;$("#wa-off").onclick=()=>{co.wa="off";saveCo();waUI()}}
-  else if(co.wa==="qr"){setSt("#wa-st","wait","Aguardando leitura");a.innerHTML=`<button class="btn2" id="wa-new" type="button">Gerar novo código</button>`;$("#wa-new").onclick=genQR;$("#qr-wrap").hidden=false;let t=45;const tick=()=>{$("#qr-exp").textContent=t>0?`O código expira em ${t} s`:"O código expirou. Gere um novo.";t--;if(t<-1)clearInterval(qrTimer)};tick();qrTimer=setInterval(tick,1000)}
-  else{setSt("#wa-st","","Desconectado");$("#qr-wrap").hidden=true;a.innerHTML=`<button class="btn" id="wa-gen" type="button">Gerar QR code</button>`;$("#wa-gen").onclick=genQR}
-  const dot=document.querySelector(".wa");if(dot)dot.lastChild.textContent=co.wa==="on"?"WhatsApp conectado":"WhatsApp desconectado",dot.querySelector(".conn-dot").style.background=co.wa==="on"?"var(--accent)":"var(--faint)";
+function waUI(){clearInterval(qrTimer);const box=$("#wa-box"),off=$("#wa-off-wrap");off.innerHTML="";
+  const chk='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>';
+  if(co.wa==="on"){box.className="wa-box on";box.innerHTML=chk+"WhatsApp conectado";off.innerHTML=`<button class="danger" id="wa-off" type="button">Desconectar WhatsApp</button>`;$("#wa-off").onclick=()=>{co.wa="off";saveCo();waUI()}}
+  else if(co.wa==="qr"){box.className="wa-box qr";box.innerHTML=`<svg class="qr" viewBox="0 0 29 29" id="qr" aria-label="QR code ilustrativo"></svg><small>WhatsApp, Aparelhos conectados, Conectar um aparelho</small><small id="qr-exp"></small><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><button class="btn2 sm" id="qr-done" type="button">Simular leitura</button><button class="btn2 sm" id="wa-new" type="button">Novo código</button></div>`;
+    drawQR();$("#qr-done").onclick=()=>{co.wa="on";saveCo();waUI()};$("#wa-new").onclick=genQR;
+    let t=45;const tick=()=>{const e=$("#qr-exp");if(e)e.textContent=t>0?`O código expira em ${t} s`:"O código expirou. Gere um novo.";t--;if(t<-1)clearInterval(qrTimer)};tick();qrTimer=setInterval(tick,1000)}
+  else{box.className="wa-box off";box.innerHTML=`WhatsApp desconectado<button class="btn" id="wa-gen" type="button">Gerar QR code</button>`;$("#wa-gen").onclick=genQR}
+  const dot=document.querySelector(".wa");if(dot){dot.lastChild.textContent=co.wa==="on"?"WhatsApp conectado":"WhatsApp desconectado";dot.querySelector(".conn-dot").style.background=co.wa==="on"?"var(--accent)":"var(--faint)"}
 }
-function genQR(){if(!co.phone||co.phone.replace(/\D/g,"").length<12){$("#co-phone").focus();$("#co-phone").setCustomValidity("Informe o número com DDI e DDD");$("#co-phone").reportValidity();return}$("#co-phone").setCustomValidity("");drawQR();co.wa="qr";waUI()}
-$("#qr-done").onclick=()=>{co.wa="on";saveCo();waUI()};
+function genQR(){if(!co.phone||co.phone.replace(/\D/g,"").length<12){basicEdit(true);$("#co-phone").focus();$("#co-phone").setCustomValidity("Informe o número com DDI e DDD");$("#co-phone").reportValidity();return}$("#co-phone").setCustomValidity("");co.wa="qr";waUI()}
 $("#tk-show").onclick=e=>{const i=$("#co-token");i.type=i.type==="password"?"text":"password";e.currentTarget.textContent=i.type==="password"?"Mostrar":"Ocultar"};
-function fbUI(){
-  if(co.fb){setSt("#fb-st","ok","Perfil conectado");$("#fb-area").innerHTML=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="av" style="width:28px;height:28px">VB</span><span style="font-size:13.5px">Conectado como <b>Vinicius Belchior</b></span><button class="btn2" id="fb-off" type="button">Desconectar</button></div>`;$("#fb-off").onclick=()=>{co.fb=false;saveCo();fbUI()}}
-  else{setSt("#fb-st","","Não conectado");$("#fb-area").innerHTML=`<button class="fb-btn" id="fb-on" type="button">Continuar com o Facebook</button>`;$("#fb-on").onclick=e=>{e.currentTarget.textContent="Conectando…";setTimeout(()=>{co.fb=true;if(!co.bm)co.bm="bm1";saveCo();fbUI()},700)}}
+function fbUI(){setTimeout(metaSum);
+  if(co.fb){setSt("#fb-st","ok","Conectado");$("#fb-area").innerHTML=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="av" style="width:28px;height:28px">VB</span><span style="font-size:13.5px">Conectado como <b>Vinicius Belchior</b></span><button class="btn2" id="fb-off" type="button">Desconectar</button></div>`;$("#fb-off").onclick=()=>{co.fb=false;saveCo();fbUI()}}
+  else{setSt("#fb-st","wait","Desconectado");$("#fb-area").innerHTML=`<button class="fb-btn" id="fb-on" type="button">Continuar com o Facebook</button>`;$("#fb-on").onclick=e=>{e.currentTarget.textContent="Conectando…";setTimeout(()=>{co.fb=true;if(!co.bm)co.bm="bm1";saveCo();fbUI()},700)}}
   ["#ms2","#ms3","#ms4"].forEach(id=>$(id).classList.toggle("locked",!co.fb));
   const bm=BMS.find(b=>b.id===co.bm)||BMS[0];
   $("#fb-bm").innerHTML=BMS.map(b=>`<option value="${b.id}" ${b===bm?"selected":""}>${esc(b.n)}</option>`).join("");
@@ -978,10 +1023,11 @@ $("#fb-test").onclick=()=>{const tk=$("#co-token");if(!co.pixel){$("#co-pixel").
   const ev=evById(stages[closeIdx()].meta)||{name:"Purchase"};const t=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   $("#fb-res").hidden=false;$("#fb-res").innerHTML=`<span class="ok-t">Evento de teste recebido.</span> ${esc(ev.name)} com valor R$ 1,00 chegou ao pixel <span class="mono">${esc(co.pixel)}</span>${co.test?` com o código <span class="mono">${esc(co.test)}</span>`:""}. Confira em Gerenciador de Eventos, aba Eventos de teste.`;
   testLog.unshift([new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" "+t,"Evento de teste",{name:stages[closeIdx()].name},ev,"1,00","Teste recebido"]);fbLog()};
-function gUI(){
-  if(co.g){setSt("#g-st","ok","Conta conectada");$("#g-area").innerHTML=`<div class="row2"><div class="field"><label for="g-acc">Conta de anúncios</label><select class="sel" id="g-acc"><option value="482-193-5567" ${co.gacc==="482-193-5567"?"selected":""}>Clínica Focus · 482-193-5567</option><option value="901-334-2210" ${co.gacc==="901-334-2210"?"selected":""}>Focus Assessoria (MCC) · 901-334-2210</option></select></div><div class="field" style="justify-content:flex-end"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn2" type="button" onclick="location.hash='eventos'">Ver ações de conversão</button><button class="btn2" type="button" id="g-off">Desconectar</button></div></div></div>`;
-    $("#g-acc").onchange=e=>{co.gacc=e.target.value;saveCo()};$("#g-off").onclick=()=>{co.g=false;saveCo();gUI()}}
-  else{setSt("#g-st","","Não conectado");$("#g-area").innerHTML=`<button class="g-btn" id="g-on" type="button">${PG}Conectar conta Google</button>`;$("#g-on").onclick=()=>{co.g=true;co.gacc=co.gacc||"482-193-5567";saveCo();gUI()}}}
+function gUI(){$("#g-hint").hidden=co.g;
+  if(co.g){setSt("#g-st","ok","Conectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-off">Desconectar</button>`;$("#g-off").onclick=()=>{co.g=false;saveCo();gUI()};
+    $("#g-area").innerHTML=`<div class="vgrid"><div class="field"><label for="g-acc">Conta de anúncios</label><select class="sel" id="g-acc"><option value="482-193-5567" ${co.gacc==="482-193-5567"?"selected":""}>Clínica Focus · 482-193-5567</option><option value="901-334-2210" ${co.gacc==="901-334-2210"?"selected":""}>Focus Assessoria (MCC) · 901-334-2210</option></select></div><div class="kv"><span>Ações de conversão</span><b>${events.filter(e=>e.plat==="google").length} sincronizadas · <button class="link" type="button" onclick="location.hash='eventos'">ver eventos</button></b></div></div>`;
+    $("#g-acc").onchange=e=>{co.gacc=e.target.value;saveCo()}}
+  else{setSt("#g-st","wait","Desconectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-on">Conectar</button>`;$("#g-area").innerHTML="";$("#g-on").onclick=()=>{co.g=true;co.gacc=co.gacc||"482-193-5567";saveCo();gUI()}}}
 
 // ---------- mensagens rastreadas ----------
 // Código oculto: ID do clique (24 bits, sequencial por empresa) em base 4, 12 caracteres invisíveis de tamanho fixo no fim da mensagem.
@@ -1066,8 +1112,9 @@ const pxSnippet=()=>`<script>
 </`+`script>`;
 function pxUI(){$("#px-code").textContent=pxSnippet();$("#px-acc").textContent=co.acct;
   $("#px-how").innerHTML=pxTab==="site"?"Cole o código logo após a abertura da tag <span class=\"mono\">&lt;body&gt;</span> em todas as páginas.":"No GTM: <b>Tags</b>, <b>Nova</b>, tipo <b>HTML personalizado</b>. Cole o código, escolha o acionador <b>All Pages</b> (todas as páginas), salve e clique em <b>Enviar</b> para publicar o contêiner.";
-  if(co.pxOk)setSt("#px-st","ok",`Detectado em ${co.site||"seu site"}`);else setSt("#px-st","","Ainda não detectado")}
+  if(co.pxOk)setSt("#px-st","ok",`Detectado em ${co.site||"seu site"}`);else setSt("#px-st","wait","Não detectado")}
 seg("#px-tab","t",v=>{pxTab=v;pxUI()});
+$("#px-toggle").onclick=e=>{const b=$("#px-body");b.hidden=!b.hidden;e.currentTarget.textContent=b.hidden?"Ver código":"Ocultar código"};
 $("#px-check").onclick=e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Verificando…";setTimeout(()=>{co.pxOk=true;saveCo();pxUI();b.disabled=false;b.textContent="Verificar instalação"},900)};
 
 board();waUI();show(location.hash.slice(1)||"painel");
