@@ -591,6 +591,18 @@ pre.code{white-space:pre;margin:0;flex:1;min-width:0;line-height:1.5;max-height:
         <div class="warn">A conexão por QR code usa uma biblioteca não oficial e pode levar ao banimento do número. A alternativa oficial é a WhatsApp Cloud API.</div>
       </div>
 
+      <div class="panel card-pad full">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Pixel do Focus Tracking</h2><span class="status" id="px-st"><i></i><span></span></span></div>
+        <p class="hint">Instale em todas as páginas do site. Ele guarda gclid, fbclid e UTMs de quem chega pelo anúncio e passa essas informações para os seus links rastreados, para cada conversa sair com a origem certa.</p>
+        <div class="seg" id="px-tab" style="align-self:flex-start">
+          <button data-t="site" aria-pressed="true">Direto no site</button>
+          <button data-t="gtm" aria-pressed="false">Google Tag Manager</button>
+        </div>
+        <p style="margin:0;font-size:13px" id="px-how"></p>
+        <div class="copyrow"><pre class="code" id="px-code" style="max-height:none"></pre><button class="btn2" type="button" data-copy="px-code" style="align-self:flex-start">Copiar</button></div>
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><button class="btn2" type="button" id="px-check">Verificar instalação</button><span style="font-size:12.5px;color:var(--muted)">Código da conta: <span class="mono" id="px-acc"></span></span></div>
+      </div>
+
       <div class="panel card-pad full" style="flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap">
         <div><h2>Mensagens rastreadas</h2><p style="margin:4px 0 0;color:var(--muted);font-size:13px">As mensagens modelo e os links de WhatsApp com código oculto ficam em Mensagens rastreadas. Elas usam o número acima.</p></div>
         <button class="btn2" type="button" onclick="location.hash='links'">Abrir Mensagens rastreadas</button>
@@ -926,7 +938,7 @@ function setSt(id,cls,txt){const el=$(id);el.className="status "+cls;el.querySel
 function company(){
   document.querySelectorAll("#v-empresa [data-k]").forEach(el=>{const k=el.dataset.k;if(el.type==="checkbox")el.checked=!!co[k];else el.value=co[k]||""});
   $("#logo-box").innerHTML=co.logo?`<img src="${co.logo}" alt="Logo da empresa">`:esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
-  waUI();fbUI();gUI();
+  waUI();fbUI();gUI();pxUI();
 }
 document.querySelectorAll("#v-empresa [data-k]").forEach(el=>{el.addEventListener(el.type==="checkbox"?"change":"input",()=>{co[el.dataset.k]=el.type==="checkbox"?el.checked:el.value;saveCo();
 if(el.dataset.k==="name"&&!co.logo)$("#logo-box").textContent=(co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();if(el.dataset.k==="phone")waUI()})});
@@ -1037,6 +1049,27 @@ document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const el=$("#
   try{navigator.clipboard.writeText(t).then(done,()=>{if(el.select)el.select();else{const r=document.createRange();r.selectNodeContents(el);getSelection().removeAllRanges();getSelection().addRange(r)}})}catch(err){}});
 
 try{const q=new URLSearchParams(location.search);if(q.has("etapa")||q.has("origem")||q.has("de"))applyKF(q)}catch(e){}
+// ---------- pixel do focus tracking ----------
+if(!co.acct){co.acct=(crypto.randomUUID?crypto.randomUUID():"55d52f45-2638-4611-9c53-fe730c34fe17".replace(/[0-9a-f]/g,()=>"0123456789abcdef"[Math.floor(Math.random()*16)]));saveCo()}
+let pxTab="site";
+const pxSnippet=()=>`<script>
+  (function (w, d, src, id) {
+    if (w.ft) return;
+    w.ft = { accountCode: id };
+    var k = d.createElement('script');
+    k.async = true;
+    k.src = src;
+    (d.head || d.getElementsByTagName('head')[0]).appendChild(k);
+  })(window, document,
+     'https://cdn.focustracking.app/ft-1.0.js',
+     '${co.acct}');
+</`+`script>`;
+function pxUI(){$("#px-code").textContent=pxSnippet();$("#px-acc").textContent=co.acct;
+  $("#px-how").innerHTML=pxTab==="site"?"Cole o código logo após a abertura da tag <span class=\"mono\">&lt;body&gt;</span> em todas as páginas.":"No GTM: <b>Tags</b>, <b>Nova</b>, tipo <b>HTML personalizado</b>. Cole o código, escolha o acionador <b>All Pages</b> (todas as páginas), salve e clique em <b>Enviar</b> para publicar o contêiner.";
+  if(co.pxOk)setSt("#px-st","ok",`Detectado em ${co.site||"seu site"}`);else setSt("#px-st","","Ainda não detectado")}
+seg("#px-tab","t",v=>{pxTab=v;pxUI()});
+$("#px-check").onclick=e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Verificando…";setTimeout(()=>{co.pxOk=true;saveCo();pxUI();b.disabled=false;b.textContent="Verificar instalação"},900)};
+
 board();waUI();show(location.hash.slice(1)||"painel");
 })();
 </script>
