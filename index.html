@@ -157,6 +157,11 @@ dd{margin:0;word-break:break-word}
 .ph-pad .hint{margin:0 0 16px;font-size:12.5px;color:var(--muted)}
 .funnel{display:flex;flex-direction:column;align-items:center;gap:6px}
 .fstep{border-radius:7px;text-align:center;padding:10px 12px;min-width:0;transition:width .25s}
+a.fstep{text-decoration:none;cursor:pointer;transition:filter .15s,transform .15s}
+a.fstep:hover{filter:brightness(.94);transform:translateY(-1px)}
+a.fstep:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.kfbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border:1px solid var(--brand);background:var(--brand-soft);border-radius:8px;font-size:13px}
+.kfbar b{font-weight:700}
 .fstep b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fstep span{font-size:13px}
 .tcard{padding:20px;display:flex;gap:16px;align-items:flex-start}
@@ -414,6 +419,7 @@ pre.code{white-space:pre;margin:0;flex:1;min-width:0;line-height:1.5;max-height:
         <button data-o="none" aria-pressed="false"><i class="sw" style="background:var(--none)"></i>Não rastreadas</button>
       </div>
     </div>
+    <div class="kfbar" id="k-fbar" hidden></div>
     <div class="board" id="board"></div>
     <p class="note">Protótipo com dados fictícios.</p>
   </section>
@@ -725,7 +731,7 @@ function kpis(r){
   $("#kpis").innerHTML=tile(null,"Conversas",n(vis),null,`média de ${(vis/(r.length||1)).toFixed(1).replace(".",",")} por dia`)+
     tile("meta","Meta Ads",n(s.meta),"meta",pct(s.meta))+tile("google","Google Ads",n(s.google),"google",pct(s.google))+tile("none","Não rastreadas",n(s.none),"none",pct(s.none))+
     tile(null,"Taxa rastreada",Math.round((s.meta+s.google)/tot*100)+"%",null,"Meta + Google ÷ total","dark");
-  journey(vis,r.length);
+  journey(vis,r.length,r);
   $("#range-lbl").textContent=r.length?`${r[0].d.toLocaleDateString("pt-BR")} a ${r[r.length-1].d.toLocaleDateString("pt-BR")}`:"sem dias no período";
   // campaigns
   const rows=[];["meta","google"].forEach(o=>{if(!on(o))return;CAMPS[o].forEach(([c])=>rows.push({c,o,n:Math.round(s[o]*SHARE[c])}))});
@@ -736,16 +742,20 @@ function kpis(r){
 // ---------- jornada ----------
 const RATES=[.66,.62,.55,.5,.46,.42,.4];
 function reach(base){let v=base;const ci=closeIdx();return stages.map((s,i)=>{if(i>0)v=Math.round(v*(i===ci?.26:RATES[i-1]));return v})}
-function funnelHTML(base){
+function funnelHTML(base,href){
   const vals=reach(base),n=stages.length,b0=vals[0]||1,ci=closeIdx();
   return stages.map((s,i)=>{const t=n>1?i/(n-1):1,pct=vals[i]/b0*100,mix=Math.round(22+t*78);
-    return `<div class="fstep" style="width:${100-i*(44/Math.max(n-1,1))}%;background:color-mix(in srgb,var(--brand) ${mix}%,#fff);color:${mix>=90?"#fff":"var(--fg)"}"><b>${esc(s.name||"Etapa sem nome")}</b><span class="mono">${pct.toFixed(2).replace(".",",")}% (${vals[i].toLocaleString("pt-BR")})${i===ci?' <span class="tag-close" style="background:'+(mix>=90?"rgba(0,0,0,.28)":"var(--fg)")+'">fechamento</span>':""}</span></div>`}).join("");
+    const tag=href?"a":"div",attr=href?` href="${href(i)}" target="_blank" rel="noopener" data-fi="${i}" title="Ver os contatos que chegaram em ${esc(s.name)}"`:"";
+    return `<${tag} class="fstep"${attr} style="width:${100-i*(44/Math.max(n-1,1))}%;background:color-mix(in srgb,var(--brand) ${mix}%,#fff);color:${mix>=90?"#fff":"var(--fg)"}"><b>${esc(s.name||"Etapa sem nome")}</b><span class="mono">${pct.toFixed(2).replace(".",",")}% (${vals[i].toLocaleString("pt-BR")})${i===ci?' <span class="tag-close" style="background:'+(mix>=90?"rgba(0,0,0,.28)":"var(--fg)")+'">fechamento</span>':""}</span></${tag}>`}).join("");
 }
 function evLine(s){const a=[];const m=evById(s.meta),g=evById(s.google);if(m)a.push("Meta: "+esc(m.name));if(g)a.push("Google: "+esc(g.name));return a.length?`<span class="fev">${a.join(" · ")}</span>`:""}
 function fmtMin(m){if(m<60)return Math.round(m)+" min";if(m<1440){const h=Math.floor(m/60),mm=Math.round(m%60);return h+" h"+(mm?" "+mm+" min":"")}return (m/1440).toFixed(1).replace(".",",")+" dias"}
 const stT={second:true};
-function journey(base,len){
-  $("#funnel").innerHTML=funnelHTML(base);
+function funnelUrl(r,i){const q=new URLSearchParams();if(st.o!=="all")q.set("origem",st.o);if(r.length){q.set("de",iso(r[0].d));q.set("ate",iso(r[r.length-1].d))}q.set("etapa",i);return "?"+q.toString()+"#conversas"}
+function journey(base,len,r){
+  $("#funnel").innerHTML=funnelHTML(base,i=>funnelUrl(r||[],i));
+  document.querySelectorAll("#funnel a.fstep").forEach(a=>a.onclick=e=>{e.preventDefault();let w=null;try{w=window.open(a.href,"_blank")}catch(err){}
+    if(w){try{w.opener=null}catch(err){}}else{applyKF(new URLSearchParams(a.getAttribute("href").split("#")[0].slice(1)));location.hash="conversas"}});
   $("#funnel-hint").textContent=`${stages.length} etapas · conversão de ${stages[0].name} até ${stages[closeIdx()].name}`;
   const k=(len*7+(st.o.length*13))%11;
   const auto=0.8+k*0.07, real=95+k*9;
@@ -815,12 +825,25 @@ $("#d-from").onchange=$("#d-to").onchange=drawChart;
 let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$("#v-painel").hidden)drawChart()},120)});
 
 // ---------- kanban ----------
-let ko="all";
+let ko="all";const kf={from:null,to:null,stage:0};
+const ONAME={meta:"Meta Ads",google:"Google Ads",none:"Não rastreadas"};
+function applyKF(q){const o=q.get("origem");ko=["meta","google","none"].includes(o)?o:"all";
+  kf.from=q.get("de")||null;kf.to=q.get("ate")||null;kf.stage=Math.max(0,Math.min(stages.length-1,parseInt(q.get("etapa")||"0",10)||0));
+  document.querySelectorAll("#k-origin button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.o===ko));
+  kf.active=!!(q.get("de")||q.get("etapa")||o);}
+const inKF=l=>{const d=iso(l.when);return (!kf.from||d>=kf.from)&&(!kf.to||d<=kf.to)&&sIdx(l)>=kf.stage};
+const brD=x=>x?x.split("-").reverse().join("/"):"";
 const sIdx=l=>{const n=stages.length;return l.fixed!=null?Math.min(l.fixed,n-1):(l.si>=3?closeIdx():Math.min(l.si,n-1))};
 function board(){
   const n=stages.length,ci=closeIdx();
-  $("#board").style.gridTemplateColumns=`repeat(${n},minmax(240px,1fr))`;
-  $("#board").innerHTML=stages.map((st,si)=>{const items=leads.filter(l=>sIdx(l)===si&&(ko==="all"||l.origin===ko));
+  const shown=stages.map((st,si)=>[st,si]).filter(([,si])=>si>=kf.stage);
+  $("#board").style.gridTemplateColumns=`repeat(${shown.length},minmax(240px,${shown.length<3?"380px":"1fr"}))`;
+  const bar=$("#k-fbar");
+  if(kf.active){const tot=leads.filter(l=>inKF(l)&&(ko==="all"||l.origin===ko)).length;bar.hidden=false;
+    bar.innerHTML=`<span>Filtro do painel: <b>${ko==="all"?"Todas as origens":ONAME[ko]}</b> · <b>${kf.from?brD(kf.from)+" a "+brD(kf.to):"todo o período"}</b> · chegaram em <b>${esc(stages[kf.stage].name)}</b> · ${tot} contato${tot===1?"":"s"}</span><button class="btn2" id="k-clear" type="button" style="margin-left:auto;padding:6px 12px">Limpar filtros</button>`;
+    $("#k-clear").onclick=()=>{kf.from=kf.to=null;kf.stage=0;kf.active=false;ko="all";document.querySelectorAll("#k-origin button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.o==="all"));try{history.replaceState(null,"",location.pathname+"#conversas")}catch(e){}board()}}
+  else bar.hidden=true;
+  $("#board").innerHTML=shown.map(([st,si])=>{const items=leads.filter(l=>sIdx(l)===si&&inKF(l)&&(ko==="all"||l.origin===ko));
     return `<div class="col"><div class="col-h"><span>${esc(st.name)}${si===ci?'<span class="tag-close">fechamento</span>':""}</span><span class="c">${items.length}</span></div>${items.map(l=>`
       <div class="card"><div class="row"><span class="nm">${esc(l.name)}</span>${badge(l.origin)}</div>
       <span class="ph mono">${l.phone}</span>
@@ -1013,6 +1036,7 @@ $("#lkd-play").onclick=lkPlay;
 document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const el=$("#"+b.dataset.copy),t=el.value||el.textContent;const done=()=>{b.textContent="Copiado";setTimeout(()=>b.textContent="Copiar",1500)};
   try{navigator.clipboard.writeText(t).then(done,()=>{if(el.select)el.select();else{const r=document.createRange();r.selectNodeContents(el);getSelection().removeAllRanges();getSelection().addRange(r)}})}catch(err){}});
 
+try{const q=new URLSearchParams(location.search);if(q.has("etapa")||q.has("origem")||q.has("de"))applyKF(q)}catch(e){}
 board();waUI();show(location.hash.slice(1)||"painel");
 })();
 </script>
