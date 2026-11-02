@@ -254,6 +254,38 @@ dd{margin:0;word-break:break-word}
 .result{font-size:13px;padding:10px 12px;border-radius:7px;background:var(--accent-soft);color:var(--fg)}
 @media (max-width:1000px){.egrid{grid-template-columns:1fr}.form{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.form{grid-template-columns:1fr}.form .wide{grid-column:auto}.row2,.sev{grid-template-columns:1fr}.qrwrap{grid-template-columns:1fr}.sev{flex:1 1 100%;margin-left:38px}}
+/* Mensagens rastreadas */
+.wsteps{display:flex;gap:18px;align-items:center;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.wsteps span{display:flex;align-items:center;gap:8px}
+.wsteps .snum{width:22px;height:22px;font-size:11px;background:var(--line);color:var(--muted)}
+.wsteps .on{color:var(--fg);font-weight:700}.wsteps .on .snum{background:var(--fg);color:#fff}
+.lk-name{font-weight:700;border:0;background:none;padding:0;color:var(--fg);text-align:left}
+.lk-name:hover{color:var(--brand);text-decoration:underline}
+.lk-msg{color:var(--muted);max-width:360px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.back{border:0;background:none;padding:0;color:var(--muted);font-size:13px;display:inline-flex;gap:6px;align-items:center}
+.back:hover{color:var(--fg)}
+.linkbox{display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid var(--line);border-radius:8px}
+.linkbox h3{margin:0;font-size:14.5px;display:flex;align-items:center;gap:8px}
+.linkbox p{margin:0;font-size:12.5px;color:var(--muted)}
+.copyrow{display:flex;gap:8px;align-items:stretch}
+.copyrow .inp{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+pre.code{white-space:pre;margin:0;flex:1;min-width:0;line-height:1.5;max-height:150px;overflow:auto}
+.cnt{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.cnt b{color:var(--fg)}
+.zw{display:inline-block;width:6px;height:13px;margin:0 1px;border-radius:2px;vertical-align:-2px}
+.zw0{background:#8b5cf6}.zw1{background:#f59e0b}.zwb{background:#111;width:3px}
+.phone{width:240px;max-width:100%;border:8px solid #111;border-radius:28px;background:#fff;aspect-ratio:9/17;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:18px;text-align:center;margin:0 auto}
+.phone .lg{width:56px;height:56px;border-radius:14px;background:var(--surface-2);display:grid;place-items:center;font-weight:700;color:var(--muted);overflow:hidden}
+.phone .lg img{width:100%;height:100%;object-fit:contain}
+.phone b{font-size:14px}
+.phone small{font-size:11.5px;color:var(--muted)}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid #dcf8c6;border-top-color:#25d366;animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.prog{width:100%;height:4px;background:var(--surface-2);border-radius:2px;overflow:hidden}
+.prog i{display:block;height:100%;background:#25d366;width:0}
+.dgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:1000px){.dgrid{grid-template-columns:1fr}}
 @media (max-width:1180px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.inner{margin:0 auto}}
 @media (max-width:900px){.how{grid-template-columns:1fr}}
 @media (max-width:780px){
@@ -279,6 +311,7 @@ dd{margin:0;word-break:break-word}
     <button class="nav-item" data-tab="conversas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg>Conversas</button>
     <button class="nav-item" data-tab="jornada"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5z"/></svg>Jornada de compra</button>
     <button class="nav-item" data-tab="eventos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Eventos de conversão</button>
+    <button class="nav-item" data-tab="links"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>Mensagens rastreadas</button>
     <button class="nav-item" data-tab="empresa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M16 9h2a2 2 0 0 1 2 2v10"/><path d="M8 7h4M8 11h4M8 15h4M3 21h18"/></svg>Informações da empresa</button>
     <button class="nav-item" data-tab="como"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17h.01"/></svg>Como funciona</button>
   </nav>
@@ -442,6 +475,77 @@ dd{margin:0;word-break:break-word}
     <p class="note">Protótipo: a sincronização é simulada e os eventos ficam salvos só neste navegador.</p>
   </section>
 
+  <!-- MENSAGENS RASTREADAS -->
+  <section class="view" id="v-links" hidden>
+    <div id="lk-list" class="view" style="gap:18px">
+      <div class="head">
+        <div><h1>Mensagens rastreadas</h1><p class="sub">Links de WhatsApp com código oculto na mensagem. Cada clique vira uma conversa rastreada.</p></div>
+        <button class="btn" id="lk-new-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Nova mensagem rastreada</button>
+      </div>
+      <div class="kpis" id="lk-kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+      <div class="panel"><div class="tbl-wrap"><table>
+        <thead><tr><th>Nome</th><th>Mensagem</th><th class="n">Cliques</th><th class="n">Conversas</th><th class="n">Vendas</th><th class="n">Valor em vendas</th><th>Criado em</th></tr></thead>
+        <tbody id="lk-body"></tbody>
+      </table></div></div>
+      <p class="note">Protótipo: os links e métricas são simulados e ficam salvos só neste navegador.</p>
+    </div>
+
+    <div id="lk-new" class="view" style="gap:18px" hidden>
+      <div><button class="back" id="lk-back1">← Mensagens rastreadas</button></div>
+      <div class="head"><div><h1>Nova mensagem rastreada</h1><p class="sub">Dê um nome e escreva a mensagem que o cliente vai enviar. Na próxima etapa geramos os links.</p></div></div>
+      <div class="wsteps"><span class="on"><i class="snum">1</i>Mensagem</span><span><i class="snum">2</i>Links gerados</span></div>
+      <form class="panel card-pad" id="lk-form" novalidate>
+        <div class="row2">
+          <div class="field"><label for="lk-name">Nome (só para você)</label><input class="inp" id="lk-name" maxlength="60" placeholder="Ex.: Página de vendas, botão principal"></div>
+          <div class="field"><label for="lk-delay">Tempo na página de redirecionamento</label><select class="sel" id="lk-delay"><option value="1">1 segundo</option><option value="2" selected>2 segundos</option><option value="3">3 segundos</option></select></div>
+        </div>
+        <div class="field"><label for="lk-text">Mensagem que o cliente envia</label><textarea class="inp" id="lk-text" rows="4" maxlength="500" placeholder="Ex.: Olá! Vim pelo site e quero agendar minha avaliação."></textarea>
+          <span style="font-size:12px;color:var(--muted)">O código de rastreio é adicionado de forma invisível no fim da mensagem. O cliente vê só o texto acima.</span></div>
+        <div class="field"><span class="flabel2">Número de destino</span><span style="font-size:13.5px"><b class="mono" id="lk-phone"></b> · <button type="button" class="link" onclick="location.hash='empresa'">alterar em Informações da empresa</button></span></div>
+        <span style="font-size:12.5px;color:#b91c1c" id="lk-err" hidden></span>
+        <div style="display:flex;gap:10px"><button class="btn" type="submit">Avançar e gerar links</button><button class="btn2" type="button" id="lk-cancel">Cancelar</button></div>
+      </form>
+    </div>
+
+    <div id="lk-detail" class="view" style="gap:18px" hidden>
+      <div><button class="back" id="lk-back2">← Mensagens rastreadas</button></div>
+      <div class="head"><div><h1 id="lkd-name"></h1><p class="sub" id="lkd-sub"></p></div><span class="status ok" id="lkd-new" hidden><i></i><span>Links gerados</span></span></div>
+      <div class="kpis" id="lkd-kpis"></div>
+      <div class="dgrid">
+        <div class="jcol">
+          <div class="panel card-pad">
+            <h2>Links gerados</h2>
+            <div class="linkbox">
+              <h3><span class="snum" style="width:22px;height:22px;font-size:11px">1</span>Link para botões da página de vendas</h3>
+              <p>Cole no link de qualquer botão (Elementor, WordPress, landing page). Abre a página de redirecionamento e depois o WhatsApp.</p>
+              <div class="copyrow"><input class="inp" id="lkd-url" readonly aria-label="Link para botões"><button class="btn2" type="button" data-copy="lkd-url">Copiar</button></div>
+            </div>
+            <div class="linkbox">
+              <h3><span class="snum" style="width:22px;height:22px;font-size:11px">2</span>Código do botão flutuante de WhatsApp</h3>
+              <p>No Elementor: Configurações do site, Código personalizado, posição "Fim do body". Cria o botão verde fixo no canto da página.</p>
+              <div class="copyrow"><pre class="code" id="lkd-code"></pre><button class="btn2" type="button" data-copy="lkd-code" style="align-self:flex-start">Copiar</button></div>
+            </div>
+          </div>
+          <div class="panel card-pad">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Mensagem que chega no WhatsApp</h2>
+              <label style="display:flex;gap:8px;align-items:center;font-size:13px;cursor:pointer"><input type="checkbox" class="sw-tg" id="lkd-show">Mostrar código oculto</label></div>
+            <div class="wa-prev"><div class="bubble" id="lkd-bubble"></div></div>
+            <div class="cnt" id="lkd-cnt"></div>
+          </div>
+          <div class="panel">
+            <div class="tbl-head"><h2>Últimas conversas deste link</h2><span>com o código identificado</span></div>
+            <div class="tbl-wrap"><table><thead><tr><th>Quando</th><th>Contato</th><th>Etapa</th><th class="n">Valor</th></tr></thead><tbody id="lkd-convs"></tbody></table></div>
+          </div>
+        </div>
+        <div class="panel card-pad">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h2>Página de redirecionamento</h2><button class="btn2" type="button" id="lkd-play">Ver de novo</button></div>
+          <div class="phone" id="lkd-phone"></div>
+          <p style="margin:0;font-size:12px;color:var(--muted);word-break:break-all" id="lkd-dest"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- EMPRESA -->
   <section class="view" id="v-empresa" hidden>
     <div class="head"><div><h1>Informações da empresa</h1><p class="sub">Dados da empresa, conexão do WhatsApp e envio de eventos para as campanhas.</p></div><span class="saved" id="co-saved" hidden>Alterações salvas</span></div>
@@ -482,22 +586,9 @@ dd{margin:0;word-break:break-word}
         <div class="warn">A conexão por QR code usa uma biblioteca não oficial e pode levar ao banimento do número. A alternativa oficial é a WhatsApp Cloud API.</div>
       </div>
 
-      <div class="panel card-pad full">
-        <h2>Mensagem modelo de rastreio</h2>
-        <p class="hint">É a mensagem que já vem escrita quando a pessoa clica no botão de WhatsApp do seu site. O código no final liga a conversa ao clique do anúncio.</p>
-        <div class="row2">
-          <div class="field">
-            <label for="co-tpl">Mensagem</label>
-            <textarea class="inp" id="co-tpl" data-k="tpl" rows="4"></textarea>
-            <span style="font-size:12px;color:var(--muted)">Use <span class="mono">{codigo}</span> onde o código de rastreio deve aparecer. Ele é obrigatório.</span>
-            <span style="font-size:12px;color:#b91c1c" id="tpl-warn" hidden>A mensagem precisa ter {codigo} para o rastreio funcionar.</span>
-          </div>
-          <div class="field"><span class="flabel2">Como o cliente vê</span><div class="wa-prev"><div class="bubble" id="tpl-prev"></div></div></div>
-        </div>
-        <div class="field">
-          <span class="flabel2">Script para o site (antes do &lt;/body&gt;)</span>
-          <div style="display:flex;gap:8px;align-items:stretch"><div class="code" id="snippet" style="flex:1;min-width:0"></div><button class="btn2" id="copy-snip" type="button">Copiar</button></div>
-        </div>
+      <div class="panel card-pad full" style="flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap">
+        <div><h2>Mensagens rastreadas</h2><p style="margin:4px 0 0;color:var(--muted);font-size:13px">As mensagens modelo e os links de WhatsApp com código oculto ficam em Mensagens rastreadas. Elas usam o número acima.</p></div>
+        <button class="btn2" type="button" onclick="location.hash='links'">Abrir Mensagens rastreadas</button>
       </div>
 
       <div class="panel card-pad full">
@@ -546,9 +637,9 @@ dd{margin:0;word-break:break-word}
       </div>
       <div class="panel">
         <h3><span class="badge b-google">Google Ads</span></h3>
-        <p>Um script no site guarda o gclid e as UTMs e coloca um código curto na mensagem pré-preenchida do botão de WhatsApp.</p>
-        <ul><li>Nomes via parâmetros de rastreio do link ou Google Ads API.</li><li>O código liga a conversa ao clique.</li></ul>
-        <div class="code">"Olá, quero saber mais sobre o plano #A7K2"</div>
+        <p>Um script no site guarda o gclid e as UTMs e adiciona um código invisível no fim da mensagem pré-preenchida do link de WhatsApp.</p>
+        <ul><li>Nomes via parâmetros de rastreio do link ou Google Ads API.</li><li>O cliente vê só o texto normal; o código oculto liga a conversa ao clique.</li></ul>
+        <div class="code">"Olá, quero agendar minha avaliação." + 40 caracteres invisíveis</div>
       </div>
       <div class="panel">
         <h3><span class="badge b-none">Não rastreada</span></h3>
@@ -634,11 +725,11 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 // ---------- tabs ----------
-const VIEWS=["painel","conversas","jornada","eventos","empresa","como"];
+const VIEWS=["painel","conversas","jornada","eventos","links","empresa","como"];
 function show(t){if(!VIEWS.includes(t))t="painel";
   document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.dataset.tab===t?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
   VIEWS.forEach(v=>$("#v-"+v).hidden=v!==t);
-  if(t==="painel")drawChart();if(t==="jornada")editor();if(t==="conversas")board();if(t==="eventos")evTable();if(t==="empresa")company();}
+  if(t==="painel")drawChart();if(t==="jornada")editor();if(t==="conversas")board();if(t==="eventos")evTable();if(t==="empresa")company();if(t==="links")lkShow("list");}
 document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.onclick=()=>{location.hash=b.dataset.tab});
 addEventListener("hashchange",()=>show(location.hash.slice(1)));
 
@@ -677,7 +768,7 @@ function reach(base){let v=base;const ci=closeIdx();return stages.map((s,i)=>{if
 function funnelHTML(base){
   const vals=reach(base),n=stages.length,b0=vals[0]||1,ci=closeIdx();
   return stages.map((s,i)=>{const t=n>1?i/(n-1):1,pct=vals[i]/b0*100,mix=Math.round(22+t*78);
-    return `<div class="fstep" style="width:${100-i*(44/Math.max(n-1,1))}%;background:color-mix(in srgb,var(--brand) ${mix}%,#fff);color:${mix>=90?"#fff":"var(--fg)"}"><b>${esc(s.name||"Etapa sem nome")}</b><span class="mono">${pct.toFixed(2).replace(".",",")}% (${vals[i].toLocaleString("pt-BR")})${i===ci?' <span class="tag-close" style="background:'+(mix>=90?"rgba(0,0,0,.28)":"var(--fg)")+'">fechamento</span>':""}</span>${evLine(s)}</div>`}).join("");
+    return `<div class="fstep" style="width:${100-i*(44/Math.max(n-1,1))}%;background:color-mix(in srgb,var(--brand) ${mix}%,#fff);color:${mix>=90?"#fff":"var(--fg)"}"><b>${esc(s.name||"Etapa sem nome")}</b><span class="mono">${pct.toFixed(2).replace(".",",")}% (${vals[i].toLocaleString("pt-BR")})${i===ci?' <span class="tag-close" style="background:'+(mix>=90?"rgba(0,0,0,.28)":"var(--fg)")+'">fechamento</span>':""}</span></div>`}).join("");
 }
 function evLine(s){const a=[];const m=evById(s.meta),g=evById(s.google);if(m)a.push("Meta: "+esc(m.name));if(g)a.push("Google: "+esc(g.name));return a.length?`<span class="fev">${a.join(" · ")}</span>`:""}
 function fmtMin(m){if(m<60)return Math.round(m)+" min";if(m<1440){const h=Math.floor(m/60),mm=Math.round(m%60);return h+" h"+(mm?" "+mm+" min":"")}return (m/1440).toFixed(1).replace(".",",")+" dias"}
@@ -841,10 +932,10 @@ function setSt(id,cls,txt){const el=$(id);el.className="status "+cls;el.querySel
 function company(){
   document.querySelectorAll("#v-empresa [data-k]").forEach(el=>{const k=el.dataset.k;if(el.type==="checkbox")el.checked=!!co[k];else el.value=co[k]||""});
   $("#logo-box").innerHTML=co.logo?`<img src="${co.logo}" alt="Logo da empresa">`:esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
-  waUI();tplUI();fbUI();gUI();
+  waUI();fbUI();gUI();
 }
 document.querySelectorAll("#v-empresa [data-k]").forEach(el=>{el.addEventListener(el.type==="checkbox"?"change":"input",()=>{co[el.dataset.k]=el.type==="checkbox"?el.checked:el.value;saveCo();
-  if(el.dataset.k==="tpl")tplUI();if(el.dataset.k==="name"&&!co.logo)$("#logo-box").textContent=(co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();if(el.dataset.k==="phone")waUI()})});
+if(el.dataset.k==="name"&&!co.logo)$("#logo-box").textContent=(co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();if(el.dataset.k==="phone")waUI()})});
 $("#logo-file").onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.size>1048576){$("#logo-file").value="";$("#logo-box").textContent="1 MB+";return}
   const r=new FileReader();r.onload=()=>{co.logo=r.result;saveCo();company()};r.readAsDataURL(f)};
 $("#logo-rm").onclick=()=>{co.logo="";$("#logo-file").value="";saveCo();company()};
@@ -856,10 +947,6 @@ function waUI(){clearInterval(qrTimer);const a=$("#wa-actions");
 }
 function genQR(){if(!co.phone||co.phone.replace(/\D/g,"").length<12){$("#co-phone").focus();$("#co-phone").setCustomValidity("Informe o número com DDI e DDD");$("#co-phone").reportValidity();return}$("#co-phone").setCustomValidity("");drawQR();co.wa="qr";waUI()}
 $("#qr-done").onclick=()=>{co.wa="on";saveCo();waUI()};
-function tplUI(){const ok=/\{codigo\}/.test(co.tpl||"");$("#tpl-warn").hidden=ok;$("#tpl-prev").textContent=(co.tpl||"").replace(/\{codigo\}/g,"#A7K2");
-  const phone=(co.phone||"").replace(/\D/g,"");$("#snippet").textContent=`<script src="https://cdn.focustracking.app/t.js" data-whatsapp="${phone}" data-mensagem="${(co.tpl||"").replace(/"/g,"&quot;")}"></`+`script>`}
-$("#copy-snip").onclick=e=>{const b=e.currentTarget,t=$("#snippet").textContent;const done=()=>{b.textContent="Copiado";setTimeout(()=>b.textContent="Copiar",1500)};
-  try{navigator.clipboard.writeText(t).then(done,()=>{const r=document.createRange();r.selectNodeContents($("#snippet"));getSelection().removeAllRanges();getSelection().addRange(r)})}catch(err){}};
 $("#tk-show").onclick=e=>{const i=$("#co-token");i.type=i.type==="password"?"text":"password";e.currentTarget.textContent=i.type==="password"?"Mostrar":"Ocultar"};
 function fbUI(){
   if(co.fb){setSt("#fb-st","ok","Perfil conectado");$("#fb-area").innerHTML=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="av" style="width:28px;height:28px">VB</span><span style="font-size:13.5px">Conectado como <b>Vinicius Belchior</b></span><button class="btn2" id="fb-off" type="button">Desconectar</button></div>`;$("#fb-off").onclick=()=>{co.fb=false;saveCo();fbUI()}}
@@ -889,6 +976,67 @@ function gUI(){
   if(co.g){setSt("#g-st","ok","Conta conectada");$("#g-area").innerHTML=`<div class="row2"><div class="field"><label for="g-acc">Conta de anúncios</label><select class="sel" id="g-acc"><option value="482-193-5567" ${co.gacc==="482-193-5567"?"selected":""}>Clínica Focus · 482-193-5567</option><option value="901-334-2210" ${co.gacc==="901-334-2210"?"selected":""}>Focus Assessoria (MCC) · 901-334-2210</option></select></div><div class="field" style="justify-content:flex-end"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn2" type="button" onclick="location.hash='eventos'">Ver ações de conversão</button><button class="btn2" type="button" id="g-off">Desconectar</button></div></div></div>`;
     $("#g-acc").onchange=e=>{co.gacc=e.target.value;saveCo()};$("#g-off").onclick=()=>{co.g=false;saveCo();gUI()}}
   else{setSt("#g-st","","Não conectado");$("#g-area").innerHTML=`<button class="g-btn" id="g-on" type="button">${PG}Conectar conta Google</button>`;$("#g-on").onclick=()=>{co.g=true;co.gacc=co.gacc||"482-193-5567";saveCo();gUI()}}}
+
+// ---------- mensagens rastreadas ----------
+const ZW0="\u200B",ZW1="\u200C",ZWM="\u2060";
+const hideCode=id=>ZWM+Array.from(id).map(c=>c.charCodeAt(0).toString(2).padStart(8,"0")).join("").replace(/0/g,ZW0).replace(/1/g,ZW1)+ZWM;
+const fullMsg=l=>l.text+hideCode(l.id);
+const lkUrl=l=>`https://wa.focustracking.app/r/${l.id}`;
+const brl=v=>"R$ "+v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const DEF_LINKS=[{id:"pv7k2a",name:"Página de vendas · botão principal",text:"Olá! Vim pela página e quero agendar minha avaliação.",delay:2,created:"18/10/2026 10:42",m:[412,96,11,13750]},{id:"fl3m9q",name:"Botão flutuante do site",text:"Oi! Estou no site e queria tirar uma dúvida.",delay:1,created:"22/10/2026 15:08",m:[238,71,6,6480]}];
+let links;try{links=JSON.parse(localStorage.getItem("ft-links"))}catch(e){}
+if(!Array.isArray(links))links=JSON.parse(JSON.stringify(DEF_LINKS));
+const saveLinks=()=>{try{localStorage.setItem("ft-links",JSON.stringify(links))}catch(e){}};
+const rid=()=>{const c="abcdefghjkmnpqrstuvwxyz23456789";let s="";for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s};
+let lkCur=null,lkPlayT;
+function lkShow(v,l){["list","new","detail"].forEach(x=>$("#lk-"+x).hidden=x!==v);clearInterval(lkPlayT);
+  if(v==="list")lkList();if(v==="new"){$("#lk-form").reset();$("#lk-err").hidden=true;$("#lk-phone").textContent=co.phone||"número não cadastrado";$("#lk-name").focus()}
+  if(v==="detail")lkDetail(l);scrollTo(0,0)}
+const mtile=(label,v,extra,dark)=>`<div class="panel kpi ${dark?"dark":""}"><span class="k">${label}</span><span class="v mono">${v}</span><span class="p">${extra}</span></div>`;
+function lkList(){const t=links.reduce((a,l)=>a.map((x,i)=>x+l.m[i]),[0,0,0,0]);
+  $("#lk-kpis").innerHTML=mtile("Cliques nos links",t[0].toLocaleString("pt-BR"),`${links.length} mensagens ativas`)+mtile("Conversas",t[1].toLocaleString("pt-BR"),t[0]?Math.round(t[1]/t[0]*100)+"% dos cliques":"—")+mtile("Vendas registradas",t[2],t[1]?Math.round(t[2]/t[1]*100)+"% das conversas":"—")+mtile("Valor em vendas",brl(t[3]),"pelas mensagens rastreadas",true);
+  $("#lk-body").innerHTML=links.map((l,i)=>`<tr><td><button class="lk-name" data-lk="${i}">${esc(l.name)}</button></td><td><div class="lk-msg">${esc(l.text)}</div></td><td class="n mono">${l.m[0]}</td><td class="n mono">${l.m[1]}</td><td class="n mono">${l.m[2]}</td><td class="n mono">${brl(l.m[3])}</td><td class="dt" style="color:var(--muted);white-space:nowrap">${l.created}</td></tr>`).join("")||`<tr><td colspan="7" style="color:var(--muted)">Nenhuma mensagem ainda. Crie a primeira em Nova mensagem rastreada.</td></tr>`;
+  document.querySelectorAll("#lk-body [data-lk]").forEach(b=>b.onclick=()=>lkShow("detail",links[+b.dataset.lk]))}
+$("#lk-new-btn").onclick=()=>lkShow("new");$("#lk-back1").onclick=$("#lk-cancel").onclick=$("#lk-back2").onclick=()=>lkShow("list");
+$("#lk-form").onsubmit=e=>{e.preventDefault();const name=$("#lk-name").value.trim(),text=$("#lk-text").value.trim(),err=$("#lk-err");
+  if(!name){err.textContent="Dê um nome para a mensagem.";err.hidden=false;$("#lk-name").focus();return}
+  if(!text){err.textContent="Escreva a mensagem que o cliente vai enviar.";err.hidden=false;$("#lk-text").focus();return}
+  if(!co.phone||co.phone.replace(/\D/g,"").length<12){err.textContent="Cadastre o número em Informações da empresa antes de gerar os links.";err.hidden=false;return}
+  const l={id:rid(),name,text,delay:+$("#lk-delay").value,created:nowStr(),m:[0,0,0,0],fresh:true};links.unshift(l);saveLinks();lkShow("detail",l)};
+function lkDetail(l){lkCur=l;const m=l.m;
+  $("#lkd-name").textContent=l.name;$("#lkd-sub").textContent=`Criada em ${l.created} · redireciona em ${l.delay} s para ${co.phone||"o número da empresa"}`;
+  $("#lkd-new").hidden=!l.fresh;
+  $("#lkd-kpis").innerHTML=mtile("Cliques no link",m[0],"pessoas que abriram o link")+mtile("Conversas",m[1],m[0]?Math.round(m[1]/m[0]*100)+"% dos cliques":"aparecem quando o código chegar")+mtile("Vendas registradas",m[2],"conversas na etapa de fechamento")+mtile("Valor em vendas",brl(m[3]),m[2]?"ticket médio "+brl(m[3]/m[2]):"informado na conversa")+mtile("Clique → venda",m[0]?(m[2]/m[0]*100).toFixed(1).replace(".",",")+"%":"—","conversão do link",true);
+  $("#lkd-url").value=lkUrl(l);
+  $("#lkd-code").textContent=`<a href="${lkUrl(l)}" target="_blank" rel="noopener"
+   aria-label="Falar no WhatsApp"
+   style="position:fixed;right:20px;bottom:20px;z-index:9999;
+   width:60px;height:60px;border-radius:50%;background:#25d366;
+   display:flex;align-items:center;justify-content:center;
+   box-shadow:0 4px 14px rgba(0,0,0,.25)">
+  <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff">
+    <path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/>
+  </svg>
+</a>`;
+  lkMsg();
+  const ci=closeIdx(),names=["Juliana Prado","Marcos Leal","Aline Torres","Rodrigo Sá","Paula Nery"];
+  $("#lkd-convs").innerHTML=m[1]?names.slice(0,Math.min(5,m[1])).map((n,i)=>{const st=i%3===0?stages[ci]:stages[Math.min(i%2+1,stages.length-1)];return `<tr><td class="mono">${String(2-Math.floor(i/2)).padStart(2,"0")}/11 ${String(9+i*2).padStart(2,"0")}:${String(10+i*7).padStart(2,"0")}</td><td>${n}</td><td>${esc(st.name)}</td><td class="n mono">${st===stages[ci]?brl(850+i*400):"—"}</td></tr>`}).join(""):`<tr><td colspan="4" style="color:var(--muted)">Nenhuma conversa ainda. Elas aparecem aqui assim que alguém clicar no link e enviar a mensagem.</td></tr>`;
+  lkPlay();
+}
+function lkMsg(){const l=lkCur,show=$("#lkd-show").checked,hid=hideCode(l.id);
+  const vis=Array.from(l.text).length,tot=Array.from(fullMsg(l)).length;
+  $("#lkd-bubble").innerHTML=esc(l.text)+(show?" "+Array.from(hid).map(c=>`<i class="zw ${c===ZW0?"zw0":c===ZW1?"zw1":"zwb"}"></i>`).join(""):"");
+  $("#lkd-cnt").innerHTML=`<span>Caracteres visíveis: <b class="mono">${vis}</b></span><span>Caracteres totais: <b class="mono">${tot}</b></span><span>Código oculto: <b class="mono">${tot-vis}</b> caracteres invisíveis</span>`}
+$("#lkd-show").onchange=lkMsg;
+function lkPlay(){clearInterval(lkPlayT);const l=lkCur,d=l.delay;let t=d;
+  const logo=co.logo?`<img src="${co.logo}" alt="">`:esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
+  const frame=()=>{$("#lkd-phone").innerHTML=t>0?`<div class="lg">${logo}</div><b>Estamos te levando para o atendimento</b><div class="spin"></div><small>${esc(co.name||"")} · abrindo o WhatsApp em ${t} s</small><div class="prog"><i style="width:${(d-t)/d*100}%;transition:width 1s linear"></i></div>`:`<svg width="44" height="44" viewBox="0 0 24 24" fill="#25d366"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/></svg><b>WhatsApp aberto</b><small>Conversa com ${esc(co.phone||"")} e mensagem já escrita</small>`;
+    requestAnimationFrame(()=>{const i=$("#lkd-phone .prog i");if(i)i.style.width=((d-t+1)/d*100)+"%"})};
+  frame();lkPlayT=setInterval(()=>{t--;frame();if(t<=0)clearInterval(lkPlayT)},1000);
+  $("#lkd-dest").textContent=`Depois de ${d} s abre wa.me/${(co.phone||"").replace(/\D/g,"")} com a mensagem já escrita e o código oculto no fim.`}
+$("#lkd-play").onclick=lkPlay;
+document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const el=$("#"+b.dataset.copy),t=el.value||el.textContent;const done=()=>{b.textContent="Copiado";setTimeout(()=>b.textContent="Copiar",1500)};
+  try{navigator.clipboard.writeText(t).then(done,()=>{if(el.select)el.select();else{const r=document.createRange();r.selectNodeContents(el);getSelection().removeAllRanges();getSelection().addRange(r)}})}catch(err){}});
 
 board();waUI();show(location.hash.slice(1)||"painel");
 })();
