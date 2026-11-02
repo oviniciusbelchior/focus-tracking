@@ -1,0 +1,460 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style></head><body>
+<title>Focus Tracking</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: fixed black sidebar (260px) + white content column; single light look matching the Focus Dock identity */
+:root{
+  color-scheme:light;
+  --side:#0b0b0c; --side-2:#1a1a1c; --side-fg:#f2f2f2; --side-muted:#a7a7ab; --side-line:#2a2a2d;
+  --bg:#ffffff; --surface:#ffffff; --surface-2:#f4f4f5; --line:#e6e6e8;
+  --fg:#111113; --muted:#55565c; --faint:#8b8c92;
+  --brand:#ff5a1f; --brand-soft:#fff0ea;
+  --meta:#1f6fe5; --meta-soft:#e8f0fd; --google:#ff8a1f; --google-soft:#fff2e4; --none:#a3a4aa; --none-soft:#f0f0f2;
+  --accent:#18a058; --accent-soft:#e3f5ea;
+  --f-body:Arial,"Helvetica Neue",Helvetica,ui-sans-serif,system-ui,sans-serif;
+  --f-mono:Arial,"Helvetica Neue",Helvetica,sans-serif;
+  --r:10px; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--f-body);font-size:14px;line-height:1.45}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.mono{font-variant-numeric:tabular-nums}
+
+/* Sidebar */
+.app{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh;background:linear-gradient(to right,var(--side) 260px,var(--bg) 260px)}
+.side{background:var(--side);color:var(--side-fg);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:18px 12px 12px max(12px,env(safe-area-inset-left,0px))}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px;padding:6px 10px 18px}
+.logo{width:32px;height:32px;border-radius:8px;background:#fff;display:grid;place-items:center}
+.logo i{width:16px;height:16px;border-radius:3px;background:var(--brand)}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto}
+.grp{display:flex;align-items:center;gap:12px;padding:10px 10px;font-size:15px;color:var(--side-fg)}
+.grp svg{flex:none}
+.grp .chev{margin-left:auto;opacity:.8}
+.sub-nav{margin:0 0 8px 33px;border-left:1px solid var(--side-line);padding-left:4px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;border:0;background:none;text-align:left;padding:9px 12px;border-radius:7px;color:var(--side-muted);font-size:13.5px;width:100%}
+.nav-item:hover{color:var(--side-fg);background:var(--side-2)}
+.nav-item[aria-current="page"]{background:var(--side-2);color:var(--brand)}
+.nav-item.static{cursor:default}
+.nav-item.static:hover{background:none;color:var(--side-muted)}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);margin-left:auto}
+.user{display:flex;align-items:center;gap:10px;background:var(--side-2);border-radius:9px;padding:10px 12px;margin-top:10px}
+.av{width:30px;height:30px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+.user b{display:block;font-weight:500;font-size:14px}
+.user small{color:var(--side-muted);font-size:11px}
+
+/* Main */
+.main{min-width:0;padding-block:28px 48px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.inner{max-width:1340px;margin:0 auto 0 calc(min(150px,6vw))}
+.view{display:flex;flex-direction:column;gap:18px}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+h1{font-size:24px;margin:0 0 4px;letter-spacing:-.01em;font-weight:700}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border:0;border-radius:6px;padding:11px 16px;font-size:14px;font-weight:500}
+.btn:hover{filter:brightness(.95)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.sec-label{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted);margin:10px 0 -4px;text-transform:uppercase}
+
+/* Filters */
+.filters{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.fgroup{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:7px;padding:3px;gap:2px;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 11px;border-radius:5px;font-size:12.5px;color:var(--fg);display:flex;align-items:center;gap:6px}
+.seg button:hover{background:var(--surface-2)}
+.seg button[aria-pressed="true"]{background:var(--fg);color:#fff}
+.sw{width:9px;height:9px;border-radius:2px;display:inline-block}
+.custom{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.custom input{font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg)}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.kpi{padding:20px;display:flex;flex-direction:column;gap:8px}
+.kpi .k{font-size:12.5px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.kpi .v{font-size:23px;font-weight:700;letter-spacing:-.01em}
+.kpi .p{font-size:12px;color:var(--muted)}
+.kpi.off{opacity:.4}
+.kpi.dark{background:var(--side);border-color:var(--side);color:#fff}
+.kpi.dark .k,.kpi.dark .p{color:#d6d6d8}
+
+/* Chart */
+.chart{padding:22px 20px 14px}
+.chart-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;margin-bottom:10px}
+.chart-head h2{font-size:16px;margin:0}
+.chart-head p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--fg)}
+.legend span{display:flex;align-items:center;gap:6px}
+#chart{position:relative;width:100%}
+#chart svg{display:block;width:100%}
+.tip{position:absolute;pointer-events:none;background:var(--side);color:#fff;font-size:12px;padding:8px 10px;border-radius:7px;min-width:150px;transform:translate(-50%,-100%);white-space:nowrap}
+.tip b{display:block;margin-bottom:4px}
+.tip div{display:flex;justify-content:space-between;gap:12px}
+
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:400;padding:10px 20px;border-bottom:1px solid var(--line)}
+td{padding:12px 20px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right}
+.bar{height:6px;border-radius:3px;background:var(--surface-2);min-width:80px}
+.bar i{display:block;height:100%;border-radius:3px}
+.tbl-head{display:flex;justify-content:space-between;align-items:baseline;padding:20px 20px 8px}
+.tbl-head h2{font-size:16px;margin:0}
+.tbl-head span{font-size:12px;color:var(--muted)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap}
+.b-meta{background:var(--meta-soft);color:var(--meta)}
+.b-google{background:var(--google-soft);color:#c75e00}
+.b-none{background:var(--none-soft);color:var(--muted)}
+
+/* Kanban */
+.board{display:grid;grid-template-columns:repeat(4,minmax(240px,1fr));align-items:start;gap:16px;overflow-x:auto;padding-bottom:4px}
+.col{background:var(--surface-2);border-radius:var(--r);padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.col-h{display:flex;justify-content:space-between;align-items:center;padding:2px 4px 4px;font-weight:700;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase}
+.col-h .c{font-size:12px;color:#fff;background:var(--fg);border-radius:999px;min-width:22px;text-align:center;padding:1px 7px;letter-spacing:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.card .row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card .nm{font-weight:700}
+.card .ph{font-size:12.5px;color:var(--muted)}
+.card .cp{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .when{font-size:11.5px;color:var(--faint)}
+.link{border:0;background:none;padding:0;color:var(--brand);font-size:12.5px;font-weight:700}
+.link:hover{text-decoration:underline}
+
+/* Drawer */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--surface);z-index:21;border-left:1px solid var(--line);display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px);transition:transform .2s ease}
+.drawer[hidden]{display:flex!important;transform:translateX(105%);visibility:hidden}
+.d-head{padding:20px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.d-head h3{margin:0 0 2px;font-size:19px}
+.x{border:1px solid var(--line);background:none;border-radius:7px;width:32px;height:32px;font-size:18px;line-height:1}
+.d-body{padding:18px 22px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.d-sec h4{margin:0 0 10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
+dl{display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px 12px;margin:0;font-size:13px}
+dt{color:var(--muted)}
+dd{margin:0;word-break:break-word}
+.msg{background:var(--surface-2);border-radius:10px 10px 10px 2px;padding:10px 12px;font-size:13.5px}
+.msg small{display:block;color:var(--faint);margin-top:4px;font-size:11px}
+
+/* Como funciona */
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.how .panel{padding:20px;display:flex;flex-direction:column;gap:10px}
+.how h3{margin:0;font-size:15px}
+.how p{margin:0;color:var(--muted)}
+.how ul{margin:0;padding-left:18px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:var(--surface-2);padding:8px 10px;border-radius:6px;overflow-x:auto;white-space:nowrap}
+.connect{display:grid;grid-template-columns:auto minmax(0,1fr);gap:24px;padding:22px;align-items:center}
+.qr{width:150px;height:150px;border-radius:8px;background:#fff;padding:10px;border:1px solid var(--line)}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.warn{background:var(--brand-soft);border-left:3px solid var(--brand);border-radius:6px;padding:10px 12px;font-size:13px}
+.note{font-size:12px;color:var(--faint);text-align:center}
+
+@media (max-width:1180px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.inner{margin:0 auto}}
+@media (max-width:900px){.how{grid-template-columns:1fr}}
+@media (max-width:780px){
+  .app{grid-template-columns:1fr;background:var(--bg)}
+  .side{position:sticky;top:0;height:auto;z-index:6;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));padding-top:calc(10px + env(safe-area-inset-top,0px))}
+  .brand{padding:0 0 8px;font-size:16px}
+  .nav{flex-direction:row;overflow-x:auto}
+  .grp,.user,.nav-item.static{display:none}
+  .sub-nav{margin:0;border:0;padding:0;flex-direction:row}
+  .nav-item{white-space:nowrap}
+  .main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .connect{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}}
+</style>
+
+<div class="app">
+<aside class="side">
+  <div class="brand"><span class="logo"><i></i></span>Focus Tracking</div>
+  <nav class="nav" aria-label="Menu">
+    <div class="grp"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Visão geral<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="sub-nav">
+      <button class="nav-item" data-tab="painel"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</button>
+      <button class="nav-item" data-tab="conversas"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg>Conversas</button>
+    </div>
+    <div class="grp"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0z"/><path d="M12 18v4"/></svg>Conexões<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="sub-nav">
+      <span class="nav-item static"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>WhatsApp<span class="conn-dot" title="Conectado"></span></span>
+      <span class="nav-item static"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Meta Ads</span>
+      <span class="nav-item static"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg>Google Ads</span>
+    </div>
+    <div class="grp"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17h.01"/></svg>Ajuda<svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+    <div class="sub-nav">
+      <button class="nav-item" data-tab="como"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><path d="M12 17h.01"/></svg>Como funciona</button>
+    </div>
+  </nav>
+  <div class="user"><span class="av">VB</span><div style="flex:1;min-width:0"><b>Vinicius Belchior</b><small>Proprietário</small></div><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div>
+</aside>
+
+<main class="main"><div class="inner">
+  <!-- PAINEL -->
+  <section class="view" id="v-painel">
+    <div class="head">
+      <div><h1>Painel</h1><p class="sub">Origem das mensagens do WhatsApp · <span id="range-lbl"></span></p></div>
+      <button class="btn" onclick="location.hash='como'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Conectar número</button>
+    </div>
+    <div class="filters">
+      <div class="seg" id="f-period">
+        <button data-p="7" aria-pressed="false">7 dias</button>
+        <button data-p="14" aria-pressed="false">14 dias</button>
+        <button data-p="28" aria-pressed="true">28 dias</button>
+        <button data-p="month" aria-pressed="false">Este mês</button>
+        <button data-p="last" aria-pressed="false">Mês passado</button>
+        <button data-p="custom" aria-pressed="false">Personalizado</button>
+      </div>
+      <div class="custom" id="custom" hidden>
+        <input type="date" id="d-from" aria-label="Data inicial"> até <input type="date" id="d-to" aria-label="Data final">
+      </div>
+      <div class="seg" id="f-origin">
+        <button data-o="all" aria-pressed="true">Todas as origens</button>
+        <button data-o="meta" aria-pressed="false"><i class="sw" style="background:var(--meta)"></i>Meta</button>
+        <button data-o="google" aria-pressed="false"><i class="sw" style="background:var(--google)"></i>Google</button>
+        <button data-o="none" aria-pressed="false"><i class="sw" style="background:var(--none)"></i>Não rastreadas</button>
+      </div>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="panel chart">
+      <div class="chart-head">
+        <div><h2>Mensagens por dia</h2><p id="chart-title">Conversas novas, empilhadas por origem</p></div>
+        <div class="legend">
+          <span><i class="sw" style="background:var(--meta)"></i>Meta Ads</span>
+          <span><i class="sw" style="background:var(--google)"></i>Google Ads</span>
+          <span><i class="sw" style="background:var(--none)"></i>Não rastreadas</span>
+        </div>
+      </div>
+      <div id="chart"></div>
+    </div>
+
+    <div class="sec-label">Campanhas</div>
+    <div class="panel">
+      <div class="tbl-head"><h2>Campanhas que mais trouxeram conversas</h2><span>no período</span></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Campanha</th><th>Canal</th><th class="n">Conversas</th><th style="width:30%">Participação</th></tr></thead>
+        <tbody id="camp"></tbody>
+      </table></div>
+    </div>
+    <p class="note">Protótipo com dados fictícios.</p>
+  </section>
+
+  <!-- CONVERSAS -->
+  <section class="view" id="v-conversas" hidden>
+    <div class="head">
+      <div><h1>Conversas</h1><p class="sub">Cada contato que chegou pelo WhatsApp, com a origem já identificada.</p></div>
+    </div>
+    <div class="filters">
+      <div class="seg" id="k-origin">
+        <button data-o="all" aria-pressed="true">Todas as origens</button>
+        <button data-o="meta" aria-pressed="false"><i class="sw" style="background:var(--meta)"></i>Meta</button>
+        <button data-o="google" aria-pressed="false"><i class="sw" style="background:var(--google)"></i>Google</button>
+        <button data-o="none" aria-pressed="false"><i class="sw" style="background:var(--none)"></i>Não rastreadas</button>
+      </div>
+    </div>
+    <div class="board" id="board"></div>
+    <p class="note">Protótipo com dados fictícios.</p>
+  </section>
+
+  <!-- COMO FUNCIONA -->
+  <section class="view" id="v-como" hidden>
+    <div class="head"><div><h1>Como funciona</h1><p class="sub">Como cada conversa recebe a sua origem.</p></div></div>
+    <div class="how">
+      <div class="panel">
+        <h3><span class="badge b-meta">Meta Ads</span></h3>
+        <p>Anúncios de clique para o WhatsApp mandam junto, na primeira mensagem, o ID do anúncio e o ctwa_clid.</p>
+        <ul><li>Campanha, conjunto e anúncio vêm da Marketing API.</li><li>Não precisa de nada no site.</li></ul>
+        <div class="code">ctwa_clid=ARAkLk3x…Q9 · ad_id=120210487733</div>
+      </div>
+      <div class="panel">
+        <h3><span class="badge b-google">Google Ads</span></h3>
+        <p>Um script no site guarda o gclid e as UTMs e coloca um código curto na mensagem pré-preenchida do botão de WhatsApp.</p>
+        <ul><li>Nomes via parâmetros de rastreio do link ou Google Ads API.</li><li>O código liga a conversa ao clique.</li></ul>
+        <div class="code">"Olá, quero saber mais sobre o plano #A7K2"</div>
+      </div>
+      <div class="panel">
+        <h3><span class="badge b-none">Não rastreada</span></h3>
+        <p>A mensagem chegou sem dados de anúncio e sem código. Pode ser indicação, orgânico, Instagram ou alguém que digitou o número.</p>
+        <ul><li>Continua no kanban normalmente.</li><li>Ajuda a medir o que os anúncios não explicam.</li></ul>
+      </div>
+    </div>
+    <div class="sec-label">Conexão</div>
+    <div class="panel connect">
+      <svg class="qr" viewBox="0 0 29 29" id="qr" aria-label="QR code ilustrativo"></svg>
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <h3 style="margin:0;font-size:16px">Conectar o número</h3>
+        <ol class="steps">
+          <li>Abra o WhatsApp no celular da empresa.</li>
+          <li>Toque em <b>Aparelhos conectados</b> e depois em <b>Conectar um aparelho</b>.</li>
+          <li>Aponte a câmera para o código ao lado.</li>
+        </ol>
+        <div class="warn">A conexão por QR code usa uma biblioteca não oficial. Existe risco de banimento do número. A alternativa oficial é a WhatsApp Cloud API.</div>
+      </div>
+    </div>
+  </section>
+</div></main>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Detalhes da conversa">
+  <div class="d-head"><div><h3 id="d-name"></h3><div class="mono" id="d-phone" style="color:var(--muted);font-size:13px"></div></div><button class="x" id="d-close" aria-label="Fechar">×</button></div>
+  <div class="d-body" id="d-body"></div>
+</aside>
+
+<script>
+(function(){
+// ---------- fake data ----------
+let seed=7; const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const today=new Date(); today.setHours(0,0,0,0);
+const DAY=864e5, N=95;
+const days=[];
+for(let i=N-1;i>=0;i--){
+  const d=new Date(today.getTime()-i*DAY); const wd=d.getDay(); const wk=(wd===0||wd===6)?0.55:1;
+  const trend=1+(N-i)/N*0.25;
+  days.push({d,meta:Math.round((14+rnd()*12)*wk*trend),google:Math.round((8+rnd()*8)*wk*trend),none:Math.round((4+rnd()*6)*wk)});
+}
+const CAMPS={meta:[["Black Friday | CTWA | Conversas","Público quente 30d","Vídeo depoimento 15s"],["Consulta grátis | CTWA","Lookalike 2% clientes","Carrossel antes e depois"],["Remarketing | Visitantes 7d","Visitantes site 7d","Imagem oferta"]],
+  google:[["Pesquisa | Marca","Termos de marca","RSA marca"],["Pesquisa | Clínica perto de mim","Local 5km","RSA localização"],["Performance Max | Leads","Grupo principal","Recursos PMax"]]};
+const SHARE={"Black Friday | CTWA | Conversas":.44,"Consulta grátis | CTWA":.36,"Remarketing | Visitantes 7d":.20,"Pesquisa | Marca":.41,"Pesquisa | Clínica perto de mim":.38,"Performance Max | Leads":.21};
+const KW={"Pesquisa | Marca":"focus clinica","Pesquisa | Clínica perto de mim":"clinica estetica perto de mim","Performance Max | Leads":"—"};
+const NAMES=["Ana Paula Ribeiro","Bruno Carvalho","Camila Souza","Diego Martins","Eduarda Lima","Felipe Rocha","Gabriela Nunes","Henrique Alves","Isabela Costa","João Pedro Santos","Larissa Mendes","Lucas Ferreira","Mariana Oliveira","Natália Gomes","Otávio Barros","Patrícia Duarte","Rafael Teixeira","Renata Moura","Sérgio Pinto","Tatiane Freitas","Vinícius Araújo","Yasmin Cardoso"];
+const FIRST={meta:["Olá! Vi o anúncio e queria saber o valor da avaliação.","Oi, tem horário essa semana?","Quero aproveitar a promoção da Black Friday."],
+  google:["Olá, quero saber mais sobre o plano #","Oi! Vim pelo site, código #","Bom dia, gostaria de agendar. Código #"],
+  none:["Oi, uma amiga me indicou vocês.","Boa tarde, vocês atendem no sábado?","Olá, qual o endereço da clínica?"]};
+const STAGES=["Novo","Em atendimento","Proposta enviada","Fechado"];
+const code=()=>{const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<4;i++)s+=c[Math.floor(rnd()*c.length)];return s};
+const hex=n=>{let s="";const c="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";for(let i=0;i<n;i++)s+=c[Math.floor(rnd()*c.length)];return s};
+const leads=NAMES.map((name,i)=>{
+  const r=rnd(); const origin=r<.5?"meta":r<.8?"google":"none";
+  const when=new Date(today.getTime()-Math.floor(rnd()*9)*DAY+ (8+Math.floor(rnd()*11))*36e5+Math.floor(rnd()*60)*6e4);
+  const L={name,phone:`+55 ${pick(["11","21","31","41","19"])} 9 ${String(1000+Math.floor(rnd()*9000))}-${String(1000+Math.floor(rnd()*9000))}`,origin,when,stage:STAGES[i%4===3&&rnd()<.6?3:Math.floor(rnd()*4)]};
+  if(origin==="meta"){const [c,s,a]=pick(CAMPS.meta);Object.assign(L,{camp:c,set:s,ad:a,clid:"ARA"+hex(22),utm:{source:"facebook",medium:"paid_social",campaign:c.toLowerCase().replace(/[^a-z0-9]+/g,"_")},msg:pick(FIRST.meta)})}
+  else if(origin==="google"){const [c,s,a]=pick(CAMPS.google);const k=code();Object.assign(L,{camp:c,set:s,ad:a,kw:KW[c],code:k,clid:"Cj0KCQiA"+hex(26),utm:{source:"google",medium:"cpc",campaign:c.toLowerCase().replace(/[^a-z0-9]+/g,"_")},msg:pick(FIRST.google)+k})}
+  else L.msg=pick(FIRST.none);
+  return L;
+}).sort((a,b)=>b.when-a.when);
+
+// ---------- helpers ----------
+const fmtD=d=>d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+const fmtFull=d=>d.toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"numeric"})+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const LBL={meta:"Meta Ads",google:"Google Ads",none:"Não rastreada"};
+const badge=o=>`<span class="badge b-${o}">${LBL[o]}</span>`;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+// ---------- tabs ----------
+const VIEWS=["painel","conversas","como"];
+function show(t){if(!VIEWS.includes(t))t="painel";
+  document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.dataset.tab===t?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  VIEWS.forEach(v=>$("#v-"+v).hidden=v!==t);
+  if(t==="painel")drawChart();}
+document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.onclick=()=>{location.hash=b.dataset.tab});
+addEventListener("hashchange",()=>show(location.hash.slice(1)));
+
+// ---------- painel ----------
+const st={p:"28",o:"all",from:null,to:null};
+$("#d-to").value=iso(today);$("#d-from").value=iso(new Date(today.getTime()-20*DAY));
+$("#d-from").min=iso(days[0].d);$("#d-to").max=iso(today);
+function range(){
+  if(st.p==="month")return days.filter(x=>x.d.getMonth()===today.getMonth()&&x.d.getFullYear()===today.getFullYear());
+  if(st.p==="last"){const lm=new Date(today.getFullYear(),today.getMonth()-1,1);return days.filter(x=>x.d.getMonth()===lm.getMonth()&&x.d.getFullYear()===lm.getFullYear())}
+  if(st.p==="custom"){const f=new Date($("#d-from").value+"T00:00"),t=new Date($("#d-to").value+"T00:00");return days.filter(x=>x.d>=f&&x.d<=t)}
+  return days.slice(-Number(st.p));
+}
+const on=k=>st.o==="all"||st.o===k;
+function kpis(r){
+  const s={meta:0,google:0,none:0};r.forEach(x=>{s.meta+=x.meta;s.google+=x.google;s.none+=x.none});
+  const tot=s.meta+s.google+s.none||1;
+  const vis=(on("meta")?s.meta:0)+(on("google")?s.google:0)+(on("none")?s.none:0);
+  const tile=(k,label,v,sw,extra,cls)=>`<div class="panel kpi ${cls||""} ${k&&!on(k)?"off":""}"><span class="k">${sw?`<i class="sw" style="background:var(--${sw})"></i>`:""}${label}</span><span class="v mono">${v}</span><span class="p">${extra}</span></div>`;
+  const pct=v=>Math.round(v/tot*100)+"% do total";
+  const n=v=>v.toLocaleString("pt-BR");
+  $("#kpis").innerHTML=tile(null,"Conversas",n(vis),null,`média de ${(vis/(r.length||1)).toFixed(1).replace(".",",")} por dia`)+
+    tile("meta","Meta Ads",n(s.meta),"meta",pct(s.meta))+tile("google","Google Ads",n(s.google),"google",pct(s.google))+tile("none","Não rastreadas",n(s.none),"none",pct(s.none))+
+    tile(null,"Taxa rastreada",Math.round((s.meta+s.google)/tot*100)+"%",null,"Meta + Google ÷ total","dark");
+  $("#range-lbl").textContent=r.length?`${r[0].d.toLocaleDateString("pt-BR")} a ${r[r.length-1].d.toLocaleDateString("pt-BR")}`:"sem dias no período";
+  // campaigns
+  const rows=[];["meta","google"].forEach(o=>{if(!on(o))return;CAMPS[o].forEach(([c])=>rows.push({c,o,n:Math.round(s[o]*SHARE[c])}))});
+  rows.sort((a,b)=>b.n-a.n);const mx=rows[0]?.n||1;
+  $("#camp").innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.c)}</td><td>${badge(r.o)}</td><td class="n mono">${r.n}</td><td><div class="bar"><i style="width:${r.n/mx*100}%;background:var(--${r.o})"></i></div></td></tr>`).join(""):
+    `<tr><td colspan="4" style="color:var(--muted)">Mensagens não rastreadas não têm campanha associada.</td></tr>`;
+}
+function nice(m){const p=Math.pow(10,Math.floor(Math.log10(m)));const s=[1,2,2.5,5,10].map(x=>x*p).find(x=>m/x<=5);return s}
+function drawChart(){
+  const r=range(),box=$("#chart");kpis(r);
+  const W=Math.max(300,box.clientWidth),H=W<560?220:280,L=34,R=8,T=10,B=26;
+  const vals=r.map(x=>(on("meta")?x.meta:0)+(on("google")?x.google:0)+(on("none")?x.none:0));
+  const step=nice(Math.max(...vals,5)),top=Math.ceil(Math.max(...vals,5)/step)*step;
+  const y=v=>T+(H-T-B)*(1-v/top),bw=(W-L-R)/Math.max(r.length,1),gap=Math.min(6,bw*.25);
+  let g=`<rect id="hl" x="0" y="${T}" width="${bw}" height="${H-T-B}" fill="var(--surface-2)" visibility="hidden"/>`,hits="";
+  for(let v=0;v<=top;v+=step)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" ${v?'stroke-dasharray="2 3"':""}/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${v}</text>`;
+  const every=Math.ceil(r.length/(W<560?6:12));
+  r.forEach((x,i)=>{
+    const x0=L+i*bw+gap/2,w=Math.max(1,bw-gap);let acc=0;
+    [["meta","meta"],["google","google"],["none","none"]].forEach(([k,c])=>{if(!on(k)||!x[k])return;const h=y(acc)-y(acc+x[k]);g+=`<rect x="${x0}" y="${y(acc+x[k])}" width="${w}" height="${Math.max(0,h-1)}" fill="var(--${c})" rx="${Math.min(2,w/4)}"/>`;acc+=x[k]});
+    hits+=`<rect class="hit" data-i="${i}" x="${L+i*bw}" y="${T}" width="${bw}" height="${H-T-B}" fill="transparent"/>`;
+    if(i%every===0||r.length<=14)g+=`<text x="${x0+w/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${fmtD(x.d)}</text>`;
+  });
+  g+=hits;
+  if(!r.length)g+=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="var(--muted)" font-size="13">Nenhum dia no período escolhido.</text>`;
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="Mensagens por dia, empilhadas por origem">${g}</svg><div class="tip" hidden></div>`;
+  const tip=box.querySelector(".tip");
+  box.querySelectorAll(".hit").forEach(h=>{
+    h.onmouseenter=()=>{const x=r[h.dataset.i];const hl=box.querySelector("#hl");hl.setAttribute("x",h.getAttribute("x"));hl.setAttribute("visibility","visible");
+      const t=(on("meta")?x.meta:0)+(on("google")?x.google:0)+(on("none")?x.none:0);
+      tip.innerHTML=`<b>${x.d.toLocaleDateString("pt-BR",{weekday:"short",day:"2-digit",month:"short"})} · ${t}</b>`+["meta","google","none"].filter(on).map(k=>`<div><span>${LBL[k]}</span><span class="mono">${x[k]}</span></div>`).join("");
+      tip.hidden=false;const cx=+h.getAttribute("x")+bw/2;tip.style.left=Math.min(Math.max(cx,85),W-85)+"px";tip.style.top=(y(t)-8)+"px"};
+    h.onmouseleave=()=>{box.querySelector("#hl").setAttribute("visibility","hidden");tip.hidden=true};
+  });
+  const titles={"7":"últimos 7 dias","14":"últimos 14 dias","28":"últimos 28 dias",month:"este mês",last:"mês passado",custom:"período personalizado"};
+  $("#chart-title").textContent="Conversas novas por origem · "+titles[st.p];
+}
+function seg(id,key,cb){document.querySelectorAll(id+" button").forEach(b=>b.onclick=()=>{document.querySelectorAll(id+" button").forEach(x=>x.setAttribute("aria-pressed",x===b));cb(b.dataset[key])})}
+seg("#f-period","p",v=>{st.p=v;$("#custom").hidden=v!=="custom";drawChart()});
+seg("#f-origin","o",v=>{st.o=v;drawChart()});
+$("#d-from").onchange=$("#d-to").onchange=drawChart;
+let rt;addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$("#v-painel").hidden)drawChart()},120)});
+
+// ---------- kanban ----------
+let ko="all";
+function board(){
+  $("#board").innerHTML=STAGES.map(s=>{const items=leads.filter(l=>l.stage===s&&(ko==="all"||l.origin===ko));
+    return `<div class="col"><div class="col-h"><span>${s}</span><span class="c">${items.length}</span></div>${items.map(l=>`
+      <div class="card"><div class="row"><span class="nm">${esc(l.name)}</span>${badge(l.origin)}</div>
+      <span class="ph mono">${l.phone}</span>
+      ${l.camp?`<span class="cp" title="${esc(l.camp)}">${esc(l.camp)}</span>`:`<span class="cp">Sem campanha</span>`}
+      <div class="row"><span class="when">${fmtD(l.when)} · ${l.when.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</span><button class="link" data-l="${leads.indexOf(l)}">Ver detalhes</button></div></div>`).join("")||`<div style="color:var(--faint);font-size:12.5px;padding:6px 4px">Nenhuma conversa aqui.</div>`}</div>`}).join("");
+  document.querySelectorAll("#board .link").forEach(b=>b.onclick=()=>openD(leads[b.dataset.l],b));
+}
+seg("#k-origin","o",v=>{ko=v;board()});
+let lastBtn;
+function openD(l,btn){lastBtn=btn;
+  $("#d-name").textContent=l.name;$("#d-phone").textContent=l.phone;
+  const dl=pairs=>`<dl>${pairs.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>`;
+  let h=`<div class="d-sec"><h4>Entrada</h4>${dl([["Data de entrada",fmtFull(l.when)],["Canal",badge(l.origin)],["Etapa",l.stage]])}</div>`;
+  if(l.origin!=="none"){
+    h+=`<div class="d-sec"><h4>Anúncio</h4>${dl([["Campanha",esc(l.camp)],[l.origin==="meta"?"Conjunto":"Grupo de anúncios",esc(l.set)],["Anúncio",esc(l.ad)]].concat(l.kw?[["Palavra-chave",esc(l.kw)]]:[]))}</div>`;
+    h+=`<div class="d-sec"><h4>Rastreamento</h4>${dl([["utm_source",`<span class="mono">${l.utm.source}</span>`],["utm_medium",`<span class="mono">${l.utm.medium}</span>`],["utm_campaign",`<span class="mono">${l.utm.campaign}</span>`],[l.origin==="meta"?"ctwa_clid":"gclid",`<span class="mono">${l.clid}</span>`]].concat(l.code?[["Código",`<span class="mono">#${l.code}</span>`]]:[]))}</div>`;
+  } else h+=`<div class="d-sec"><h4>Rastreamento</h4><p style="margin:0;color:var(--muted)">Chegou sem dados de anúncio e sem código de rastreio.</p></div>`;
+  h+=`<div class="d-sec"><h4>Primeira mensagem</h4><div class="msg">${esc(l.msg)}<small>${fmtFull(l.when)}</small></div></div>`;
+  $("#d-body").innerHTML=h;$("#drawer").hidden=false;$("#scrim").hidden=false;$("#d-close").focus();
+}
+function closeD(){$("#drawer").hidden=true;$("#scrim").hidden=true;lastBtn&&lastBtn.focus()}
+$("#d-close").onclick=closeD;$("#scrim").onclick=closeD;addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#drawer").hidden)closeD()});
+
+// ---------- illustrative QR ----------
+(function(){let s="";const f=(x,y)=>{s+=`<rect x="${x}" y="${y}" width="7" height="7" fill="#111"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3" fill="#111"/>`};
+  for(let y=0;y<29;y++)for(let x=0;x<29;x++){const inF=(x<8&&y<8)||(x>20&&y<8)||(x<8&&y>20);if(!inF&&rnd()<.48)s+=`<rect x="${x}" y="${y}" width="1" height="1" fill="#111"/>`}
+  f(0,0);f(22,0);f(0,22);$("#qr").innerHTML=s})();
+
+board();show(location.hash.slice(1)||"painel");
+})();
+</script>
+</body></html>
