@@ -257,6 +257,7 @@ a.fstep:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 .log{font-size:12.5px}
 .ok-t{color:var(--accent);font-weight:700}
 .result{font-size:13px;padding:10px 12px;border-radius:7px;background:var(--accent-soft);color:var(--fg)}
+.result.bad{background:#fff4ed}
 @media (max-width:1000px){.egrid{grid-template-columns:1fr}.form{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.form{grid-template-columns:1fr}.form .wide{grid-column:auto}.row2,.sev{grid-template-columns:1fr}.qrwrap{grid-template-columns:1fr}.sev{flex:1 1 100%;margin-left:38px}}
 /* Mensagens rastreadas */
@@ -653,8 +654,10 @@ details.more summary:hover{color:var(--fg)}
         </div>
 
         <div class="panel icard">
-          <div class="ch"><h2><svg class="pm" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="#111"/><rect x="7" y="7" width="10" height="10" rx="2" fill="#ff5a1f"/></svg> Pixel do Focus Tracking <span class="status" id="px-st"><i></i><span></span></span></h2><div style="display:flex;gap:6px"><button class="mini" type="button" id="px-check">Verificar instalação</button><button class="mini" type="button" id="px-toggle">Ver código</button></div></div>
+          <div class="ch"><h2><svg class="pm" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="#111"/><rect x="7" y="7" width="10" height="10" rx="2" fill="#ff5a1f"/></svg> Pixel do Focus Tracking <span class="status" id="px-st"><i></i><span></span></span></h2><div style="display:flex;gap:6px"><button class="mini" type="button" id="px-toggle">Ver código</button></div></div>
           <p class="hint" style="margin:0">Instale em todas as páginas do site para os links rastreados levarem gclid, fbclid e UTMs. Código da conta: <span class="mono" id="px-acc"></span></p>
+          <form id="px-form" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end"><div class="field" style="flex:1;min-width:220px"><label for="px-url">URL do site para verificar</label><input class="inp" id="px-url" type="text" inputmode="url" placeholder="https://seusite.com.br" autocomplete="url"></div><button class="btn2" type="submit" id="px-go">Verificar agora</button></form>
+          <p class="result" id="px-res" hidden style="margin:0"></p>
           <div id="px-body" hidden style="display:flex;flex-direction:column;gap:12px">
             <div class="seg" id="px-tab" style="align-self:flex-start">
               <button data-t="site" aria-pressed="true">Direto no site</button>
@@ -1102,15 +1105,23 @@ const pxSnippet=()=>`<script>
     k.src = src;
     (d.head || d.getElementsByTagName('head')[0]).appendChild(k);
   })(window, document,
-     'https://cdn.focustracking.app/ft-1.0.js',
+     'https://focus-tracking.vercel.app/ft-1.0.js',
      '${co.acct}');
 </`+`script>`;
 function pxUI(){$("#px-code").textContent=pxSnippet();$("#px-acc").textContent=co.acct;
   $("#px-how").innerHTML=pxTab==="site"?"Cole o código logo após a abertura da tag <span class=\"mono\">&lt;body&gt;</span> em todas as páginas.":"No GTM: <b>Tags</b>, <b>Nova</b>, tipo <b>HTML personalizado</b>. Cole o código, escolha o acionador <b>All Pages</b> (todas as páginas), salve e clique em <b>Enviar</b> para publicar o contêiner.";
-  if(co.pxOk)setSt("#px-st","ok",`Detectado em ${co.site||"seu site"}`);else setSt("#px-st","wait","Não detectado")}
+  const c=co.pxChk;if(!$("#px-url").value)$("#px-url").value=(c&&c.url)||co.site||"";
+  if(c&&c.ok)setSt("#px-st","ok",c.via==="gtm"?"Detectado via GTM":"Detectado no site");else setSt("#px-st","wait","Não detectado");
+  const r=$("#px-res");if(c){r.hidden=false;r.className="result"+(c.ok?"":" bad");r.innerHTML=`<span class="${c.ok?"ok-t":""}" style="${c.ok?"":"color:#c2410c"}">${esc(c.msg)}</span> <span style="color:var(--muted)">${esc(c.url||"")} · verificado em ${esc(c.at)}</span>`}else r.hidden=true}
 seg("#px-tab","t",v=>{pxTab=v;pxUI()});
 $("#px-toggle").onclick=e=>{const b=$("#px-body");b.hidden=!b.hidden;e.currentTarget.textContent=b.hidden?"Ver código":"Ocultar código"};
-$("#px-check").onclick=e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Verificando…";setTimeout(()=>{co.pxOk=true;saveCo();pxUI();b.disabled=false;b.textContent="Verificar instalação"},900)};
+delete co.pxOk;
+$("#px-form").onsubmit=e=>{e.preventDefault();const url=$("#px-url").value.trim(),b=$("#px-go"),r=$("#px-res");
+  if(!url){$("#px-url").focus();return}
+  if(!LIVE){r.hidden=false;r.className="result bad";r.innerHTML='<span style="color:#c2410c">A verificação real só funciona no sistema publicado (focus-tracking.vercel.app).</span>';return}
+  b.disabled=true;b.textContent="Verificando…";
+  fetch("/api/pixel/check?url="+encodeURIComponent(url)+"&id="+encodeURIComponent(co.acct)).then(x=>x.json()).catch(()=>({ok:false,msg:"Não foi possível verificar agora. Tente de novo."}))
+    .then(d=>{co.pxChk={ok:!!d.ok,via:d.via||"",url:d.url||url,msg:d.msg||"",at:nowStr()};saveCo();pxUI();b.disabled=false;b.textContent="Verificar agora"})};
 
 if(LIVE){const MSG={ok:[1,"Facebook conectado."],cancelado:[0,"Login cancelado no Facebook."],erro_estado:[0,"A sessão de login expirou. Tente de novo."],erro:[0,"Não foi possível concluir o login. Tente de novo."]};
   let mq=null;try{mq=new URLSearchParams(location.search).get("meta");if(mq)history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
