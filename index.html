@@ -666,7 +666,7 @@ details.more summary:hover{color:var(--fg)}
         </div>
       </div>
     </div>
-    <p class="note">Protótipo: as conexões são simuladas e os dados ficam salvos só neste navegador.</p>
+    <p class="note">Protótipo: o WhatsApp e o Google ainda são simulados, e os dados ficam salvos só neste navegador.</p>
   </section>
 
 </div></main>
@@ -947,7 +947,10 @@ $("#sync-meta").onclick=e=>doSync("meta",e.currentTarget);$("#sync-google").oncl
 const DEF_CO={name:"",seg:"",site:"",phone:"",tpl:"",pixel:"",token:"",auto:true,value:true,untr:false,test:"",wa:"off",fb:false,bm:"",accs:[],px:"",g:false,gacc:"",logo:""};
 let co;try{co=Object.assign({},DEF_CO,JSON.parse(localStorage.getItem("ft-company")||"{}"))}catch(e){co=Object.assign({},DEF_CO)}
 let coT;const saveCo=()=>{try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}const sv=$("#co-saved");sv.hidden=false;clearTimeout(coT);coT=setTimeout(()=>sv.hidden=true,1500)};
-const BMS=[{id:"bm1",n:"Business Manager 1",accs:[["act_1029384756","Conta de anúncios 1"],["act_5647382910","Conta de anúncios 2"]],px:[["1234567890123456","Pixel 1"],["6543210987654321","Pixel 2"]]},{id:"bm2",n:"Business Manager 2",accs:[["act_8899001122","Conta de anúncios 3"]],px:[["1122334455667788","Pixel 3"]]}];
+// Na Vercel (LIVE) o login é real; na prévia continua simulado.
+const LIVE=/(^|\.)vercel\.app$/.test(location.hostname)||location.hostname==="localhost";
+let metaUser=null,metaMsg="";
+let BMS=LIVE?[]:[{id:"bm1",n:"Business Manager 1",accs:[["act_1029384756","Conta de anúncios 1"],["act_5647382910","Conta de anúncios 2"]],px:[["1234567890123456","Pixel 1"],["6543210987654321","Pixel 2"]]},{id:"bm2",n:"Business Manager 2",accs:[["act_8899001122","Conta de anúncios 3"]],px:[["1122334455667788","Pixel 3"]]}];
 let qrTimer;
 function setSt(id,cls,txt){const el=$(id);el.className="status "+cls;el.querySelector("span").textContent=txt}
 const initials=()=>esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
@@ -957,7 +960,7 @@ function basicEdit(on){$("#basic-view").hidden=on;$("#basic-edit").hidden=!on;$(
 $("#basic-btn").onclick=()=>basicEdit(true);$("#basic-done").onclick=()=>basicEdit(false);
 function metaEdit(on){$("#meta-view").hidden=on;$("#meta-edit").hidden=!on;$("#meta-btn").hidden=on;if(!on)metaSum()}
 $("#meta-btn").onclick=()=>metaEdit(true);$("#meta-done").onclick=()=>metaEdit(false);
-function metaSum(){const bm=BMS.find(b=>b.id===co.bm)||BMS[0];const accs=bm.accs.filter(a=>co.accs.includes(a[0]));
+function metaSum(){const bm=BMS.find(b=>b.id===co.bm)||BMS[0]||{accs:[]};const accs=bm.accs.filter(a=>co.accs.includes(a[0]));
   const yn=v=>`<span class="yn ${v?"y":"n"}">${v?"Sim":"Não"}</span>`;
   const tok=co.token?(co.token.length>24?co.token.slice(0,14)+"••••••••"+co.token.slice(-6):co.token.replace(/./g,"•")):"";
   $("#meta-view").innerHTML=`<div class="kv"><span>Pixel do Meta Ads</span><b class="mono">${esc(co.pixel||"Não configurado")}</b></div>
@@ -988,15 +991,19 @@ function waUI(){clearInterval(qrTimer);const box=$("#wa-box"),off=$("#wa-off-wra
 function genQR(){if(!co.phone||co.phone.replace(/\D/g,"").length<12){basicEdit(true);$("#co-phone").focus();$("#co-phone").setCustomValidity("Informe o número com DDI e DDD");$("#co-phone").reportValidity();return}$("#co-phone").setCustomValidity("");co.wa="qr";waUI()}
 $("#tk-show").onclick=e=>{const i=$("#co-token");i.type=i.type==="password"?"text":"password";e.currentTarget.textContent=i.type==="password"?"Mostrar":"Ocultar"};
 function fbUI(){setTimeout(metaSum);
-  if(co.fb){setSt("#fb-st","ok","Conectado");$("#fb-area").innerHTML=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="av" style="width:28px;height:28px">VB</span><span style="font-size:13.5px">Conectado como <b>Vinicius Belchior</b></span><button class="btn2" id="fb-off" type="button">Desconectar</button></div>`;$("#fb-off").onclick=()=>{co.fb=false;saveCo();fbUI()}}
-  else{setSt("#fb-st","wait","Desconectado");$("#fb-area").innerHTML=`<button class="fb-btn" id="fb-on" type="button">Continuar com o Facebook</button>`;$("#fb-on").onclick=e=>{e.currentTarget.textContent="Conectando…";setTimeout(()=>{co.fb=true;if(!co.bm)co.bm="bm1";saveCo();fbUI()},700)}}
+  const un=metaUser?metaUser.name:"Vinicius Belchior",ui=esc(un.split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
+  const av=metaUser&&metaUser.pic?`<img src="${esc(metaUser.pic)}" alt="" style="width:28px;height:28px;border-radius:50%">`:`<span class="av" style="width:28px;height:28px">${ui}</span>`;
+  const note=metaMsg?`<p style="margin:8px 0 0;font-size:13px;color:${metaMsg.ok?"var(--accent)":"#c2410c"}">${esc(metaMsg.t)}</p>`:"";
+  if(co.fb){setSt("#fb-st","ok","Conectado");$("#fb-area").innerHTML=`<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${av}<span style="font-size:13.5px">Conectado como <b>${esc(un)}</b></span><button class="btn2" id="fb-off" type="button">Desconectar</button></div>`+note;
+    $("#fb-off").onclick=()=>{const done=()=>{co.fb=false;metaUser=null;metaMsg="";if(LIVE){BMS=[];co.bm="";co.accs=[];co.px="";co.pixel=""}saveCo();fbUI()};if(LIVE)fetch("/api/meta/logout",{method:"POST"}).finally(done);else done()}}
+  else{setSt("#fb-st","wait","Desconectado");$("#fb-area").innerHTML=`<button class="fb-btn" id="fb-on" type="button">Continuar com o Facebook</button>`+note;$("#fb-on").onclick=e=>{e.currentTarget.textContent="Conectando…";if(LIVE){location.href="/api/meta/login";return}setTimeout(()=>{co.fb=true;if(!co.bm)co.bm="bm1";saveCo();fbUI()},700)}}
   ["#ms2","#ms3","#ms4"].forEach(id=>$(id).classList.toggle("locked",!co.fb));
-  const bm=BMS.find(b=>b.id===co.bm)||BMS[0];
-  $("#fb-bm").innerHTML=BMS.map(b=>`<option value="${b.id}" ${b===bm?"selected":""}>${esc(b.n)}</option>`).join("");
-  $("#fb-pixel").innerHTML=bm.px.map(([id,n])=>`<option value="${id}" ${co.px===id?"selected":""}>${esc(n)} · ${id}</option>`).join("");
-  if(!bm.px.some(p=>p[0]===co.px)){co.px=bm.px[0][0]}
+  const bm=BMS.find(b=>b.id===co.bm)||BMS[0]||{id:"",n:"Nenhuma BM encontrada",accs:[],px:[]};
+  $("#fb-bm").innerHTML=BMS.length?BMS.map(b=>`<option value="${b.id}" ${b===bm?"selected":""}>${esc(b.n)}</option>`).join(""):`<option value="">${co.fb?"Nenhuma BM encontrada neste perfil":"Conecte o Facebook primeiro"}</option>`;
+  $("#fb-pixel").innerHTML=bm.px.length?bm.px.map(([id,n])=>`<option value="${id}" ${co.px===id?"selected":""}>${esc(n)} · ${id}</option>`).join(""):`<option value="">Nenhum pixel nesta BM</option>`;
+  if(!bm.px.some(p=>p[0]===co.px)){co.px=bm.px[0]?bm.px[0][0]:""}
   if(co.fb&&!co.pixel){co.pixel=co.px;$("#co-pixel").value=co.pixel}
-  $("#fb-accs").innerHTML=bm.accs.map(([id,n])=>`<label class="acc"><input type="checkbox" data-acc="${id}" ${co.accs.includes(id)?"checked":""}>${esc(n)}<small class="mono">${id}</small></label>`).join("");
+  $("#fb-accs").innerHTML=bm.accs.map(([id,n])=>`<label class="acc"><input type="checkbox" data-acc="${id}" ${co.accs.includes(id)?"checked":""}>${esc(n)}<small class="mono">${id}</small></label>`).join("")||(co.fb?'<p style="margin:0;color:var(--muted);font-size:13px">Nenhuma conta de anúncio nesta BM.</p>':"");
   document.querySelectorAll("#fb-accs [data-acc]").forEach(c=>c.onchange=()=>{const id=c.dataset.acc;co.accs=c.checked?[...new Set([...co.accs,id])]:co.accs.filter(x=>x!==id);saveCo()});
   fbLog();
 }
@@ -1105,6 +1112,14 @@ seg("#px-tab","t",v=>{pxTab=v;pxUI()});
 $("#px-toggle").onclick=e=>{const b=$("#px-body");b.hidden=!b.hidden;e.currentTarget.textContent=b.hidden?"Ver código":"Ocultar código"};
 $("#px-check").onclick=e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Verificando…";setTimeout(()=>{co.pxOk=true;saveCo();pxUI();b.disabled=false;b.textContent="Verificar instalação"},900)};
 
+if(LIVE){const MSG={ok:[1,"Facebook conectado."],cancelado:[0,"Login cancelado no Facebook."],erro_estado:[0,"A sessão de login expirou. Tente de novo."],erro:[0,"Não foi possível concluir o login. Tente de novo."]};
+  let mq=null;try{mq=new URLSearchParams(location.search).get("meta");if(mq)history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+  if(mq&&MSG[mq])metaMsg={ok:!!MSG[mq][0],t:MSG[mq][1]};
+  const refresh=()=>{if(!$("#v-empresa").hidden){fbUI();if(mq)metaEdit(true)}};
+  fetch("/api/meta/assets",{credentials:"same-origin"}).then(r=>r.json()).then(d=>{
+    if(d.connected){metaUser=d.user;BMS=d.bms||[];co.fb=true;if(!BMS.some(b=>b.id===co.bm)){co.bm=BMS[0]?BMS[0].id:"";co.accs=[];co.px="";co.pixel=""}}
+    else{co.fb=false;metaUser=null;if(d.error)metaMsg={ok:false,t:"A conexão com o Facebook expirou. Conecte de novo."}}
+    try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}refresh()}).catch(()=>{co.fb=false;refresh()})}
 board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
 })();
 </script>
