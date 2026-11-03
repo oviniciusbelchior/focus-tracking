@@ -353,7 +353,7 @@ details.more summary:hover{color:var(--fg)}
     <button class="nav-item" data-tab="links"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>Mensagens rastreadas</button>
     <button class="nav-item" data-tab="empresa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M16 9h2a2 2 0 0 1 2 2v10"/><path d="M8 7h4M8 11h4M8 15h4M3 21h18"/></svg>Informações da empresa</button>
   </nav>
-  <div class="wa"><span class="conn-dot"></span>WhatsApp conectado</div>
+  <div class="wa"><span class="conn-dot"></span>WhatsApp desconectado</div>
   <div class="user"><span class="av">VB</span><div style="flex:1;min-width:0"><b>Vinicius Belchior</b><small>Proprietário</small></div><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div>
 </aside>
 
@@ -680,7 +680,9 @@ details.more summary:hover{color:var(--fg)}
 
 <script>
 (function(){
-// ---------- fake data ----------
+// Sistema zerado: limpa dados salvos de versões de demonstração.
+try{if(localStorage.getItem("ft-ver")!=="2"){["ft-stages","ft-events","ft-company","ft-links"].forEach(k=>localStorage.removeItem(k));localStorage.setItem("ft-ver","2")}}catch(e){}
+// ---------- dados ----------
 let seed=7; const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646};
 const pick=a=>a[Math.floor(rnd()*a.length)];
 const today=new Date(); today.setHours(0,0,0,0);
@@ -689,7 +691,7 @@ const days=[];
 for(let i=N-1;i>=0;i--){
   const d=new Date(today.getTime()-i*DAY); const wd=d.getDay(); const wk=(wd===0||wd===6)?0.55:1;
   const trend=1+(N-i)/N*0.25;
-  days.push({d,meta:Math.round((14+rnd()*12)*wk*trend),google:Math.round((8+rnd()*8)*wk*trend),none:Math.round((4+rnd()*6)*wk)});
+  days.push({d,meta:0,google:0,none:0});
 }
 const CAMPS={meta:[["Black Friday | CTWA | Conversas","Público quente 30d","Vídeo depoimento 15s"],["Consulta grátis | CTWA","Lookalike 2% clientes","Carrossel antes e depois"],["Remarketing | Visitantes 7d","Visitantes site 7d","Imagem oferta"]],
   google:[["Pesquisa | Marca","Termos de marca","RSA marca"],["Pesquisa | Clínica perto de mim","Local 5km","RSA localização"],["Performance Max | Leads","Grupo principal","Recursos PMax"]]};
@@ -699,7 +701,7 @@ const NAMES=["Ana Paula Ribeiro","Bruno Carvalho","Camila Souza","Diego Martins"
 const FIRST={meta:["Olá! Vi o anúncio e queria saber o valor da avaliação.","Oi, tem horário essa semana?","Quero aproveitar a promoção da Black Friday."],
   google:["Olá, quero saber mais sobre o plano #","Oi! Vim pelo site, código #","Bom dia, gostaria de agendar. Código #"],
   none:["Oi, uma amiga me indicou vocês.","Boa tarde, vocês atendem no sábado?","Olá, qual o endereço da clínica?"]};
-const DEF_STAGES=[{name:"Fez contato",meta:"m0",google:"g0"},{name:"Em atendimento",meta:"m1",google:"g1"},{name:"Cotação enviada",meta:"m3",google:""},{name:"Venda realizada",close:true,meta:"m4",google:"g2"}];
+const DEF_STAGES=[{name:"Fez contato",meta:"",google:""},{name:"Em atendimento",meta:"",google:""},{name:"Cotação enviada",meta:"",google:""},{name:"Venda realizada",close:true,meta:"",google:""}];
 let stages;try{stages=JSON.parse(localStorage.getItem("ft-stages"))}catch(e){}
 if(!Array.isArray(stages)||stages.length<2)stages=JSON.parse(JSON.stringify(DEF_STAGES));
 const saveStages=()=>{try{localStorage.setItem("ft-stages",JSON.stringify(stages))}catch(e){}};
@@ -708,28 +710,15 @@ const PLAT={meta:{n:"Meta Ads",i:PM},google:{n:"Google Ads",i:PG}};
 const nowStr=()=>{const d=new Date();return d.toLocaleDateString("pt-BR")+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})};
 const META_STD=[["Contact","Um telefone, SMS, email, bate-papo ou outro tipo de contato entre um cliente e sua empresa."],["Lead","O envio de informações por parte do cliente, sabendo que poderá ser contatado posteriormente pela empresa."],["Schedule","O agendamento de um horário para visitar uma de suas localizações."],["InitiateCheckout","O início de um processo de finalização de compra."],["Purchase","A conclusão de uma compra, geralmente indicada pelo recebimento de uma confirmação de pedido ou recibo."],["ViewContent","Uma visita a uma página da web importante para você, como uma página de produto."],["CompleteRegistration","O envio de informações em troca de um serviço da empresa, como um cadastro."],["AddToCart","A adição de um item ao carrinho de compras."]];
 const G_STD=[["Contato_WhatsApp","Clique no botão de WhatsApp do site com código de rastreio."],["Lead qualificado","Contato avaliado como com potencial de compra."],["Lead convertido","Venda fechada, enviada como conversão offline pelo gclid."]];
-const DEF_EVENTS=[...G_STD.map(([n,d],i)=>({id:"g"+i,plat:"google",name:n,desc:d,src:"sync",created:"02/10/2026 11:05"})),...META_STD.map(([n,d],i)=>({id:"m"+i,plat:"meta",name:n,desc:d,src:"sync",created:"14/08/2026 16:10"}))];
-DEF_EVENTS.find(e=>e.id==="g0").link="m0";DEF_EVENTS.find(e=>e.id==="m0").link="g0";
-DEF_EVENTS.find(e=>e.id==="g1").link="m1";DEF_EVENTS.find(e=>e.id==="m1").link="g1";
-DEF_EVENTS.find(e=>e.id==="g2").link="m4";DEF_EVENTS.find(e=>e.id==="m4").link="g2";
+const STD_EVENTS=[...G_STD.map(([n,d],i)=>({id:"g"+i,plat:"google",name:n,desc:d,src:"sync",created:"02/10/2026 11:05"})),...META_STD.map(([n,d],i)=>({id:"m"+i,plat:"meta",name:n,desc:d,src:"sync",created:"14/08/2026 16:10"}))];
 let events;try{events=JSON.parse(localStorage.getItem("ft-events"))}catch(e){}
-if(!Array.isArray(events))events=JSON.parse(JSON.stringify(DEF_EVENTS));
+if(!Array.isArray(events))events=[];
 const saveEvents=()=>{try{localStorage.setItem("ft-events",JSON.stringify(events))}catch(e){}};
 const evById=id=>events.find(e=>e.id===id);
-const DEF_MAP=[["m0","g0"],["m1","g1"],["m3",""],["m4","g2"]];
-stages.forEach((s,i)=>{if(s.meta===undefined&&DEF_MAP[i]&&s.name===DEF_STAGES[i].name){s.meta=DEF_MAP[i][0];s.google=DEF_MAP[i][1]}});
 const closeIdx=()=>{const i=stages.findIndex(s=>s.close);return i<0?stages.length-1:i};
 const code=()=>{const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<4;i++)s+=c[Math.floor(rnd()*c.length)];return s};
 const hex=n=>{let s="";const c="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";for(let i=0;i<n;i++)s+=c[Math.floor(rnd()*c.length)];return s};
-const leads=NAMES.map((name,i)=>{
-  const r=rnd(); const origin=r<.5?"meta":r<.8?"google":"none";
-  const when=new Date(today.getTime()-Math.floor(rnd()*9)*DAY+ (8+Math.floor(rnd()*11))*36e5+Math.floor(rnd()*60)*6e4);
-  const L={name,phone:`+55 ${pick(["11","21","31","41","19"])} 9 ${String(1000+Math.floor(rnd()*9000))}-${String(1000+Math.floor(rnd()*9000))}`,origin,when,si:i%4===3&&rnd()<.6?3:Math.floor(rnd()*4)};
-  if(origin==="meta"){const [c,s,a]=pick(CAMPS.meta);Object.assign(L,{camp:c,set:s,ad:a,clid:"ARA"+hex(22),utm:{source:"facebook",medium:"paid_social",campaign:c.toLowerCase().replace(/[^a-z0-9]+/g,"_")},msg:pick(FIRST.meta)})}
-  else if(origin==="google"){const [c,s,a]=pick(CAMPS.google);const k=code();Object.assign(L,{camp:c,set:s,ad:a,kw:KW[c],code:k,clid:"Cj0KCQiA"+hex(26),utm:{source:"google",medium:"cpc",campaign:c.toLowerCase().replace(/[^a-z0-9]+/g,"_")},msg:pick(FIRST.google)+k})}
-  else L.msg=pick(FIRST.none);
-  return L;
-}).sort((a,b)=>b.when-a.when);
+const leads=[];
 
 // ---------- helpers ----------
 const fmtD=d=>d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
@@ -773,10 +762,10 @@ function kpis(r){
   journey(vis,r.length,r);
   $("#range-lbl").textContent=r.length?`${r[0].d.toLocaleDateString("pt-BR")} a ${r[r.length-1].d.toLocaleDateString("pt-BR")}`:"sem dias no período";
   // campaigns
-  const rows=[];["meta","google"].forEach(o=>{if(!on(o))return;CAMPS[o].forEach(([c])=>rows.push({c,o,n:Math.round(s[o]*SHARE[c])}))});
+  const rows=[];
   rows.sort((a,b)=>b.n-a.n);const mx=rows[0]?.n||1;
   $("#camp").innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.c)}</td><td>${badge(r.o)}</td><td class="n mono">${r.n}</td><td><div class="bar"><i style="width:${r.n/mx*100}%;background:var(--${r.o})"></i></div></td></tr>`).join(""):
-    `<tr><td colspan="4" style="color:var(--muted)">Mensagens não rastreadas não têm campanha associada.</td></tr>`;
+    `<tr><td colspan="4" style="color:var(--muted)">${st.o==="none"?"Mensagens não rastreadas não têm campanha associada.":"Nenhuma campanha ainda. Elas aparecem quando chegarem as primeiras conversas de anúncios."}</td></tr>`;
 }
 // ---------- jornada ----------
 const RATES=[.66,.62,.55,.5,.46,.42,.4];
@@ -796,13 +785,11 @@ function journey(base,len,r){
   document.querySelectorAll("#funnel a.fstep").forEach(a=>a.onclick=e=>{e.preventDefault();let w=null;try{w=window.open(a.href,"_blank")}catch(err){}
     if(w){try{w.opener=null}catch(err){}}else{applyKF(new URLSearchParams(a.getAttribute("href").split("#")[0].slice(1)));location.hash="conversas"}});
   $("#funnel-hint").textContent=`${stages.length} etapas · conversão de ${stages[0].name} até ${stages[closeIdx()].name}`;
-  const k=(len*7+(st.o.length*13))%11;
-  const auto=0.8+k*0.07, real=95+k*9;
-  $("#t-resp").textContent=fmtMin(stT.second?real:auto);
+  $("#t-resp").textContent="—";
   $("#t-resp-sub").textContent=stT.second?"contando a partir da 2ª mensagem do atendente":"inclui a saudação automática";
   const vals=reach(base),ci=closeIdx();
-  $("#t-jor").textContent=(7.2+k*0.55).toFixed(1).replace(".",",")+" dias";
-  $("#t-jor-sub").textContent=`de ${stages[0].name} até ${stages[ci].name} · ${vals[ci].toLocaleString("pt-BR")} fechamentos`;
+  $("#t-jor").textContent="—";
+  $("#t-jor-sub").textContent=`de ${stages[0].name} até ${stages[ci].name} · nenhum fechamento ainda`;
 }
 $("#second").onchange=e=>{stT.second=e.target.checked;drawChart()};
 let savedT;
@@ -845,6 +832,7 @@ function drawChart(){
   });
   g+=hits;
   if(!r.length)g+=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="var(--muted)" font-size="13">Nenhum dia no período escolhido.</text>`;
+  else if(!vals.some(v=>v))g+=`<text x="${W/2}" y="${(H-B)/2}" text-anchor="middle" fill="var(--muted)" font-size="13">${co.wa==="on"?"Nenhuma conversa no período ainda.":"Nenhuma conversa ainda. Conecte o WhatsApp em Informações da empresa."}</text>`;
   box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="Mensagens por dia, empilhadas por origem">${g}</svg><div class="tip" hidden></div>`;
   const tip=box.querySelector(".tip");
   box.querySelectorAll(".hit").forEach(h=>{
@@ -887,7 +875,7 @@ function board(){
       <div class="card"><div class="row"><span class="nm">${esc(l.name)}</span>${badge(l.origin)}</div>
       <span class="ph mono">${l.phone}</span>
       ${l.camp?`<span class="cp" title="${esc(l.camp)}">${esc(l.camp)}</span>`:`<span class="cp">Sem campanha</span>`}
-      <div class="row"><span class="when">${fmtD(l.when)} · ${l.when.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</span><button class="link" data-l="${leads.indexOf(l)}">Ver detalhes</button></div></div>`).join("")||`<div style="color:var(--faint);font-size:12.5px;padding:6px 4px">Nenhuma conversa aqui.</div>`}</div>`}).join("");
+      <div class="row"><span class="when">${fmtD(l.when)} · ${l.when.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}</span><button class="link" data-l="${leads.indexOf(l)}">Ver detalhes</button></div></div>`).join("")||`<div style="color:var(--faint);font-size:12.5px;padding:6px 4px">${leads.length?"Nenhuma conversa aqui.":"As conversas aparecem aqui quando o WhatsApp estiver conectado."}</div>`}</div>`}).join("");
   document.querySelectorAll("#board .link").forEach(b=>b.onclick=()=>openD(leads[b.dataset.l],b));
 }
 seg("#k-origin","o",v=>{ko=v;board()});
@@ -925,7 +913,7 @@ function evTable(){
     return `<tr><td><span class="ptag">${PLAT[e.plat].i}${PLAT[e.plat].n}</span></td><td class="nm">${esc(e.name)}<div class="src ${e.src==="manual"?"man":""}">${e.src==="manual"?"Manual":"Sincronizado"}</div></td><td class="desc">${e.desc?esc(e.desc):"—"}</td>
     <td>${lk?`<span class="chip">${PLAT[lk.plat].i}${esc(lk.name)}</span>`:'<span style="color:var(--faint)">—</span>'}</td>
     <td>${u.length?u.join(", "):'<span style="color:var(--faint)">—</span>'}</td><td class="dt">${e.created}</td>
-    <td><div class="acts"><button class="ib" data-ed="${e.id}" aria-label="Editar ${esc(e.name)}">${pen}</button>${e.src==="manual"?`<button class="ib" data-del="${e.id}" aria-label="Excluir ${esc(e.name)}">${del}</button>`:""}</div></td></tr>`}).join("")||`<tr><td colspan="7" style="color:var(--muted)">Nenhum evento neste filtro.</td></tr>`;
+    <td><div class="acts"><button class="ib" data-ed="${e.id}" aria-label="Editar ${esc(e.name)}">${pen}</button>${e.src==="manual"?`<button class="ib" data-del="${e.id}" aria-label="Excluir ${esc(e.name)}">${del}</button>`:""}</div></td></tr>`}).join("")||`<tr><td colspan="7" style="color:var(--muted)">${events.length?"Nenhum evento neste filtro.":"Nenhum evento ainda. Conecte o Meta Ads ou o Google Ads em Informações da empresa e clique em Sincronizar, ou crie um evento manual."}</td></tr>`;
   document.querySelectorAll("#ev-body [data-ed]").forEach(b=>b.onclick=()=>openForm(evById(b.dataset.ed)));
   document.querySelectorAll("#ev-body [data-del]").forEach(b=>b.onclick=()=>{const id=b.dataset.del;events=events.filter(e=>e.id!==id);events.forEach(e=>{if(e.link===id)e.link=null});stages.forEach(s=>{if(s.meta===id)s.meta="";if(s.google===id)s.google=""});saveEvents();saveStages();evTable()});
 }
@@ -947,19 +935,19 @@ $("#ev-form").onsubmit=ev=>{ev.preventDefault();const name=$("#ev-name").value.t
   e.link=$("#ev-link").value||null;if(e.link){const o=evById(e.link);if(o.link&&evById(o.link))evById(o.link).link=null;o.link=e.id}
   saveEvents();$("#ev-form").hidden=true;editing=null;evTable()};
 seg("#ev-f","f",v=>{evF=v;evTable()});
-let syncInfo={meta:"14/08/2026 16:10",google:"02/10/2026 11:05"};
+let syncInfo={meta:"nunca",google:"nunca"};
 const syncTxt=()=>$("#sync-st").textContent=`Última sincronização: Meta ${syncInfo.meta} · Google ${syncInfo.google}`;syncTxt();
-function doSync(pl,btn){btn.disabled=true;btn.textContent="Sincronizando…";setTimeout(()=>{
-  const extra=pl==="meta"?["SubmitApplication","O envio de uma inscrição para um produto, serviço ou programa."]:["Agendamento","Visita ou reunião agendada pelo WhatsApp."];
-  if(!events.some(e=>e.plat===pl&&e.name===extra[0]))events.push({id:pl[0]+"s"+Date.now().toString(36),plat:pl,name:extra[0],desc:extra[1],src:"sync",created:nowStr()});
+function doSync(pl,btn){if(!(pl==="meta"?co.fb:co.g)){location.hash="empresa";return}
+  btn.disabled=true;btn.textContent="Sincronizando…";setTimeout(()=>{
+  STD_EVENTS.filter(e=>e.plat===pl&&!events.some(x=>x.plat===pl&&x.name===e.name)).forEach(e=>events.push(Object.assign({},e,{created:nowStr()})));
   syncInfo[pl]=nowStr();saveEvents();syncTxt();evTable();btn.disabled=false;btn.textContent=pl==="meta"?"Sincronizar Meta":"Sincronizar Google"},900)}
 $("#sync-meta").onclick=e=>doSync("meta",e.currentTarget);$("#sync-google").onclick=e=>doSync("google",e.currentTarget);
 
 // ---------- empresa ----------
-const DEF_CO={name:"Clínica Focus",seg:"Estética",site:"clinicafocus.com.br",phone:"+55 11 9 4821-3307",tpl:"Olá! Vim pelo site e quero saber mais sobre a avaliação. {codigo}",pixel:"",token:"",auto:true,value:true,untr:false,test:"",wa:"off",fb:false,bm:"",accs:[],px:"",g:false,gacc:"",logo:""};
+const DEF_CO={name:"",seg:"",site:"",phone:"",tpl:"",pixel:"",token:"",auto:true,value:true,untr:false,test:"",wa:"off",fb:false,bm:"",accs:[],px:"",g:false,gacc:"",logo:""};
 let co;try{co=Object.assign({},DEF_CO,JSON.parse(localStorage.getItem("ft-company")||"{}"))}catch(e){co=Object.assign({},DEF_CO)}
 let coT;const saveCo=()=>{try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}const sv=$("#co-saved");sv.hidden=false;clearTimeout(coT);coT=setTimeout(()=>sv.hidden=true,1500)};
-const BMS=[{id:"bm1",n:"Focus Assessoria (BM principal)",accs:[["act_1029384756","Clínica Focus | Conta 01"],["act_5647382910","Clínica Focus | Remarketing"]],px:[["1234567890123456","Pixel Clínica Focus"],["6543210987654321","Pixel Site Antigo"]]},{id:"bm2",n:"Clínica Focus Ltda",accs:[["act_8899001122","Conta reserva"]],px:[["1122334455667788","Conjunto de dados Clínica"]]}];
+const BMS=[{id:"bm1",n:"Business Manager 1",accs:[["act_1029384756","Conta de anúncios 1"],["act_5647382910","Conta de anúncios 2"]],px:[["1234567890123456","Pixel 1"],["6543210987654321","Pixel 2"]]},{id:"bm2",n:"Business Manager 2",accs:[["act_8899001122","Conta de anúncios 3"]],px:[["1122334455667788","Pixel 3"]]}];
 let qrTimer;
 function setSt(id,cls,txt){const el=$(id);el.className="status "+cls;el.querySelector("span").textContent=txt}
 const initials=()=>esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
@@ -1016,16 +1004,16 @@ $("#fb-bm").onchange=e=>{co.bm=e.target.value;co.accs=[];co.px="";co.pixel="";sa
 $("#fb-pixel").onchange=e=>{co.px=e.target.value;co.pixel=co.px;$("#co-pixel").value=co.pixel;saveCo()};
 let testLog=[];
 function fbLog(){const ci=closeIdx(),close=stages[ci],cm=evById(close.meta);
-  const base=[["02/11 13:07","Otávio Barros",stages[0],evById(stages[0].meta),""],["01/11 12:11","Isabela Costa",close,cm,"1.250,00"],["01/11 09:37","Bruno Carvalho",stages[Math.min(1,stages.length-1)],evById(stages[Math.min(1,stages.length-1)].meta),""],["31/10 16:40","Renata Moura",close,cm,"890,00"]];
+  const base=[];
   const rows=[...testLog,...base.filter(r=>r[3])];
-  $("#fb-log").innerHTML=rows.map(r=>`<tr><td class="mono">${r[0]}</td><td>${esc(r[1])}</td><td>${esc(r[2].name||r[2])}</td><td><span class="ptag">${PM}${esc(r[3].name||r[3])}</span></td><td class="n mono">${r[4]?"R$ "+r[4]:"—"}</td><td><span class="ok-t">${r[5]||"Recebido"}</span></td></tr>`).join("")||`<tr><td colspan="6" style="color:var(--muted)">Ligue eventos do Meta às etapas em Jornada de compra.</td></tr>`}
+  $("#fb-log").innerHTML=rows.map(r=>`<tr><td class="mono">${r[0]}</td><td>${esc(r[1])}</td><td>${esc(r[2].name||r[2])}</td><td><span class="ptag">${PM}${esc(r[3].name||r[3])}</span></td><td class="n mono">${r[4]?"R$ "+r[4]:"—"}</td><td><span class="ok-t">${r[5]||"Recebido"}</span></td></tr>`).join("")||`<tr><td colspan="6" style="color:var(--muted)">Nenhum evento enviado ainda.</td></tr>`}
 $("#fb-test").onclick=()=>{const tk=$("#co-token");if(!co.pixel){$("#co-pixel").focus();return}if(!co.token){tk.focus();tk.setCustomValidity("Cole o token da API de Conversões");tk.reportValidity();return}tk.setCustomValidity("");
   const ev=evById(stages[closeIdx()].meta)||{name:"Purchase"};const t=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   $("#fb-res").hidden=false;$("#fb-res").innerHTML=`<span class="ok-t">Evento de teste recebido.</span> ${esc(ev.name)} com valor R$ 1,00 chegou ao pixel <span class="mono">${esc(co.pixel)}</span>${co.test?` com o código <span class="mono">${esc(co.test)}</span>`:""}. Confira em Gerenciador de Eventos, aba Eventos de teste.`;
   testLog.unshift([new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" "+t,"Evento de teste",{name:stages[closeIdx()].name},ev,"1,00","Teste recebido"]);fbLog()};
 function gUI(){$("#g-hint").hidden=co.g;
   if(co.g){setSt("#g-st","ok","Conectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-off">Desconectar</button>`;$("#g-off").onclick=()=>{co.g=false;saveCo();gUI()};
-    $("#g-area").innerHTML=`<div class="vgrid"><div class="field"><label for="g-acc">Conta de anúncios</label><select class="sel" id="g-acc"><option value="482-193-5567" ${co.gacc==="482-193-5567"?"selected":""}>Clínica Focus · 482-193-5567</option><option value="901-334-2210" ${co.gacc==="901-334-2210"?"selected":""}>Focus Assessoria (MCC) · 901-334-2210</option></select></div><div class="kv"><span>Ações de conversão</span><b>${events.filter(e=>e.plat==="google").length} sincronizadas · <button class="link" type="button" onclick="location.hash='eventos'">ver eventos</button></b></div></div>`;
+    $("#g-area").innerHTML=`<div class="vgrid"><div class="field"><label for="g-acc">Conta de anúncios</label><select class="sel" id="g-acc"><option value="482-193-5567" ${co.gacc==="482-193-5567"?"selected":""}>Conta de anúncios · 482-193-5567</option><option value="901-334-2210" ${co.gacc==="901-334-2210"?"selected":""}>Conta de administrador (MCC) · 901-334-2210</option></select></div><div class="kv"><span>Ações de conversão</span><b>${events.filter(e=>e.plat==="google").length} sincronizadas · <button class="link" type="button" onclick="location.hash='eventos'">ver eventos</button></b></div></div>`;
     $("#g-acc").onchange=e=>{co.gacc=e.target.value;saveCo()}}
   else{setSt("#g-st","wait","Desconectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-on">Conectar</button>`;$("#g-area").innerHTML="";$("#g-on").onclick=()=>{co.g=true;co.gacc=co.gacc||"482-193-5567";saveCo();gUI()}}}
 
@@ -1041,7 +1029,7 @@ const lkUrl=l=>`https://wa.focustracking.app/r/${l.id}`;
 const brl=v=>"R$ "+v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
 const DEF_LINKS=[{id:"pv7k2a",name:"Página de vendas · botão principal",text:"Olá! Vim pela página e quero agendar minha avaliação.",delay:2,created:"18/10/2026 10:42",m:[412,96,11,13750]},{id:"fl3m9q",name:"Botão flutuante do site",text:"Oi! Estou no site e queria tirar uma dúvida.",delay:1,created:"22/10/2026 15:08",m:[238,71,6,6480]}];
 let links;try{links=JSON.parse(localStorage.getItem("ft-links"))}catch(e){}
-if(!Array.isArray(links))links=JSON.parse(JSON.stringify(DEF_LINKS));
+if(!Array.isArray(links))links=[];
 const saveLinks=()=>{try{localStorage.setItem("ft-links",JSON.stringify(links))}catch(e){}};
 const rid=()=>{const c="abcdefghjkmnpqrstuvwxyz23456789";let s="";for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s};
 let lkCur=null,lkPlayT;
@@ -1096,7 +1084,7 @@ document.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const el=$("#
 
 try{const q=new URLSearchParams(location.search);if(q.has("etapa")||q.has("origem")||q.has("de"))applyKF(q)}catch(e){}
 // ---------- pixel do focus tracking ----------
-if(!co.acct){co.acct=(crypto.randomUUID?crypto.randomUUID():"55d52f45-2638-4611-9c53-fe730c34fe17".replace(/[0-9a-f]/g,()=>"0123456789abcdef"[Math.floor(Math.random()*16)]));saveCo()}
+if(!co.acct){co.acct=(crypto.randomUUID?crypto.randomUUID():"55d52f45-2638-4611-9c53-fe730c34fe17".replace(/[0-9a-f]/g,()=>"0123456789abcdef"[Math.floor(Math.random()*16)]));try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}}
 let pxTab="site";
 const pxSnippet=()=>`<script>
   (function (w, d, src, id) {
@@ -1117,7 +1105,7 @@ seg("#px-tab","t",v=>{pxTab=v;pxUI()});
 $("#px-toggle").onclick=e=>{const b=$("#px-body");b.hidden=!b.hidden;e.currentTarget.textContent=b.hidden?"Ver código":"Ocultar código"};
 $("#px-check").onclick=e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Verificando…";setTimeout(()=>{co.pxOk=true;saveCo();pxUI();b.disabled=false;b.textContent="Verificar instalação"},900)};
 
-board();waUI();show(location.hash.slice(1)||"painel");
+board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
 })();
 </script>
 </body></html>
