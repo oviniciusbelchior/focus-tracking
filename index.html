@@ -258,6 +258,9 @@ a.fstep:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
 .ok-t{color:var(--accent);font-weight:700}
 .result{font-size:13px;padding:10px 12px;border-radius:7px;background:var(--accent-soft);color:var(--fg)}
 .result.bad{background:#fff4ed}
+.pwm{position:fixed;inset:0;z-index:80;background:rgba(11,11,12,.55);display:grid;place-items:center;padding:16px}
+.pwm form{background:var(--surface);border-radius:14px;padding:26px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.pwm h2{margin:0;font-size:19px}.pwm p{margin:0;color:var(--muted);font-size:14px}
 @media (max-width:1000px){.egrid{grid-template-columns:1fr}.form{grid-template-columns:1fr 1fr}}
 @media (max-width:560px){.form{grid-template-columns:1fr}.form .wide{grid-column:auto}.row2,.sev{grid-template-columns:1fr}.qrwrap{grid-template-columns:1fr}.sev{flex:1 1 100%;margin-left:38px}}
 /* Mensagens rastreadas */
@@ -680,15 +683,28 @@ details.more summary:hover{color:var(--fg)}
       <form id="us-form" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
         <div class="field" style="flex:2;min-width:220px"><label for="us-email">E-mail da pessoa</label><input class="inp" id="us-email" type="email" placeholder="nome@empresa.com.br" autocomplete="off"></div>
         <div class="field" style="flex:1;min-width:180px"><label for="us-papel">Acesso</label><select class="sel" id="us-papel"><option value="leitura">Leitura: só visualiza</option><option value="admin">Administrador: edita e convida</option></select></div>
+        <div class="field" style="flex:1.4;min-width:200px"><label for="us-pass">Senha provisória (opcional)</label><div style="display:flex;gap:6px"><input class="inp mono" id="us-pass" type="text" autocomplete="off" placeholder="mínimo 8 caracteres"><button class="btn2" type="button" id="us-gen">Gerar</button></div></div>
         <button class="btn" type="submit" id="us-go">Convidar</button>
       </form>
+      <p class="hint" style="margin:0;font-size:12.5px;color:var(--muted)">Com senha provisória, a pessoa já entra com o e-mail e essa senha, e no primeiro acesso cria a própria senha. Sem senha, ela recebe um link para criar a conta.</p>
       <div class="result" id="us-res" hidden></div>
     </div>
     <div class="panel" style="margin-top:16px"><div class="tbl-wrap"><table>
       <thead><tr><th>E-mail</th><th>Acesso</th><th>Situação</th><th>Desde</th><th></th></tr></thead>
       <tbody id="us-body"></tbody></table></div></div>
+    <div class="panel" style="margin-top:16px;padding:20px;display:flex;flex-direction:column;gap:12px">
+      <h2 style="margin:0;font-size:16px">Minha senha</h2>
+      <p style="margin:0;font-size:13.5px;color:var(--muted)" id="my-pw-sub">Defina ou troque a senha para entrar com e-mail.</p>
+      <form id="my-pw" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end"><div class="field" style="flex:1;min-width:220px"><label for="my-pass">Nova senha</label><input class="inp" id="my-pass" type="password" autocomplete="new-password" placeholder="mínimo 8 caracteres"></div><button class="btn2" type="submit">Salvar senha</button></form>
+      <div class="result" id="my-res" hidden></div>
+    </div>
     <p class="note" id="us-note"></p>
   </section>
+  <div class="pwm" id="pwm" hidden><form id="pwm-f"><h2 id="pwm-t"></h2><p id="pwm-p"></p>
+    <div class="field"><label for="pwm-1">Nova senha</label><input class="inp" id="pwm-1" type="password" autocomplete="new-password" placeholder="mínimo 8 caracteres"></div>
+    <div class="field"><label for="pwm-2">Repita a senha</label><input class="inp" id="pwm-2" type="password" autocomplete="new-password"></div>
+    <div class="result bad" id="pwm-e" hidden></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn2" type="button" id="pwm-skip">Agora não</button><button class="btn" type="submit" id="pwm-go">Salvar senha</button></div></form></div>
 
 </div></main>
 </div>
@@ -1178,14 +1194,44 @@ async function usUI(){const body=$("#us-body"),adm=papel!=="leitura";$("#us-new"
     else usDemo=usDemo.filter(u=>u!==r);usUI()})}
 $("#us-form").onsubmit=async e=>{e.preventDefault();const em=$("#us-email").value.trim().toLowerCase(),pp=$("#us-papel").value,res=$("#us-res"),b=$("#us-go");
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){res.hidden=false;res.className="result bad";res.textContent="Digite um e-mail válido.";$("#us-email").focus();return}
-  b.disabled=true;b.textContent="Convidando…";let err=null;
-  if(sb&&empId){const x=await sb.from("convites").insert({empresa_id:empId,email:em,papel:pp,criado_por:me.id});err=x.error}
+  const tmp=$("#us-pass").value.trim();
+  if(tmp&&tmp.length<8){res.hidden=false;res.className="result bad";res.textContent="A senha provisória precisa ter pelo menos 8 caracteres.";$("#us-pass").focus();return}
+  b.disabled=true;b.textContent="Convidando…";let err=null,kind="";
+  if(sb&&empId&&tmp){const x=await sb.rpc("convidar_com_senha",{p_empresa:empId,p_email:em,p_papel:pp,p_senha:tmp});err=x.error;kind=x.data}
+  else if(sb&&empId){const x=await sb.from("convites").insert({empresa_id:empId,email:em,papel:pp,criado_por:me.id});err=x.error}
+  else if(tmp){kind="criado";usDemo.push({email:em,papel:pp,created_at:new Date().toISOString(),ativo:true})}
   else if(usDemo.some(u=>u.email===em))err={code:"23505"};else usDemo.push({email:em,papel:pp,created_at:new Date().toISOString(),ativo:false});
   b.disabled=false;b.textContent="Convidar";res.hidden=false;
-  if(err){res.className="result bad";res.textContent=err.code==="23505"?"Esse e-mail já foi convidado.":"Não foi possível convidar: "+(err.message||"erro");return}
+  if(err){res.className="result bad";const t=err.message||"";res.textContent=err.code==="23505"?"Esse e-mail já foi convidado.":/sem_permissao/.test(t)?"Só o dono e os administradores podem convidar.":/senha_curta/.test(t)?"A senha provisória precisa ter pelo menos 8 caracteres.":/email_invalido/.test(t)?"Digite um e-mail válido.":"Não foi possível convidar: "+t;return}
+  $("#us-pass").value="";
+  const site=invLink(em).split("/login")[0]+"/login";
+  if(kind==="existente"){res.className="result";res.innerHTML=`<b>${esc(em)}</b> já tinha conta no Focus Tracking e agora tem acesso a esta empresa. Ela entra com a senha que já usa.`;$("#us-email").value="";usUI();return}
+  if(kind==="criado"){res.className="result";const txt=`Acesse ${site}\nE-mail: ${em}\nSenha provisória: ${tmp}\nNo primeiro acesso você cria a sua senha.`;
+    res.innerHTML=`<b>Acesso criado.</b> Envie para <b>${esc(em)}</b> os dados abaixo. No primeiro login a pessoa é obrigada a criar a própria senha.<div class="copyrow" style="margin-top:8px"><pre class="code" id="us-txt" style="margin:0;flex:1">${esc(txt)}</pre><button class="btn2" type="button" id="us-cp" style="align-self:flex-start">Copiar</button></div>`;
+    $("#us-cp").onclick=()=>{try{navigator.clipboard.writeText(txt).then(()=>$("#us-cp").textContent="Copiado")}catch(e){}};$("#us-email").value="";usUI();return}
   const lk=invLink(em);res.className="result";res.innerHTML=`<b>Convite criado.</b> Envie este link para <b>${esc(em)}</b>. A pessoa cria a conta com esse e-mail (ou entra com o Google) e já vê esta conta.<div class="copyrow" style="margin-top:8px"><input class="inp mono" id="us-link" readonly value="${esc(lk)}"><button class="btn2" type="button" id="us-cp">Copiar</button></div>`;
   $("#us-cp").onclick=()=>{try{navigator.clipboard.writeText(lk).then(()=>$("#us-cp").textContent="Copiado")}catch(e){$("#us-link").select()}};
   $("#us-email").value="";usUI()};
+$("#us-gen").onclick=()=>{const c="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";let x="";const a=new Uint32Array(10);crypto.getRandomValues(a);a.forEach(n=>x+=c[n%c.length]);$("#us-pass").value=x};
+async function setPw(pw){if(!sb)return {error:{message:"Disponível só no sistema publicado."}};return sb.auth.updateUser({password:pw,data:{trocar_senha:false}})}
+$("#my-pw").onsubmit=async e=>{e.preventDefault();const pw=$("#my-pass").value,r=$("#my-res");r.hidden=false;
+  if(pw.length<8){r.className="result bad";r.textContent="A senha precisa ter pelo menos 8 caracteres.";return}
+  const x=await setPw(pw);if(x.error){r.className="result bad";r.textContent=/same/i.test(x.error.message)?"Essa já é a sua senha atual.":"Não foi possível salvar: "+x.error.message}else{r.className="result";r.textContent="Senha salva. Agora você também entra com "+(me?me.email:"seu e-mail")+" e essa senha.";$("#my-pass").value=""}};
+function pwModal(forced){const m=$("#pwm");m.hidden=false;$("#pwm-skip").hidden=forced;
+  $("#pwm-t").textContent=forced?"Crie a sua senha":"Crie uma senha para entrar com e-mail";
+  $("#pwm-p").textContent=forced?"Você entrou com uma senha provisória. Escolha uma senha sua para os próximos acessos.":"Você entrou pelo Google. Com uma senha, você também consegue entrar com "+me.email+" e a senha.";
+  $("#pwm-1").focus();
+  $("#pwm-skip").onclick=()=>{try{localStorage.setItem("ft-skip-pw-"+me.id,"1")}catch(e){}m.hidden=true};
+  $("#pwm-f").onsubmit=async e=>{e.preventDefault();const a=$("#pwm-1").value,b2=$("#pwm-2").value,er=$("#pwm-e");
+    if(a.length<8){er.hidden=false;er.textContent="A senha precisa ter pelo menos 8 caracteres.";return}
+    if(a!==b2){er.hidden=false;er.textContent="As duas senhas não são iguais.";return}
+    $("#pwm-go").disabled=true;const x=await setPw(a);$("#pwm-go").disabled=false;
+    if(x.error){er.hidden=false;er.textContent=/same/i.test(x.error.message)?"Escolha uma senha diferente da provisória.":"Não foi possível salvar: "+x.error.message;return}
+    if(x.data&&x.data.user)me=x.data.user;m.hidden=true}}
+async function checkPw(){if(!sb||!me)return;
+  if(me.user_metadata&&me.user_metadata.trocar_senha)return pwModal(true);
+  let skip=false;try{skip=localStorage.getItem("ft-skip-pw-"+me.id)==="1"}catch(e){}
+  if(skip)return;const r=await sb.rpc("tenho_senha");if(r.data===false)pwModal(false)}
 async function cloudInit(){
   if(!window.supabase||!window.FT_SB){document.documentElement.style.visibility="";return}
   sb=window.supabase.createClient(FT_SB.url,FT_SB.key);
@@ -1205,6 +1251,7 @@ async function cloudInit(){
   cloudReady=true;if(!d.co)cloudSave();
   userCard();board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
   document.documentElement.style.visibility="";
+  checkPw().catch(()=>{});
   sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT")location.replace("/login")});
 }
 if(/(^|\.)vercel\.app$/.test(location.hostname))cloudInit().catch(x=>{console.error(x);document.documentElement.style.visibility=""});
