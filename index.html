@@ -331,13 +331,20 @@ details.more summary:hover{color:var(--fg)}
 @media (max-width:900px){.co-layout{grid-template-columns:1fr}.basic{position:static}.vgrid{grid-template-columns:1fr}}
 @media (max-width:1180px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.inner{margin:0 auto}}
 @media (max-width:900px){.how{grid-template-columns:1fr}}
+.kpis.lk4{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:780px){.kpis.lk4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:780px){
-  .app{grid-template-columns:minmax(0,1fr);background:var(--bg)}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr;background:var(--bg)}
   .side{min-width:0}
   .side{position:sticky;top:0;height:auto;z-index:6;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));padding-top:calc(10px + env(safe-area-inset-top,0px))}
   .brand{padding:0 0 8px;font-size:16px}
   .nav{flex-direction:row;overflow-x:auto}
-  .user,.wa{display:none}
+  .wa{display:none}
+  .side{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:10px}
+  .side .nav{grid-column:1/-1;flex:none}
+  .user{grid-row:1;grid-column:2;margin:0 0 8px;padding:4px 6px 4px 4px;background:none;gap:6px}
+  .user>div{display:none}
+  .user .av{width:28px;height:28px;font-size:11px}
   .nav-item{white-space:nowrap}
   .main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -442,7 +449,7 @@ details.more summary:hover{color:var(--fg)}
         <tbody id="camp"></tbody>
       </table></div>
     </div>
-    <p class="note">Protótipo com dados fictícios.</p>
+    <p class="note">Os dados aparecem conforme as conversas chegam pelo WhatsApp conectado.</p>
   </section>
 
   <!-- CONVERSAS -->
@@ -460,7 +467,7 @@ details.more summary:hover{color:var(--fg)}
     </div>
     <div class="kfbar" id="k-fbar" hidden></div>
     <div class="board" id="board"></div>
-    <p class="note">Protótipo com dados fictícios.</p>
+    <p class="note">Os dados aparecem conforme as conversas chegam pelo WhatsApp conectado.</p>
   </section>
 
   <!-- JORNADA -->
@@ -483,7 +490,7 @@ details.more summary:hover{color:var(--fg)}
         <div class="funnel" id="funnel-prev"></div>
       </div>
     </div>
-    <p class="note">Protótipo: as etapas ficam salvas só neste navegador.</p>
+    <p class="note">As etapas ficam salvas na conta e valem para todos os usuários.</p>
   </section>
 
   <!-- EVENTOS -->
@@ -516,7 +523,7 @@ details.more summary:hover{color:var(--fg)}
       <thead><tr><th>Plataforma</th><th>Nome</th><th>Descrição</th><th>Vinculado a</th><th>Etapa da jornada</th><th>Criado em</th><th style="text-align:right">Ações</th></tr></thead>
       <tbody id="ev-body"></tbody>
     </table></div></div>
-    <p class="note">Protótipo: a sincronização é simulada e os eventos ficam salvos só neste navegador.</p>
+    <p class="note">Os eventos ficam salvos na conta. A sincronização com o Google ainda é simulada.</p>
   </section>
 
   <!-- MENSAGENS RASTREADAS -->
@@ -526,12 +533,12 @@ details.more summary:hover{color:var(--fg)}
         <div><h1>Mensagens rastreadas</h1><p class="sub">Links de WhatsApp com código oculto na mensagem. Cada clique vira uma conversa rastreada.</p></div>
         <button class="btn" id="lk-new-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Nova mensagem rastreada</button>
       </div>
-      <div class="kpis" id="lk-kpis" style="grid-template-columns:repeat(4,minmax(0,1fr))"></div>
+      <div class="kpis lk4" id="lk-kpis"></div>
       <div class="panel"><div class="tbl-wrap"><table>
         <thead><tr><th>Nome</th><th>Mensagem</th><th class="n">Cliques</th><th class="n">Conversas</th><th class="n">Vendas</th><th class="n">Valor em vendas</th><th>Criado em</th></tr></thead>
         <tbody id="lk-body"></tbody>
       </table></div></div>
-      <p class="note">Protótipo: os links e métricas são simulados e ficam salvos só neste navegador.</p>
+      <p class="note">As mensagens ficam salvas na conta. As métricas passam a contar quando o WhatsApp estiver conectado.</p>
     </div>
 
     <div id="lk-new" class="view" style="gap:18px" hidden>
@@ -766,12 +773,22 @@ const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice
 const LBL={meta:"Meta Ads",google:"Google Ads",none:"Não rastreada"};
 const badge=o=>`<span class="badge b-${o}">${LBL[o]}</span>`;
 const $=s=>document.querySelector(s);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeLogo=v=>typeof v==="string"&&/^data:image\/(png|jpe?g|gif|webp);base64,[A-Za-z0-9+\/=]+$/.test(v)?v:"";
+// Limpa dados vindos do banco: campos que entram no HTML sem escape (ids, datas, números) só aceitam caracteres seguros.
+const cleanId=v=>String(v==null?"":v).replace(/[^\w.:\/@+-]/g,"").slice(0,80);
+const cleanDt=v=>String(v==null?"":v).replace(/[^\d\/: ]/g,"").slice(0,20);
+function cleanDados(d){
+  if(d.co){["acct","px","pixel","bm","gacc","wa"].forEach(k=>{if(d.co[k]!=null)d.co[k]=cleanId(d.co[k])});d.co.accs=Array.isArray(d.co.accs)?d.co.accs.map(cleanId):[];d.co.logo=safeLogo(d.co.logo)}
+  if(Array.isArray(d.stages))d.stages=d.stages.filter(x=>x&&typeof x==="object").slice(0,8).map(x=>({name:String(x.name||"").slice(0,40),close:!!x.close,meta:cleanId(x.meta),google:cleanId(x.google)}));
+  if(Array.isArray(d.events))d.events=d.events.filter(x=>x&&typeof x==="object").map(x=>({id:cleanId(x.id),plat:x.plat==="google"?"google":"meta",name:String(x.name||"").slice(0,120),desc:String(x.desc||"").slice(0,500),src:x.src==="manual"?"manual":"sync",created:cleanDt(x.created),link:x.link?cleanId(x.link):null}));
+  if(Array.isArray(d.links))d.links=d.links.filter(x=>x&&typeof x==="object").map(x=>({id:cleanId(x.id),name:String(x.name||"").slice(0,120),text:String(x.text||"").slice(0,1000),delay:Math.min(3,Math.max(1,parseInt(x.delay,10)||2)),created:cleanDt(x.created),m:(Array.isArray(x.m)?x.m:[0,0,0,0]).slice(0,4).map(n=>Number(n)||0),ck:x.ck!=null?(Number(x.ck)||0)%16777216:undefined}));
+  return d}
 
 // ---------- tabs ----------
 const VIEWS=["painel","conversas","jornada","eventos","links","empresa","usuarios"];
 function show(t){if(!VIEWS.includes(t))t="painel";
-  document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.dataset.tab===t?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  document.querySelectorAll(".nav-item[data-tab]").forEach(b=>{if(b.dataset.tab===t){b.setAttribute("aria-current","page");try{b.scrollIntoView({block:"nearest",inline:"nearest"})}catch(e){}}else b.removeAttribute("aria-current")});
   VIEWS.forEach(v=>$("#v-"+v).hidden=v!==t);
   if(t==="painel")drawChart();if(t==="jornada")editor();if(t==="conversas")board();if(t==="eventos")evTable();if(t==="empresa")company();if(t==="links")lkShow("list");if(t==="usuarios")usUI();}
 document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.onclick=()=>{location.hash=b.dataset.tab});
@@ -871,7 +888,8 @@ function drawChart(){
   });
   g+=hits;
   if(!r.length)g+=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="var(--muted)" font-size="13">Nenhum dia no período escolhido.</text>`;
-  else if(!vals.some(v=>v))g+=`<text x="${W/2}" y="${(H-B)/2}" text-anchor="middle" fill="var(--muted)" font-size="13">${co.wa==="on"?"Nenhuma conversa no período ainda.":"Nenhuma conversa ainda. Conecte o WhatsApp em Informações da empresa."}</text>`;
+  else if(!vals.some(v=>v)){const t=co.wa==="on"?["Nenhuma conversa no período ainda."]:W<560?["Nenhuma conversa ainda.","Conecte o WhatsApp em","Informações da empresa."]:["Nenhuma conversa ainda. Conecte o WhatsApp em Informações da empresa."];
+    t.forEach((l,i)=>g+=`<text x="${W/2}" y="${(H-B)/2-(t.length-1)*9+i*18}" text-anchor="middle" fill="var(--muted)" font-size="13" paint-order="stroke" stroke="var(--surface)" stroke-width="4">${l}</text>`)}
   box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="Mensagens por dia, empilhadas por origem">${g}</svg><div class="tip" hidden></div>`;
   const tip=box.querySelector(".tip");
   box.querySelectorAll(".hit").forEach(h=>{
@@ -993,7 +1011,7 @@ let BMS=LIVE?[]:[{id:"bm1",n:"Business Manager 1",accs:[["act_1029384756","Conta
 let qrTimer;
 function setSt(id,cls,txt){const el=$(id);el.className="status "+cls;el.querySelector("span").textContent=txt}
 const initials=()=>esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
-function logoUI(){["#logo-box","#logo-box2"].forEach(id=>$(id).innerHTML=co.logo?`<img src="${co.logo}" alt="Logo da empresa">`:initials())}
+function logoUI(){["#logo-box","#logo-box2"].forEach(id=>$(id).innerHTML=co.logo?`<img src="${esc(safeLogo(co.logo))}" alt="Logo da empresa">`:initials())}
 function basicUI(){$("#bv-name").textContent=co.name||"Sem nome";$("#bv-phone").textContent=co.phone||"Não informado";$("#bv-seg").textContent=co.seg||"—";$("#bv-site").textContent=co.site||"—"}
 function basicEdit(on){$("#basic-view").hidden=on;$("#basic-edit").hidden=!on;$("#basic-btn").hidden=on;if(on)$("#co-name").focus();else{basicUI();waUI()}}
 $("#basic-btn").onclick=()=>basicEdit(true);$("#basic-done").onclick=()=>basicEdit(false);
@@ -1119,7 +1137,7 @@ function lkMsg(){const l=lkCur,show=$("#lkd-show").checked,hid=hideCode(clickId(
   $("#lkd-cnt").innerHTML=`<span>Caracteres visíveis: <b class="mono">${vis}</b></span><span>Caracteres totais: <b class="mono">${tot}</b></span><span>Código oculto: <b class="mono">${tot-vis}</b> caracteres invisíveis (clique nº <b class="mono">${readCode(fullMsg(l)).toLocaleString("pt-BR")}</b>)</span>`}
 $("#lkd-show").onchange=lkMsg;
 function lkPlay(){clearInterval(lkPlayT);const l=lkCur,d=l.delay;let t=d;
-  const logo=co.logo?`<img src="${co.logo}" alt="">`:esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
+  const logo=co.logo?`<img src="${esc(safeLogo(co.logo))}" alt="">`:esc((co.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase());
   const frame=()=>{const done=t<=0;$("#lkd-phone").innerHTML=`<div class="lg">${logo}</div><b>Estamos te levando para o atendimento</b><div class="spin"></div><small>${esc(co.name||"")} · ${done?"abrindo o WhatsApp…":`abrindo o WhatsApp em ${t} s`}</small><div class="prog"><i style="width:${(d-t)/d*100}%;transition:width 1s linear"></i></div>`;
     requestAnimationFrame(()=>{const i=$("#lkd-phone .prog i");if(i&&!done)i.style.width=((d-t+1)/d*100)+"%"})};
   frame();lkPlayT=setInterval(()=>{t--;frame();if(t<=0)clearInterval(lkPlayT)},1000);
@@ -1156,7 +1174,7 @@ $("#px-form").onsubmit=e=>{e.preventDefault();const url=$("#px-url").value.trim(
   if(!url){$("#px-url").focus();return}
   if(!LIVE){r.hidden=false;r.className="result bad";r.innerHTML='<span style="color:#c2410c">A verificação real só funciona no sistema publicado (focus-tracking.vercel.app).</span>';return}
   b.disabled=true;b.textContent="Verificando…";
-  fetch("/api/pixel/check?url="+encodeURIComponent(url)+"&id="+encodeURIComponent(co.acct)).then(x=>x.json()).catch(()=>({ok:false,msg:"Não foi possível verificar agora. Tente de novo."}))
+  (sb?sb.auth.getSession():Promise.resolve({data:{}})).then(r=>{const t=r.data&&r.data.session&&r.data.session.access_token;return fetch("/api/pixel/check?url="+encodeURIComponent(url)+"&id="+encodeURIComponent(co.acct),{headers:t?{Authorization:"Bearer "+t}:{}})}).then(x=>x.json()).catch(()=>({ok:false,msg:"Não foi possível verificar agora. Tente de novo."}))
     .then(d=>{co.pxChk={ok:!!d.ok,via:d.via||"",url:d.url||url,msg:d.msg||"",at:nowStr()};saveCo();pxUI();b.disabled=false;b.textContent="Verificar agora"})};
 
 if(LIVE){const MSG={ok:[1,"Facebook conectado."],cancelado:[0,"Login cancelado no Facebook."],erro_estado:[0,"A sessão de login expirou. Tente de novo."],erro:[0,"Não foi possível concluir o login. Tente de novo."]};
@@ -1242,7 +1260,7 @@ async function cloudInit(){
   if(!m.data){document.documentElement.style.visibility="";document.body.innerHTML='<div style="font:15px Arial;padding:40px;max-width:520px">Sua conta ainda não tem acesso a nenhuma empresa. Peça um novo convite ao dono da conta.<p><a href="#" id="lo" style="color:#ff5a1f">Sair</a></p></div>';document.getElementById("lo").onclick=e=>{e.preventDefault();sb.auth.signOut().finally(()=>location.replace("/login"))};return}
   empId=m.data.empresa_id;papel=m.data.papel;
   const e=await sb.from("empresas").select("dados").eq("id",empId).single();
-  const d=(e.data&&e.data.dados)||{};
+  const d=cleanDados((e.data&&e.data.dados)||{});
   if(d.co){co=Object.assign({},DEF_CO,d.co)}
   if(Array.isArray(d.stages)&&d.stages.length>1)stages=d.stages;
   if(Array.isArray(d.events))events=d.events;

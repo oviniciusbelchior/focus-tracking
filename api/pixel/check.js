@@ -38,7 +38,17 @@ async function get(url, hops = 0) {
   } finally { clearTimeout(t); }
 }
 
+// Só usuários logados no Focus Tracking podem usar a verificação (evita uso como proxy aberto).
+const SB_URL = process.env.SUPABASE_URL || "https://jutzkouymkbwlisnumzp.supabase.co";
+const SB_KEY = process.env.SUPABASE_PUBLISHABLE_KEY || "sb_publishable_0q43xqEAoJ5I4ULP2g2LKA_3-0JXC4k";
+async function logged(req) {
+  const h = req.headers.authorization || "";
+  if (!/^Bearer [\w.-]+$/.test(h)) return false;
+  try { const r = await fetch(SB_URL + "/auth/v1/user", { headers: { apikey: SB_KEY, Authorization: h } }); return r.ok; } catch (e) { return false; }
+}
+
 module.exports = async (req, res) => {
+  if (!(await logged(req))) return send(res, 401, { ok: false, msg: "Entre no Focus Tracking para verificar o pixel." });
   const q = new URL(req.url, "https://x").searchParams;
   let url = (q.get("url") || "").trim(); const id = (q.get("id") || "").trim().toLowerCase();
   if (!/^[0-9a-f-]{36}$/.test(id)) return send(res, 400, { ok: false, msg: "Código da conta inválido." });
