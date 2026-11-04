@@ -313,7 +313,7 @@ pre.code{white-space:pre;margin:0;flex:1;min-width:0;line-height:1.5;max-height:
 .wa-box{border-radius:8px;padding:16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:700;font-size:14px}
 .wa-box.on{background:var(--accent-soft);color:var(--accent)}
 .wa-box.off{background:var(--surface-2);color:var(--muted)}
-.wa-box.qr{background:var(--surface-2);color:var(--fg)}
+.wa-box.scan{background:var(--surface-2);color:var(--fg)}
 .wa-box .qr{width:150px;height:150px}
 .wa-box small{font-weight:400;font-size:12px;color:var(--muted)}
 .danger{width:100%;border:0;background:#fdecec;color:#c0392b;font-weight:700;font-size:13px;padding:10px;border-radius:7px}
@@ -1021,7 +1021,7 @@ $("#logo-rm").onclick=()=>{co.logo="";$("#logo-file").value="";saveCo();company(
 function waUI(){clearInterval(qrTimer);const box=$("#wa-box"),off=$("#wa-off-wrap");off.innerHTML="";
   const chk='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>';
   if(co.wa==="on"){box.className="wa-box on";box.innerHTML=chk+"WhatsApp conectado";off.innerHTML=`<button class="danger" id="wa-off" type="button">Desconectar WhatsApp</button>`;$("#wa-off").onclick=()=>{co.wa="off";saveCo();waUI()}}
-  else if(co.wa==="qr"){box.className="wa-box qr";box.innerHTML=`<svg class="qr" viewBox="0 0 29 29" id="qr" aria-label="QR code ilustrativo"></svg><small>WhatsApp, Aparelhos conectados, Conectar um aparelho</small><small id="qr-exp"></small><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><button class="btn2 sm" id="qr-done" type="button">Simular leitura</button><button class="btn2 sm" id="wa-new" type="button">Novo código</button></div>`;
+  else if(co.wa==="qr"){box.className="wa-box scan";box.innerHTML=`<svg class="qr" viewBox="0 0 29 29" id="qr" aria-label="QR code ilustrativo"></svg><small>WhatsApp, Aparelhos conectados, Conectar um aparelho</small><small id="qr-exp"></small><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center"><button class="btn2 sm" id="qr-done" type="button">Simular leitura</button><button class="btn2 sm" id="wa-new" type="button">Novo código</button></div>`;
     drawQR();$("#qr-done").onclick=()=>{co.wa="on";saveCo();waUI()};$("#wa-new").onclick=genQR;
     let t=45;const tick=()=>{const e=$("#qr-exp");if(e)e.textContent=t>0?`O código expira em ${t} s`:"O código expirou. Gere um novo.";t--;if(t<-1)clearInterval(qrTimer)};tick();qrTimer=setInterval(tick,1000)}
   else{box.className="wa-box off";box.innerHTML=`WhatsApp desconectado<button class="btn" id="wa-gen" type="button">Gerar QR code</button>`;$("#wa-gen").onclick=genQR}
