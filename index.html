@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><title>Focus Tracking</title><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" href="/favicon.svg"><style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style></head><body>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><title>Focus Tracking</title><script>if(/(^|\.)vercel\.app$/.test(location.hostname))document.documentElement.style.visibility="hidden"</script><link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="apple-touch-icon" href="/favicon.svg"><style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style></head><body>
 <style>
 /* Layout: fixed black sidebar (260px) + white content column; single light look matching the Focus Dock identity */
 :root{
@@ -353,9 +353,10 @@ details.more summary:hover{color:var(--fg)}
     <button class="nav-item" data-tab="eventos"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>Eventos de conversão</button>
     <button class="nav-item" data-tab="links"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>Mensagens rastreadas</button>
     <button class="nav-item" data-tab="empresa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M16 9h2a2 2 0 0 1 2 2v10"/><path d="M8 7h4M8 11h4M8 15h4M3 21h18"/></svg>Informações da empresa</button>
+    <button class="nav-item" data-tab="usuarios"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg>Usuários</button>
   </nav>
   <div class="wa"><span class="conn-dot"></span>WhatsApp desconectado</div>
-  <div class="user"><span class="av">VB</span><div style="flex:1;min-width:0"><b>Vinicius Belchior</b><small>Proprietário</small></div><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div>
+  <div class="user"><span class="av" id="u-av">VB</span><div style="flex:1;min-width:0"><b id="u-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Vinicius Belchior</b><small id="u-role">Proprietário</small></div><button type="button" id="u-out" aria-label="Sair" title="Sair" style="border:0;background:none;color:inherit;padding:4px;cursor:pointer;display:grid"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
 </aside>
 
 <main class="main"><div class="inner">
@@ -669,7 +670,24 @@ details.more summary:hover{color:var(--fg)}
         </div>
       </div>
     </div>
-    <p class="note">Protótipo: o WhatsApp e o Google ainda são simulados, e os dados ficam salvos só neste navegador.</p>
+    <p class="note">Protótipo: o WhatsApp e o Google ainda são simulados.</p>
+  </section>
+
+  <section class="view" id="v-usuarios" hidden>
+    <div class="head"><div><h1>Usuários</h1><p class="sub">Convide pessoas para acessar esta conta do Focus Tracking.</p></div></div>
+    <div class="panel" id="us-new" style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <h2 style="margin:0;font-size:16px">Convidar usuário</h2>
+      <form id="us-form" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <div class="field" style="flex:2;min-width:220px"><label for="us-email">E-mail da pessoa</label><input class="inp" id="us-email" type="email" placeholder="nome@empresa.com.br" autocomplete="off"></div>
+        <div class="field" style="flex:1;min-width:180px"><label for="us-papel">Acesso</label><select class="sel" id="us-papel"><option value="leitura">Leitura: só visualiza</option><option value="admin">Administrador: edita e convida</option></select></div>
+        <button class="btn" type="submit" id="us-go">Convidar</button>
+      </form>
+      <div class="result" id="us-res" hidden></div>
+    </div>
+    <div class="panel" style="margin-top:16px"><div class="tbl-wrap"><table>
+      <thead><tr><th>E-mail</th><th>Acesso</th><th>Situação</th><th>Desde</th><th></th></tr></thead>
+      <tbody id="us-body"></tbody></table></div></div>
+    <p class="note" id="us-note"></p>
   </section>
 
 </div></main>
@@ -681,6 +699,8 @@ details.more summary:hover{color:var(--fg)}
   <div class="d-body" id="d-body"></div>
 </aside>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/ft-auth.js"></script>
 <script>
 (function(){
 // Sistema zerado: limpa dados salvos de versões de demonstração.
@@ -707,7 +727,7 @@ const FIRST={meta:["Olá! Vi o anúncio e queria saber o valor da avaliação.",
 const DEF_STAGES=[{name:"Fez contato",meta:"",google:""},{name:"Em atendimento",meta:"",google:""},{name:"Cotação enviada",meta:"",google:""},{name:"Venda realizada",close:true,meta:"",google:""}];
 let stages;try{stages=JSON.parse(localStorage.getItem("ft-stages"))}catch(e){}
 if(!Array.isArray(stages)||stages.length<2)stages=JSON.parse(JSON.stringify(DEF_STAGES));
-const saveStages=()=>{try{localStorage.setItem("ft-stages",JSON.stringify(stages))}catch(e){}};
+const saveStages=()=>{try{localStorage.setItem("ft-stages",JSON.stringify(stages))}catch(e){}cloudSave()};
 const PM='<svg class="pm" viewBox="0 0 24 24"><path d="M3.5 15.5c0-4 2-8 4.4-8 2.6 0 4.2 4.5 6 7.3 1.3 2 2.4 2.7 3.6 2.7 1.8 0 3-1.6 3-4.1 0-3.4-1.8-5.9-3.8-5.9-2.4 0-4.2 3.3-5.5 5.6-1.6 2.8-2.9 4.4-4.6 4.4-1.8 0-3.1-1.6-3.1-2z" fill="none" stroke="#1877f2" stroke-width="2.2" stroke-linejoin="round"/></svg>',PG='<svg class="pm" viewBox="0 0 24 24"><rect x="9.5" y="2" width="6" height="19" rx="3" transform="rotate(30 12.5 11.5)" fill="#4285f4"/><rect x="3.5" y="5" width="6" height="15" rx="3" transform="rotate(-30 6.5 12.5)" fill="#fbbc04"/><circle cx="5.5" cy="18.5" r="3" fill="#34a853"/></svg>';
 const PLAT={meta:{n:"Meta Ads",i:PM},google:{n:"Google Ads",i:PG}};
 const nowStr=()=>{const d=new Date();return d.toLocaleDateString("pt-BR")+" "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})};
@@ -716,7 +736,7 @@ const G_STD=[["Contato_WhatsApp","Clique no botão de WhatsApp do site com códi
 const STD_EVENTS=[...G_STD.map(([n,d],i)=>({id:"g"+i,plat:"google",name:n,desc:d,src:"sync",created:"02/10/2026 11:05"})),...META_STD.map(([n,d],i)=>({id:"m"+i,plat:"meta",name:n,desc:d,src:"sync",created:"14/08/2026 16:10"}))];
 let events;try{events=JSON.parse(localStorage.getItem("ft-events"))}catch(e){}
 if(!Array.isArray(events))events=[];
-const saveEvents=()=>{try{localStorage.setItem("ft-events",JSON.stringify(events))}catch(e){}};
+const saveEvents=()=>{try{localStorage.setItem("ft-events",JSON.stringify(events))}catch(e){}cloudSave()};
 const evById=id=>events.find(e=>e.id===id);
 const closeIdx=()=>{const i=stages.findIndex(s=>s.close);return i<0?stages.length-1:i};
 const code=()=>{const c="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";for(let i=0;i<4;i++)s+=c[Math.floor(rnd()*c.length)];return s};
@@ -733,11 +753,11 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 // ---------- tabs ----------
-const VIEWS=["painel","conversas","jornada","eventos","links","empresa"];
+const VIEWS=["painel","conversas","jornada","eventos","links","empresa","usuarios"];
 function show(t){if(!VIEWS.includes(t))t="painel";
   document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.dataset.tab===t?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
   VIEWS.forEach(v=>$("#v-"+v).hidden=v!==t);
-  if(t==="painel")drawChart();if(t==="jornada")editor();if(t==="conversas")board();if(t==="eventos")evTable();if(t==="empresa")company();if(t==="links")lkShow("list");}
+  if(t==="painel")drawChart();if(t==="jornada")editor();if(t==="conversas")board();if(t==="eventos")evTable();if(t==="empresa")company();if(t==="links")lkShow("list");if(t==="usuarios")usUI();}
 document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.onclick=()=>{location.hash=b.dataset.tab});
 addEventListener("hashchange",()=>show(location.hash.slice(1)));
 
@@ -949,7 +969,7 @@ $("#sync-meta").onclick=e=>doSync("meta",e.currentTarget);$("#sync-google").oncl
 // ---------- empresa ----------
 const DEF_CO={name:"",seg:"",site:"",phone:"",tpl:"",pixel:"",token:"",auto:true,value:true,untr:false,test:"",wa:"off",fb:false,bm:"",accs:[],px:"",g:false,gacc:"",logo:""};
 let co;try{co=Object.assign({},DEF_CO,JSON.parse(localStorage.getItem("ft-company")||"{}"))}catch(e){co=Object.assign({},DEF_CO)}
-let coT;const saveCo=()=>{try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}const sv=$("#co-saved");sv.hidden=false;clearTimeout(coT);coT=setTimeout(()=>sv.hidden=true,1500)};
+let coT;const saveCo=()=>{try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}cloudSave();const sv=$("#co-saved");sv.hidden=false;clearTimeout(coT);coT=setTimeout(()=>sv.hidden=true,1500)};
 // Na Vercel (LIVE) o login é real; na prévia continua simulado.
 const LIVE=/(^|\.)vercel\.app$/.test(location.hostname)||location.hostname==="localhost";
 let metaUser=null,metaMsg="";
@@ -1040,7 +1060,7 @@ const brl=v=>"R$ "+v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFrac
 const DEF_LINKS=[{id:"pv7k2a",name:"Página de vendas · botão principal",text:"Olá! Vim pela página e quero agendar minha avaliação.",delay:2,created:"18/10/2026 10:42",m:[412,96,11,13750]},{id:"fl3m9q",name:"Botão flutuante do site",text:"Oi! Estou no site e queria tirar uma dúvida.",delay:1,created:"22/10/2026 15:08",m:[238,71,6,6480]}];
 let links;try{links=JSON.parse(localStorage.getItem("ft-links"))}catch(e){}
 if(!Array.isArray(links))links=[];
-const saveLinks=()=>{try{localStorage.setItem("ft-links",JSON.stringify(links))}catch(e){}};
+const saveLinks=()=>{try{localStorage.setItem("ft-links",JSON.stringify(links))}catch(e){}cloudSave()};
 const rid=()=>{const c="abcdefghjkmnpqrstuvwxyz23456789";let s="";for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s};
 let lkCur=null,lkPlayT;
 function lkShow(v,l){["list","new","detail"].forEach(x=>$("#lk-"+x).hidden=x!==v);clearInterval(lkPlayT);
@@ -1131,6 +1151,63 @@ if(LIVE){const MSG={ok:[1,"Facebook conectado."],cancelado:[0,"Login cancelado n
     if(d.connected){metaUser=d.user;BMS=d.bms||[];co.fb=true;if(!BMS.some(b=>b.id===co.bm)){co.bm=BMS[0]?BMS[0].id:"";co.accs=[];co.px="";co.pixel=""}}
     else{co.fb=false;metaUser=null;if(d.error)metaMsg={ok:false,t:"A conexão com o Facebook expirou. Conecte de novo."}}
     try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}refresh()}).catch(()=>{co.fb=false;refresh()})}
+// ---------- contas, login e usuários (Supabase) ----------
+var sb=null,me=null,empId=null,papel="dono",cloudT=null,cloudReady=false;
+const PAPEL={dono:"Dono",admin:"Administrador",leitura:"Leitura"};
+function cloudSave(){if(!cloudReady||!sb||!empId||papel==="leitura")return;clearTimeout(cloudT);
+  cloudT=setTimeout(()=>{sb.from("empresas").update({nome:co.name||"Minha empresa",dados:{co,stages,events,links}}).eq("id",empId).then(r=>{if(r.error)console.error("salvar",r.error)})},800)}
+function userCard(){const em=me?me.email:"";const nm=(me&&me.user_metadata&&(me.user_metadata.full_name||me.user_metadata.name))||(em?em.split("@")[0]:"Vinicius Belchior");
+  $("#u-name").textContent=nm;$("#u-name").title=em;$("#u-role").textContent=PAPEL[papel]||"";
+  $("#u-av").textContent=nm.split(/[\s._-]+/).filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase()}
+$("#u-out").onclick=()=>{if(sb)sb.auth.signOut().finally(()=>location.replace("/login"));else location.href="/login"};
+let usDemo=[{email:"vinnicius.belchior01@gmail.com",papel:"dono",created_at:new Date().toISOString(),ativo:true}];
+const dBR=x=>new Date(x).toLocaleDateString("pt-BR");
+const invLink=em=>(/^https?:/.test(location.origin)&&!/claude/.test(location.hostname)?location.origin:"https://focus-tracking.vercel.app")+"/login?convite=1&email="+encodeURIComponent(em);
+async function usUI(){const body=$("#us-body"),adm=papel!=="leitura";$("#us-new").hidden=!adm;
+  $("#us-note").textContent=adm?"O dono não pode ser removido. Quem tem acesso de leitura não altera nada na conta.":"Seu acesso é de leitura. Só o dono e os administradores convidam pessoas.";
+  let rows=[];
+  if(sb&&empId){body.innerHTML='<tr><td colspan="5" style="color:var(--muted)">Carregando…</td></tr>';
+    const [m,c]=await Promise.all([sb.from("membros").select("user_id,email,papel,created_at").eq("empresa_id",empId).order("created_at"),sb.from("convites").select("id,email,papel,created_at").eq("empresa_id",empId).is("aceito_em",null).order("created_at")]);
+    rows=(m.data||[]).map(x=>Object.assign(x,{ativo:true})).concat((c.data||[]).map(x=>Object.assign(x,{ativo:false})))}
+  else rows=usDemo;
+  body.innerHTML=rows.map((r,i)=>`<tr><td>${esc(r.email)}${me&&r.user_id===me.id?' <span style="color:var(--muted)">(você)</span>':""}</td><td>${PAPEL[r.papel]}</td><td>${r.ativo?'<span class="ok-t">Ativo</span>':'<span style="color:#c2410c">Convite pendente</span>'}</td><td style="color:var(--muted);white-space:nowrap">${dBR(r.created_at)}</td>
+    <td style="text-align:right;white-space:nowrap">${adm&&!r.ativo?`<button class="link" data-cp="${i}">Copiar link</button> · `:""}${adm&&r.papel!=="dono"&&!(me&&r.user_id===me.id)?`<button class="link" data-rm="${i}" style="color:#c0392b">${r.ativo?"Remover":"Cancelar"}</button>`:""}</td></tr>`).join("")||'<tr><td colspan="5" style="color:var(--muted)">Ninguém ainda.</td></tr>';
+  body.querySelectorAll("[data-cp]").forEach(b=>b.onclick=()=>{const t=invLink(rows[+b.dataset.cp].email);try{navigator.clipboard.writeText(t).then(()=>{b.textContent="Copiado";setTimeout(()=>b.textContent="Copiar link",1500)})}catch(e){}});
+  body.querySelectorAll("[data-rm]").forEach(b=>b.onclick=async()=>{const r=rows[+b.dataset.rm];if(!confirm((r.ativo?"Remover o acesso de ":"Cancelar o convite de ")+r.email+"?"))return;
+    if(sb&&empId){const q=r.ativo?sb.from("membros").delete().eq("empresa_id",empId).eq("user_id",r.user_id):sb.from("convites").delete().eq("id",r.id);const x=await q;if(x.error){alert("Não foi possível remover: "+x.error.message);return}}
+    else usDemo=usDemo.filter(u=>u!==r);usUI()})}
+$("#us-form").onsubmit=async e=>{e.preventDefault();const em=$("#us-email").value.trim().toLowerCase(),pp=$("#us-papel").value,res=$("#us-res"),b=$("#us-go");
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){res.hidden=false;res.className="result bad";res.textContent="Digite um e-mail válido.";$("#us-email").focus();return}
+  b.disabled=true;b.textContent="Convidando…";let err=null;
+  if(sb&&empId){const x=await sb.from("convites").insert({empresa_id:empId,email:em,papel:pp,criado_por:me.id});err=x.error}
+  else if(usDemo.some(u=>u.email===em))err={code:"23505"};else usDemo.push({email:em,papel:pp,created_at:new Date().toISOString(),ativo:false});
+  b.disabled=false;b.textContent="Convidar";res.hidden=false;
+  if(err){res.className="result bad";res.textContent=err.code==="23505"?"Esse e-mail já foi convidado.":"Não foi possível convidar: "+(err.message||"erro");return}
+  const lk=invLink(em);res.className="result";res.innerHTML=`<b>Convite criado.</b> Envie este link para <b>${esc(em)}</b>. A pessoa cria a conta com esse e-mail (ou entra com o Google) e já vê esta conta.<div class="copyrow" style="margin-top:8px"><input class="inp mono" id="us-link" readonly value="${esc(lk)}"><button class="btn2" type="button" id="us-cp">Copiar</button></div>`;
+  $("#us-cp").onclick=()=>{try{navigator.clipboard.writeText(lk).then(()=>$("#us-cp").textContent="Copiado")}catch(e){$("#us-link").select()}};
+  $("#us-email").value="";usUI()};
+async function cloudInit(){
+  if(!window.supabase||!window.FT_SB){document.documentElement.style.visibility="";return}
+  sb=window.supabase.createClient(FT_SB.url,FT_SB.key);
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){location.replace("/login");return}
+  me=session.user;
+  const m=await sb.from("membros").select("empresa_id,papel").eq("user_id",me.id).limit(1).maybeSingle();
+  if(!m.data){document.documentElement.style.visibility="";document.body.innerHTML='<div style="font:15px Arial;padding:40px;max-width:520px">Sua conta ainda não tem acesso a nenhuma empresa. Peça um novo convite ao dono da conta.<p><a href="#" id="lo" style="color:#ff5a1f">Sair</a></p></div>';document.getElementById("lo").onclick=e=>{e.preventDefault();sb.auth.signOut().finally(()=>location.replace("/login"))};return}
+  empId=m.data.empresa_id;papel=m.data.papel;
+  const e=await sb.from("empresas").select("dados").eq("id",empId).single();
+  const d=(e.data&&e.data.dados)||{};
+  if(d.co){co=Object.assign({},DEF_CO,d.co)}
+  if(Array.isArray(d.stages)&&d.stages.length>1)stages=d.stages;
+  if(Array.isArray(d.events))events=d.events;
+  if(Array.isArray(d.links))links=d.links;
+  try{localStorage.setItem("ft-company",JSON.stringify(co));localStorage.setItem("ft-stages",JSON.stringify(stages));localStorage.setItem("ft-events",JSON.stringify(events));localStorage.setItem("ft-links",JSON.stringify(links))}catch(x){}
+  cloudReady=true;if(!d.co)cloudSave();
+  userCard();board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
+  document.documentElement.style.visibility="";
+  sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT")location.replace("/login")});
+}
+if(/(^|\.)vercel\.app$/.test(location.hostname))cloudInit().catch(x=>{console.error(x);document.documentElement.style.visibility=""});
 board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
 })();
 </script>
