@@ -145,7 +145,7 @@ label{font-size:13.5px;font-weight:700;margin-bottom:7px;display:block}
     if(session&&!recovering&&(ev==="SIGNED_IN"||ev==="INITIAL_SESSION"))location.replace("/")});
   $("#google").onclick=function(){show("");var gb=this;gb.disabled=true;
     fetch(FT_SB.url+"/auth/v1/settings",{headers:{apikey:FT_SB.key}}).then(function(r){return r.json()}).then(function(st){
-      if(!st.external||!st.external.google){gb.disabled=false;show("O login com Google ainda não foi ativado. Use e-mail e senha por enquanto.");return}
+      if(st&&st.external&&st.external.google===false){gb.disabled=false;show("O login com Google ainda não foi ativado. Use e-mail e senha por enquanto.");return}
       sb.auth.signInWithOAuth({provider:"google",options:{redirectTo:back}}).then(function(r){gb.disabled=false;if(r.error)show(msg(r.error))})}).catch(function(){gb.disabled=false;show("Não foi possível abrir o login com Google. Tente de novo.")})};
   $("#forgot").onclick=function(e){e.preventDefault();var m=$("#email").value.trim();
     if(!m){show("Digite seu e-mail acima e clique de novo em Esqueci minha senha.");$("#email").focus();return}
