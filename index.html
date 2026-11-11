@@ -1186,7 +1186,7 @@ if(LIVE){const MSG={ok:[1,"Facebook conectado."],cancelado:[0,"Login cancelado n
     else{co.fb=false;metaUser=null;if(d.error)metaMsg={ok:false,t:"A conexão com o Facebook expirou. Conecte de novo."}}
     try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}refresh()}).catch(()=>{co.fb=false;refresh()})}
 // ---------- contas, login e usuários (Supabase) ----------
-var sb=null,me=null,empId=null,papel="dono",cloudT=null,cloudReady=false;
+var sb=null,me=null,empId=null,papel="dono",cloudT=null,cloudReady=false,cloudDead=false;
 const PAPEL={dono:"Dono",admin:"Administrador",leitura:"Leitura"};
 function cloudSave(){if(!cloudReady||!sb||!empId||papel==="leitura")return;clearTimeout(cloudT);
   cloudT=setTimeout(()=>{sb.from("empresas").update({nome:co.name||"Minha empresa",dados:{co,stages,events,links}}).eq("id",empId).then(r=>{if(r.error)console.error("salvar",r.error)})},800)}
@@ -1257,22 +1257,30 @@ async function cloudInit(){
   if(!session){location.replace("/login");return}
   me=session.user;
   const m=await sb.from("membros").select("empresa_id,papel").eq("user_id",me.id).limit(1).maybeSingle();
+  if(m.error)throw m.error;
   if(!m.data){document.documentElement.style.visibility="";document.body.innerHTML='<div style="font:15px Arial;padding:40px;max-width:520px">Sua conta ainda não tem acesso a nenhuma empresa. Peça um novo convite ao dono da conta.<p><a href="#" id="lo" style="color:#ff5a1f">Sair</a></p></div>';document.getElementById("lo").onclick=e=>{e.preventDefault();sb.auth.signOut().finally(()=>location.replace("/login"))};return}
   empId=m.data.empresa_id;papel=m.data.papel;
   const e=await sb.from("empresas").select("dados").eq("id",empId).single();
+  if(e.error)throw e.error;
   const d=cleanDados((e.data&&e.data.dados)||{});
   if(d.co){co=Object.assign({},DEF_CO,d.co)}
   if(Array.isArray(d.stages)&&d.stages.length>1)stages=d.stages;
   if(Array.isArray(d.events))events=d.events;
   if(Array.isArray(d.links))links=d.links;
   try{localStorage.setItem("ft-company",JSON.stringify(co));localStorage.setItem("ft-stages",JSON.stringify(stages));localStorage.setItem("ft-events",JSON.stringify(events));localStorage.setItem("ft-links",JSON.stringify(links))}catch(x){}
+  if(cloudDead)return;
   cloudReady=true;if(!d.co)cloudSave();
   userCard();board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
   document.documentElement.style.visibility="";
   checkPw().catch(()=>{});
   sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT")location.replace("/login")});
 }
-if(/(^|\.)vercel\.app$/.test(location.hostname))cloudInit().catch(x=>{console.error(x);document.documentElement.style.visibility=""});
+// Se o servidor não responder (ex.: banco do Supabase pausado), mostra um aviso em vez de deixar a tela em branco.
+function cloudFail(){if(cloudReady)return;cloudDead=true;document.documentElement.style.visibility="";
+  document.body.innerHTML='<div style="font:15px Arial;padding:40px;max-width:560px;line-height:1.5"><b>Não foi possível carregar os dados da conta.</b><p>O servidor não respondeu. Verifique sua internet e tente de novo em instantes. Se continuar, avise o suporte.</p><p><a href="#" id="rt" style="color:#ff5a1f">Tentar de novo</a> &nbsp;·&nbsp; <a href="#" id="lo" style="color:#ff5a1f">Sair</a></p></div>';
+  document.getElementById("rt").onclick=e=>{e.preventDefault();location.reload()};
+  document.getElementById("lo").onclick=e=>{e.preventDefault();try{Object.keys(localStorage).filter(k=>k.startsWith("sb-")).forEach(k=>localStorage.removeItem(k))}catch(x){}location.replace("/login")}}
+if(/(^|\.)vercel\.app$/.test(location.hostname)){const wd=setTimeout(cloudFail,15000);cloudInit().then(()=>clearTimeout(wd)).catch(x=>{clearTimeout(wd);console.error(x);cloudFail()})}
 board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
 })();
 </script>
