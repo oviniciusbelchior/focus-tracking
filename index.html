@@ -397,6 +397,9 @@ button.crcard:hover{border-color:var(--brand)}
 .crerrs li{display:flex;gap:14px;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid #fed7aa;background:#fff7ed;border-radius:8px;font-size:13.5px}
 .crerrs li small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
 .crerrs li .btn2{flex:none}
+.crboxes{display:grid;grid-template-columns:1fr;gap:10px}.crsl{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.crbox{display:flex;flex-direction:column;gap:4px;min-width:0}.crbox-h{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--muted)}.crbox-h span{font-weight:600;color:var(--fg)}.crbox-h small{margin-left:auto}.crbox-h .link{font-size:12px}
+.crbox textarea{resize:vertical;min-height:0;field-sizing:content}
 .crask{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-left,0px))}
 .crask-box{background:var(--surface,#fff);color:var(--fg);border-radius:12px;padding:22px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .crask-box h2{font-size:17px;margin:0}.crask-box p{margin:0;font-size:14px;color:var(--muted);overflow-wrap:anywhere}.crask-box .jactions{justify-content:flex-end;margin-top:6px}
@@ -1598,21 +1601,29 @@ function syncBrief(c){const b=c.brief;c.name=(b.campName||autoName(b)).trim();c.
   c.bid=b.bid||"MAX_CONV";c.cpc=b.cpc;c.tcpa=b.tcpa;c.url=b.url;c.addrs=b.addrs.slice();c.areas=b.cities.slice();c.radius=+b.radius||3;c.eu=!!b.eu;return c}
 // O que muda o conteúdo do plano (grupos, anúncios e extensões). Mudar só orçamento, conta ou lance não refaz o plano.
 const planKey=b=>JSON.stringify([b.biz,b.services,b.mode,b.diffs,b.offer,b.hours,briefCities(b),b.avoid]);
+// Sitelinks: sempre 6. Quem somos, serviços, prova social e contato fecham o anúncio completo.
+const SL_ROLES=["Quem somos","Serviços","Serviço 1 ou diferenciais","Serviço 2 ou depoimentos","Depoimentos ou localização","Contato"];
+function SL_PLAN(b){const sv=b.services.map(titleCase).filter(x=>x&&x.length<=25);
+  const l=sv.length>=2?["Quem Somos","Nossos Serviços",sv[0],sv[1],"Depoimentos","Fale Conosco"]
+    :["Quem Somos",sv[0]||"Nossos Serviços","Nossos Diferenciais","Depoimentos",b.addrs.length?"Como Chegar":"Nossos Valores","Fale Conosco"];
+  return uniq(l,25,6)}
 // Intenções de busca: cada uma vira um grupo no modo "por intenção".
 const INTENTS=[
   {k:"servico",n:"Serviço",kw:(s,c)=>[s,c?`${s} ${c}`:"",`${s} especialista`,`clínica de ${s}`]},
   {k:"preco",n:"Preço",kw:(s,c)=>[`${s} preço`,`${s} valor`,`quanto custa ${s}`,c?`${s} preço ${c}`:"",`${s} orçamento`]},
   {k:"local",n:"Perto de mim",kw:(s,c)=>[`${s} perto de mim`,c?`${s} em ${c}`:"",`${s} próximo`,`onde fazer ${s}`]},
   {k:"agendar",n:"Agendar",kw:(s,c)=>[`agendar ${s}`,`marcar ${s}`,`${s} agendamento`,`${s} horário`]}];
-function adsFor(S,it,o){const {B,C,O,D,hours}=o,sl=S.toLowerCase(),Ct=C?titleCase(C):"";
-  const lead={preco:[`Preço de ${S}`,`${S}: Veja Valores`,`Orçamento de ${S}`,`${S} com Preço Justo`],local:[Ct?`${S} em ${Ct}`:"",`${S} Perto de Você`,`${S} na Sua Região`],
-    agendar:[`Agende ${S} Hoje`,`Onde Fazer ${S}`,`Horários para ${S}`],servico:[Ct?`${S} em ${Ct}`:"",S,`Especialistas em ${S}`]}[it]||[];
-  const titles=uniq([...lead,Ct?`${S} em ${Ct}`:"",S,`${S} Perto de Você`,`${S} com Especialistas`,`Especialistas em ${S}`,`${S} | ${B}`,`Onde Fazer ${S}`,`Preço de ${S}`,`Agende ${S} Hoje`,
-    `Faça ${S}`,`${S} | Agende`,`${S} na Região`,`${S} Agora`,O?cap(O):"",...D.map(cap),"Agende pelo WhatsApp","Fale Conosco no WhatsApp","Resposta em Minutos",B],30,15);
+function adsFor(S,it,o,kws=[]){const {B,C,O,D,hours}=o,sl=S.toLowerCase(),Ct=C?titleCase(C):"";
+  // Títulos próprios de cada intenção. Cada grupo fala com uma busca diferente, então os títulos não se repetem entre grupos.
+  const lead={preco:[`Preço de ${S}`,`${S}: Veja Valores`,`Orçamento de ${S}`,`${S} com Preço Justo`,`Quanto Custa ${S}`,`Valor de ${S}`,`${S} | Peça Orçamento`,"Orçamento Sem Compromisso","Consulte Valores no WhatsApp","Peça Seu Orçamento Hoje","Preço Justo e Transparente"],
+    local:[Ct?`${S} em ${Ct}`:"",`${S} Perto de Você`,`${S} na Sua Região`,`${S} Perto de Mim`,`${S} Próximo a Você`,`Onde Fazer ${S}`,Ct?`${S} ${Ct}`:"",Ct?`Atendemos em ${Ct}`:"","Fácil de Chegar","Atendimento na Sua Região","Venha Nos Conhecer"],
+    agendar:[`Agende ${S} Hoje`,`Agendar ${S}`,`Marque ${S}`,`Horários para ${S}`,`${S} | Agende Já`,"Marque Seu Horário","Horários Disponíveis","Agendamento Rápido","Agende pelo WhatsApp","Agende em Poucos Minutos","Escolha Seu Horário"],
+    servico:[Ct?`${S} em ${Ct}`:"",S,`Especialistas em ${S}`,`${S} com Especialistas`,`${S} Especializado`,`${S} de Confiança`,`${S} | ${B}`,`Faça ${S}`,`${S} Profissional`,"Equipe Especializada","Atendimento de Confiança"]}[it]||[];
+  const titles=uniq([...lead,...kws.map(titleCase),O?cap(O):"",...D.map(cap),`${S} Agora`,`${S} na Região`,"Fale Conosco no WhatsApp","Resposta em Minutos","Fale com Nossa Equipe",B],30,40);
   const d1=cut(`${S}${Ct?" em "+Ct:""} com ${lowFirst(D[0]||"atendimento especializado")}. ${O?cap(O)+".":"Fale com a gente."} Chame no WhatsApp.`,90);
   const d2=cut({preco:`Quer saber o valor de ${sl}? Fale com a ${B} pelo WhatsApp e receba seu orçamento.`,local:`${S} perto de você${Ct?" em "+Ct:""}. Atendimento de confiança. Agende pelo WhatsApp.`,
     agendar:`Agende ${sl} no melhor horário para você. Resposta rápida pelo WhatsApp.`}[it]||`Tire suas dúvidas sobre ${sl} e agende o melhor horário para você.`,90);
-  const d3=cut(`${B}: ${D.slice(0,2).map(lowFirst).join(" e ")||"atendimento de confiança"}. Agende pelo WhatsApp.`,90);
+  const d3=cut(`${S} na ${B}: ${D.slice(0,2).map(lowFirst).join(" e ")||"atendimento de confiança"}. Agende pelo WhatsApp.`,90);
   const d4=cut(`${hours?"Atendimento "+hours+". ":""}Fale com nossa equipe sobre ${sl} pelo WhatsApp, sem compromisso.`,90);
   return {titles,descs:uniq([d1,d2,d3,d4],90,4)}}
 // Gera o plano de ação a partir do briefing: grupos por serviço ou por intenção, títulos puxados das palavras-chave.
@@ -1620,12 +1631,13 @@ function genPlan(c){const b=c.brief,cs=briefCities(b),C=cs[0]||"",B=b.biz.trim()
   const svc=b.services.slice(0,6),kwl=(arr)=>uniq(arr.map(x=>String(x||"").toLowerCase()),80,20);
   if(b.mode==="intencao"){const S0=titleCase(svc[0]||"");
     c.groups=INTENTS.map(it=>{const kws=kwl(svc.flatMap(s=>{s=s.toLowerCase().trim();return it.kw(s,"").concat(cs.slice(0,2).flatMap(ci=>it.kw(s,ci.toLowerCase()).filter(k=>k.includes(ci.toLowerCase()))))}));
-      const ad=adsFor(S0,it.k,o);return {name:svc.length===1?`${S0} | ${it.n}`:it.n,match:"PHRASE",kws,titles:ad.titles,descs:ad.descs,url:""}})}
+      const ad=adsFor(S0,it.k,o,kws);return {name:svc.length===1?`${S0} | ${it.n}`:it.n,match:"PHRASE",kws,titles:ad.titles,descs:ad.descs,url:""}})}
   else c.groups=svc.map(s=>{const S=titleCase(s),sl=s.toLowerCase().trim();
     const kws=kwl([sl,...cs.slice(0,3).map(ci=>`${sl} ${ci.toLowerCase()}`),`${sl} perto de mim`,`${sl} preço`,`${sl} valor`,`agendar ${sl}`,`onde fazer ${sl}`]);
-    const ad=adsFor(S,"servico",o);return {name:S,match:"PHRASE",kws,titles:ad.titles,descs:ad.descs,url:""}});
+    const ad=adsFor(S,"servico",o,kws);return {name:S,match:"PHRASE",kws,titles:ad.titles,descs:ad.descs,url:""}});
+  const usedT=new Set();c.groups.forEach(g=>{g.titles=g.titles.filter(t=>!usedT.has(norm(t))).slice(0,15);g.titles.forEach(t=>usedT.add(norm(t)))});
   c.neg=uniq(NEG_BASE.filter(n=>!(O+" "+svc.join(" ")).toLowerCase().includes(n)).concat(b.avoid),80,200);
-  c.sitelinks=uniq(svc.map(titleCase).concat(["Fale no WhatsApp","Como Chegar","Sobre Nós"]),25,6);
+  c.sitelinks=SL_PLAN(b);
   c.callouts=uniq(D.map(cap).concat(["Atendimento Rápido","Agende pelo WhatsApp","Sem Compromisso","Resposta em Minutos"]),25,8);
   c.step="plano";c.approved=false;return c}
 // ---------- Conferência no padrão do Google Ads ----------
@@ -1690,7 +1702,7 @@ function crCheck(c){syncBrief(c);const e=briefCheck(c.brief).map(x=>Object.assig
   c.neg.forEach(n=>{if(KW_BAD.test(n))E(`A negativa "${n}" tem símbolo que o Google não aceita.`,"#cf-neg")});
   dupes(c.neg).forEach(n=>E(`A negativa "${n}" aparece repetida.`,"#cf-neg",1));
   if(!c.groups.length)E("Crie pelo menos um grupo de anúncios.","#cf-addg");
-  const allKw=[];
+  const allKw=[],allT=[];
   c.groups.forEach((g,i)=>{const n=`Grupo ${i+1}${g.name?` (${g.name})`:""}`,F=k=>`#cf-groups .crg:nth-child(${i+1}) [data-f=${k}]`;
     if(!g.name.trim())E(`Grupo ${i+1}: dê um nome.`,F("name"));
     if(c.groups.findIndex(x=>norm(x.name)===norm(g.name))!==i)E(`${n}: já existe outro grupo com esse nome.`,F("name"));
@@ -1703,6 +1715,7 @@ function crCheck(c){syncBrief(c);const e=briefCheck(c.brief).map(x=>Object.assig
     if(g.titles.length<3||g.titles.length>15)E(`${n}: o anúncio precisa de 3 a 15 títulos (tem ${g.titles.length}).`,F("titles"));
     g.titles.forEach(t=>adText(t,30,n+", título",F("titles"),{noBang:1}).forEach(x=>e.push(x)));
     dupes(g.titles).forEach(t=>E(`${n}: o título "${t}" está repetido.`,F("titles")));
+    g.titles.forEach(t=>{const o=allT.find(x=>x.t===norm(t));if(o&&o.g!==i)E(`${n}: o título "${t}" já está no grupo ${o.g+1}. Cada grupo fala com uma busca diferente, então use títulos próprios.`,F("titles"));else if(!o)allT.push({t:norm(t),g:i})});
     if(g.descs.length<2||g.descs.length>4)E(`${n}: o anúncio precisa de 2 a 4 descrições (tem ${g.descs.length}).`,F("descs"));
     g.descs.forEach(t=>adText(t,90,n+", descrição",F("descs")).forEach(x=>e.push(x)));
     dupes(g.descs).forEach(t=>E(`${n}: a descrição "${t.slice(0,40)}…" está repetida.`,F("descs")));
@@ -1714,7 +1727,7 @@ function crCheck(c){syncBrief(c);const e=briefCheck(c.brief).map(x=>Object.assig
     if(g.kws.length>20)E(`${n}: mais de 20 palavras-chave. Grupos menores têm anúncios mais relevantes.`,F("kws"),1)});
   c.sitelinks.forEach(t=>adText(t,25,"Sitelink","#cf-sl").forEach(x=>e.push(x)));dupes(c.sitelinks).forEach(t=>E(`O sitelink "${t}" está repetido.`,"#cf-sl"));
   c.callouts.forEach(t=>adText(t,25,"Frase de destaque","#cf-co").forEach(x=>e.push(x)));dupes(c.callouts).forEach(t=>E(`A frase de destaque "${t}" está repetida.`,"#cf-co"));
-  if(c.sitelinks.length<4)E("Use pelo menos 4 sitelinks: eles aumentam o anúncio e a taxa de cliques.","#cf-sl",1);
+  if(c.sitelinks.length<6)E(`Preencha os 6 sitelinks (tem ${c.sitelinks.length}): quem somos, serviços, prova social e contato deixam o anúncio completo.`,"#cf-sl",1);
   if(c.callouts.length<4)E("Use pelo menos 4 frases de destaque.","#cf-co",1);
   if(c.bid!=="MAX_CONV")E("Para leads, o Google recomenda Maximizar conversões assim que a conversão de lead estiver medida.","#bf-bid",1);
   return e}
@@ -1722,7 +1735,8 @@ const crErrors=c=>crCheck(c).filter(x=>!x.w).map(x=>x.t);
 // Arruma o que dá para arrumar sozinho: repetições, espaços e linhas vazias.
 function crTidy(c){const u=a=>uniq(a,999,999);c.neg=u(c.neg);c.sitelinks=u(c.sitelinks);c.callouts=u(c.callouts);
   const seen=new Set();c.groups.forEach(g=>{g.kws=u(g.kws).map(k=>k.replace(/["\[\]]/g,"").trim()).filter(k=>{const n=norm(k);if(!n||seen.has(n))return false;seen.add(n);return true});
-    g.titles=u(g.titles.map(t=>t.replace(/!/g,"").replace(/\s+/g," ").trim()));g.descs=u(g.descs)});return c}
+    g.titles=u(g.titles.map(t=>t.replace(/!/g,"").replace(/\s+/g," ").trim()));g.descs=u(g.descs)});
+  const usedT=new Set();c.groups.forEach(g=>{g.titles=g.titles.filter(t=>!usedT.has(norm(t)));g.titles.forEach(t=>usedT.add(norm(t)))});return c}
 function crPlan(c){syncBrief(c);const mi=v=>Math.round((Number(v)||0)*1e6),s=c.sched||{};
   return {conta:c.cust,objetivo:"LEADS",campanha:{nome:c.name,canal:"SEARCH",redes:{pesquisa_google:true,parceiros_de_pesquisa:false,display:false},status:"PAUSED",orcamento_diario_micros:mi(c.budget),
       lance:c.bid==="MANUAL_CPC"?{estrategia:"MANUAL_CPC",cpc_micros:mi(c.cpc)}:c.bid==="MAX_CLICKS"?{estrategia:"MAXIMIZE_CLICKS",cpc_maximo_micros:c.cpc>0?mi(c.cpc):null}:{estrategia:"MAXIMIZE_CONVERSIONS",cpa_desejado_micros:c.tcpa>0?mi(c.tcpa):null},
@@ -1832,14 +1846,17 @@ function crBrief(c){crCur=c;const b=c.brief,box=$("#i-create"),accOpts=gList(),d
 function crRead(){const c=crCur;
   c.presence=(document.querySelector("[name=cf-pres]:checked")||{}).value!=="interesse";
   c.sched={on:$("#cf-sched-on").checked,days:[...document.querySelectorAll("#cf-sched input[type=checkbox]:checked")].map(x=>x.value),from:+$("#cf-from").value,to:+$("#cf-to").value};
-  c.neg=lines($("#cf-neg").value);c.sitelinks=lines($("#cf-sl").value);c.callouts=lines($("#cf-co").value);
-  c.groups=[...document.querySelectorAll("#cf-groups .crg")].map(el=>({name:el.querySelector("[data-f=name]").value.trim(),match:el.querySelector("[data-f=match]").value,kws:lines(el.querySelector("[data-f=kws]").value),titles:lines(el.querySelector("[data-f=titles]").value),descs:lines(el.querySelector("[data-f=descs]").value),url:el.querySelector("[data-f=url]").value.trim()}));
+  c.neg=lines($("#cf-neg").value);c.sitelinks=[...document.querySelectorAll("#cf-sls input")].map(x=>x.value.replace(/\s+/g," ").trim()).filter(Boolean);c.callouts=lines($("#cf-co").value);
+  c.groups=[...document.querySelectorAll("#cf-groups .crg")].map(el=>({name:el.querySelector("[data-f=name]").value.trim(),match:el.querySelector("[data-f=match]").value,kws:lines(el.querySelector("[data-f=kws]").value),titles:lines(el.querySelector("[data-f=titles]").value),descs:[...el.querySelectorAll("[data-f=descs]")].map(x=>x.value.replace(/\s+/g," ").trim()).filter(Boolean),url:el.querySelector("[data-f=url]").value.trim()}));
   return syncBrief(c)}
-function crCount(el){const t=lines(el.querySelector("[data-f=titles]").value),d=lines(el.querySelector("[data-f=descs]").value),k=lines(el.querySelector("[data-f=kws]").value);
+const crBoxN=el=>el.querySelectorAll(".crbox").forEach(b=>{const n=b.querySelector("[data-f]").value.trim().length,m=+b.dataset.max;b.querySelector("[data-n]").innerHTML=n>m?`<b class="bad">${n}/${m}</b>`:`${n}/${m}`});
+function crCount(el){crBoxN(el);const t=lines(el.querySelector("[data-f=titles]").value),d=[...el.querySelectorAll("[data-f=descs]")].map(x=>x.value.trim()).filter(Boolean),k=lines(el.querySelector("[data-f=kws]").value);
   const tl=t.filter(x=>x.length>30).length,dl=d.filter(x=>x.length>90).length,td=dupes(t).length,dd=dupes(d).length,kd=dupes(k).length;
   el.querySelector("[data-c=titles]").innerHTML=`${t.length} de 3 a 15${tl?` · <b class="bad">${tl} acima de 30</b>`:""}${td?` · <b class="bad">${td} repetido${td>1?"s":""}</b>`:""}`;
-  el.querySelector("[data-c=descs]").innerHTML=`${d.length} de 2 a 4${dl?` · <b class="bad">${dl} acima de 90</b>`:""}${dd?` · <b class="bad">${dd} repetida${dd>1?"s":""}</b>`:""}`;
+  el.querySelector("[data-c=descs]").innerHTML=`${d.length} de 4${dl?` · <b class="bad">${dl} acima de 90</b>`:""}${dd?` · <b class="bad">${dd} repetida${dd>1?"s":""}</b>`:""}`;
   el.querySelector("[data-c=kws]").innerHTML=`${k.length} palavras-chave${kd?` · <b class="bad">${kd} repetida${kd>1?"s":""}</b>`:""}`}
+// Uma caixa por texto (descrição ou sitelink), com contador e botão de copiar.
+const crBox=(f,label,val,max,rows,id)=>`<div class="crbox" data-max="${max}"><div class="crbox-h"><span>${esc(label)}</span><small data-n></small><button class="link" type="button" data-copy>Copiar</button></div>${rows?`<textarea class="inp" rows="${rows}" data-f="${f}" maxlength="${max}">${esc(val)}</textarea>`:`<input class="inp" data-f="${f}" maxlength="${max}" ${id?`id="${id}"`:""} value="${esc(val)}">`}</div>`;
 // Página 2: só o que é do plano. Conta, orçamento, lance, site e regiões ficam no briefing.
 function crForm(c){crCur=c;syncBrief(c);const box=$("#i-create");c.step="plano";const s=c.sched||(c.sched={on:false,days:DAYS.slice(0,5).map(d=>d[0]),from:8,to:19});
   const hrs=sel=>Array.from({length:25},(_,h)=>`<option value="${h}" ${+sel===h?"selected":""}>${String(h).padStart(2,"0")}:00</option>`).join("");
@@ -1848,7 +1865,7 @@ function crForm(c){crCur=c;syncBrief(c);const box=$("#i-create");c.step="plano";
     <div class="field"><label>Correspondência</label><select class="sel" data-f="match">${Object.entries(MATCH).map(([k,v])=>`<option value="${k}" ${g.match===k?"selected":""}>${v}</option>`).join("")}</select></div>
     <div class="field full"><label>Palavras-chave, uma por linha <small data-c="kws"></small></label><textarea class="inp" rows="4" data-f="kws">${esc(g.kws.join("\n"))}</textarea></div>
     <div class="field wide"><label>Títulos, até 30 caracteres <small data-c="titles"></small></label><textarea class="inp" rows="8" data-f="titles">${esc(g.titles.join("\n"))}</textarea></div>
-    <div class="field wide"><label>Descrições, até 90 caracteres <small data-c="descs"></small></label><textarea class="inp" rows="8" data-f="descs">${esc(g.descs.join("\n"))}</textarea></div>
+    <div class="field wide"><label>Descrições, até 90 caracteres cada <small data-c="descs"></small></label><div class="crboxes">${[0,1,2,3].map(k=>crBox("descs",`Descrição ${k+1}`,g.descs[k]||"",90,2)).join("")}</div></div>
     <div class="field full"><label>Página final do grupo <small>opcional; a página do serviço deixa anúncio, palavra-chave e página falando da mesma coisa</small></label><input class="inp" data-f="url" type="url" maxlength="300" placeholder="${esc(c.url||"https://")}" value="${esc(g.url||"")}"></div></div></div>`;
   const where=[c.addrs.length?`${c.addrs.length} pino${c.addrs.length>1?"s":""} de ${c.radius} km`:"",c.areas.length?c.areas.join(", "):""].filter(Boolean).join(" + ");
   box.innerHTML=`${backBtn}${crSteps(c,2)}
@@ -1864,13 +1881,17 @@ function crForm(c){crCur=c;syncBrief(c);const box=$("#i-create");c.step="plano";
     <div id="cf-groups" style="display:flex;flex-direction:column;gap:16px">${c.groups.map(grp).join("")}</div>
     ${c.groups.length<6?`<button class="btn2" type="button" id="cf-addg" style="align-self:flex-start">+ Adicionar grupo (${c.groups.length} de 6)</button>`:""}
     <div class="panel"><div class="ph-pad" style="padding-bottom:0"><h2>Extensões e negativas</h2></div><div class="form crf">
-      ${fld("cf-sl","Sitelinks",c.sitelinks.join("\n"),{rows:6,hint:"até 25 caracteres"})}${fld("cf-co","Frases de destaque",c.callouts.join("\n"),{rows:6,hint:"até 25 caracteres"})}
+      <div class="field full"><label for="cf-sl">Sitelinks <small>sempre 6, até 25 caracteres cada</small></label><div class="crboxes crsl" id="cf-sls">${SL_ROLES.map((r,k)=>crBox("sl",`${k+1} · ${r}`,c.sitelinks[k]||"",25,0,k?"":"cf-sl")).join("")}</div></div>
+      ${fld("cf-co","Frases de destaque",c.callouts.join("\n"),{rows:6,hint:"até 25 caracteres"})}
       ${fld("cf-neg","Palavras-chave negativas",c.neg.join("\n"),{rows:6,hint:"uma por linha"})}</div></div>
     <div id="cf-res" hidden></div>
     <div class="jactions crnav"><button class="btn2" type="button" id="cf-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m15 18-6-6 6-6"/></svg>Briefing</button>
       <span class="sp"></span><button class="link" type="button" id="cf-tidy">Tirar repetições</button><button class="link" type="button" id="cf-check">Conferir</button><button class="link" type="button" id="cf-dl">Baixar plano</button><button class="btn2" type="button" id="cf-save">Salvar rascunho</button>
       <button class="btn" type="button" id="cf-pub">${c.pub?"Subir como nova campanha":"Subir campanha pausada"}</button></div>`;
   box.querySelectorAll("#cf-groups .crg").forEach(el=>{crCount(el);el.addEventListener("input",()=>crCount(el))});
+  const sls=$("#cf-sls");crBoxN(sls);sls.addEventListener("input",()=>crBoxN(sls));
+  box.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{const f=b.closest(".crbox").querySelector("[data-f]"),ok=()=>{b.textContent="Copiado";setTimeout(()=>b.textContent="Copiar",1500)};
+    try{navigator.clipboard.writeText(f.value.trim()).then(ok,()=>{f.select()})}catch(x){f.select()}});
   box.addEventListener("input",e=>{if(e.target.classList)e.target.classList.remove("err")});
   $("#cf-sched-on").onchange=e=>{$("#cf-sched").hidden=!e.target.checked};
   $("#cf-back").onclick=()=>{crRead();crSave(c);crList()};crStepNav(c);
