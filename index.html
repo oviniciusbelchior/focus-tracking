@@ -373,6 +373,30 @@ button.crcard:hover{border-color:var(--brand)}
 .crf .field label small{font-weight:400;color:var(--muted);margin-left:4px}
 .crf .bad{color:#c2410c}
 .crf textarea.inp{font-size:13.5px;line-height:1.5;resize:vertical}
+.crsteps button{border:0;background:none;padding:0;font:inherit;color:inherit;display:flex;align-items:center;gap:8px;cursor:pointer}
+.crsteps button:hover{color:var(--fg)}.crsteps .done .snum{background:var(--accent-soft);color:var(--accent)}
+.crsteps .sep{width:28px;height:1px;background:var(--line)}
+.crsteps .snum{display:grid;place-items:center;border-radius:50%;flex:none;gap:0}
+.crnav{margin-top:0;align-items:center;flex-wrap:wrap;gap:10px}.crnav .sp{flex:1}.crnav .btn svg,.crnav .btn2 svg{vertical-align:-2px;margin:0 2px}
+.crissues{font-size:13px;padding:12px 14px;border-radius:8px;background:var(--accent-soft)}
+.crissues.bad{background:#fff4ed;border:1px solid #fed7aa}
+.crissues ul{margin:8px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.crissues li{display:flex;gap:12px;justify-content:space-between;align-items:baseline}
+.crissues li .link{white-space:nowrap;flex:none}
+.crissues .crtip{margin:12px 0 0}.crissues ul.tips li span{color:var(--muted)}
+.crload{display:flex;gap:12px;align-items:center}.crload .spin{width:20px;height:20px;border-color:var(--line);border-top-color:var(--brand)}
+.inp.err,.sel.err{border-color:#ea580c;box-shadow:0 0 0 3px #ffedd5}
+.crdone{padding:36px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.crdone .spin{border-color:var(--line);border-top-color:var(--brand)}
+.crdone h2{font-size:20px;margin:4px 0 0}.crdone .hint{max-width:520px;margin:0}
+.crdone .kv{width:100%;max-width:520px;text-align:left;display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--line);margin:0}
+.crdone .kv b{text-align:right}.crdone a.btn{text-decoration:none}
+.crbig{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-size:28px;font-weight:700;color:#fff}
+.crbig.ok{background:#16a34a}.crbig.bad{background:#ea580c}
+.crerrs{list-style:none;margin:8px 0 0;padding:0;width:100%;max-width:640px;text-align:left;display:flex;flex-direction:column;gap:8px}
+.crerrs li{display:flex;gap:14px;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid #fed7aa;background:#fff7ed;border-radius:8px;font-size:13.5px}
+.crerrs li small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
+.crerrs li .btn2{flex:none}
 @media (max-width:780px){.crpick{grid-template-columns:1fr}}
 .itabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
 .itabs button{border:0;background:none;padding:10px 14px;font-size:14px;color:var(--muted);display:flex;align-items:center;gap:8px;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
@@ -906,7 +930,7 @@ function cleanDados(d){
   const S=(v,n)=>String(v==null?"":v).slice(0,n),L=(a,m,n)=>(Array.isArray(a)?a:[]).slice(0,m).map(x=>S(x,n));
   if(Array.isArray(d.camps))d.camps=d.camps.filter(x=>x&&typeof x==="object").slice(0,200).map(x=>{const bf=x.brief&&typeof x.brief==="object"?x.brief:{};const num=v=>S(v,12).replace(/[^\d.]/g,"");
     return {id:cleanId(x.id),plat:"google",step:x.step==="brief"?"brief":"plano",name:S(x.name,120),cust:S(x.cust,12).replace(/[^\d-]/g,""),budget:num(x.budget),bid:BIDS[x.bid]?x.bid:"MAX_CONV",cpc:num(x.cpc),tcpa:num(x.tcpa),url:S(x.url,300),
-      radius:Math.max(1,Math.min(65,parseInt(x.radius,10)||3)),addrs:L(x.addrs,50,200),presence:x.presence!==false,hours:S(x.hours,200),neg:L(x.neg,200,80),sitelinks:L(x.sitelinks,10,50),callouts:L(x.callouts,10,50),eu:!!x.eu,approved:!!x.approved,updated:cleanDt(x.updated),pub:x.pub&&typeof x.pub==="object"&&/^customers\/\d+\/campaigns\/\d+$/.test(x.pub.rn||"")?{rn:x.pub.rn,at:cleanDt(x.pub.at)}:null,
+      radius:Math.max(1,Math.min(65,parseInt(x.radius,10)||3)),addrs:L(x.addrs,50,200),presence:x.presence!==false,hours:S(x.hours,200),neg:L(x.neg,200,80),sitelinks:L(x.sitelinks,10,50),callouts:L(x.callouts,10,50),eu:!!x.eu,approved:!!x.approved,updated:cleanDt(x.updated),genAt:cleanDt(x.genAt),genFrom:typeof x.genFrom==="string"?x.genFrom.slice(0,20000):"",err:Array.isArray(x.err)?x.err.slice(0,30).map(e=>({t:S(e&&e.t,400),f:typeof (e&&e.f)==="string"&&/^[#\w\s.:()\[\]=-]{1,120}$/.test(e.f)?e.f:null})):null,pub:x.pub&&typeof x.pub==="object"&&/^customers\/\d+\/campaigns\/\d+$/.test(x.pub.rn||"")?{rn:x.pub.rn,at:cleanDt(x.pub.at)}:null,
       brief:{biz:S(bf.biz,120),seg:S(bf.seg,80),url:S(bf.url,300),phone:S(bf.phone,30),services:L(bf.services,6,80),cities:L(bf.cities,20,80),addrs:L(bf.addrs,50,200),radius:Math.max(1,Math.min(65,parseInt(bf.radius,10)||3)),hours:S(bf.hours,200),budgetM:num(bf.budgetM),ticket:num(bf.ticket),offer:S(bf.offer,80),diffs:L(bf.diffs,15,60),avoid:L(bf.avoid,100,80),notes:S(bf.notes,1000),approved:!!bf.approved},
       groups:(Array.isArray(x.groups)?x.groups:[]).filter(g=>g&&typeof g==="object").slice(0,6).map(g=>({name:S(g.name,80),match:MATCH[g.match]?g.match:"PHRASE",kws:L(g.kws,200,80),titles:L(g.titles,15,60),descs:L(g.descs,4,180)}))}});
   return d}
@@ -1543,17 +1567,13 @@ const titleCase=s=>String(s||"").trim().split(/\s+/).map(w=>/^(de|da|do|das|dos|
 const cut=(s,n)=>{s=String(s).replace(/\s+/g," ").trim();if(s.length<=n)return s;
   const ps=s.match(/[^.!?]+[.!?]/g)||[];let o="";for(const x of ps){if((o+x).trim().length>n)break;o+=x}if(o.trim().length>=40)return o.trim();const t=s.slice(0,n-1).replace(/[\s,.;:–-]+\S*$/,"");return (t||s.slice(0,n-1)).replace(/[\s,;:–-]+$/,"")+"."};
 const uniq=(a,n,max)=>{const seen=new Set(),o=[];a.forEach(x=>{x=String(x||"").replace(/\s+/g," ").trim();const k=x.toLowerCase();if(x&&x.length<=n&&!seen.has(k)&&o.length<max){seen.add(k);o.push(x)}});return o};
-function briefErrors(b){const e=[];if(!b.biz.trim())e.push("Informe o nome do negócio.");if(!/^https:\/\/[^\s.]+\.[^\s]+$/.test(b.url||""))e.push("Informe a página do site com https://.");
-  if(!b.services.length)e.push("Liste pelo menos um serviço ou produto.");if(b.services.length>6)e.push("Use no máximo 6 serviços (cada um vira um grupo de anúncios).");
-  if(!b.addrs.length&&!b.cities.length)e.push("Informe os endereços ou as cidades atendidas.");if(!(+b.budgetM>0))e.push("Informe o orçamento mensal de mídia.");
-  if(!b.diffs.length)e.push("Liste pelo menos um diferencial.");return e}
 // Gera o plano de ação a partir do briefing aprovado.
-function genPlan(c){const b=c.brief,city=b.cities[0]||"",B=b.biz.trim(),O=b.offer.trim(),D=b.diffs,daily=Math.max(10,Math.round(+b.budgetM/30.4*100)/100);
+function genPlan(c){const b=c.brief,cs=b.cities.map(x=>x.replace(/\s*-\s*[A-Za-z]{2}$/,"").trim()),city=cs[0]||"",B=b.biz.trim(),O=b.offer.trim(),D=b.diffs,daily=Math.max(10,Math.round(+b.budgetM/30.4*100)/100);
   c.name=`Pesquisa | Leads | ${B}${city?" | "+city:""}`.slice(0,120);c.url=b.url;c.budget=String(daily);c.radius=+b.radius||3;c.addrs=b.addrs.slice();c.presence=true;c.hours=b.hours;
   c.bid="MAX_CONV";c.cpc=String(Math.max(1,Math.round(daily/12*100)/100));c.tcpa=b.ticket&&+b.ticket>0?"":"";
   c.neg=uniq(NEG_BASE.filter(n=>!(O+" "+b.services.join(" ")).toLowerCase().includes(n)).concat(b.avoid),80,200);
   c.groups=b.services.slice(0,6).map(s=>{const S=titleCase(s),sl=s.toLowerCase().trim();
-    const kws=uniq([sl,...b.cities.slice(0,3).map(ci=>`${sl} ${ci.toLowerCase()}`),`${sl} perto de mim`,`${sl} preço`,`${sl} valor`,`agendar ${sl}`,`onde fazer ${sl}`],80,20);
+    const kws=uniq([sl,...cs.slice(0,3).map(ci=>`${sl} ${ci.toLowerCase()}`),`${sl} perto de mim`,`${sl} preço`,`${sl} valor`,`agendar ${sl}`,`onde fazer ${sl}`],80,20);
     const titles=uniq([city?`${S} em ${titleCase(city)}`:"",S,`${S} | ${B}`,O?cap(O):"",...D.map(cap),"Agende pelo WhatsApp","Fale Conosco no WhatsApp",`${S} com Especialistas`,"Agende Seu Horário","Atendimento Rápido",`${S} Perto de Você`,"Resposta em Minutos","Orçamento Sem Compromisso",B,city?`${B} em ${titleCase(city)}`:"","Agende Hoje Mesmo"],30,15);
     const descs=uniq([cut(`${S}${city?" em "+titleCase(city):""} com ${(D[0]||"atendimento especializado").replace(/^\p{Lu}(?=\p{Ll})/u,c=>c.toLowerCase())}. ${O?cap(O)+".":"Fale com a gente."} Chame no WhatsApp.`,90),
       cut(`${B}: ${D.slice(0,2).join(" e ").replace(/ e (\p{Lu})(?=\p{Ll})/u,(m,c)=>" e "+c.toLowerCase())||"atendimento de confiança"}. Agende pelo WhatsApp.`,90),
@@ -1563,33 +1583,92 @@ function genPlan(c){const b=c.brief,city=b.cities[0]||"",B=b.biz.trim(),O=b.offe
   c.sitelinks=uniq(b.services.map(titleCase).concat(["Fale no WhatsApp","Como Chegar"]),25,6);
   c.callouts=uniq(D.map(cap).concat(["Atendimento Rápido","Agende pelo WhatsApp","Sem Compromisso"]),25,8);
   c.step="plano";c.approved=false;return c}
-function crErrors(c){const e=[];
-  if(!c.name.trim())e.push("Dê um nome à campanha.");
-  if(!/^\d{10}$/.test(String(c.cust||"").replace(/\D/g,"")))e.push("Informe o ID da conta do Google Ads com 10 dígitos.");
-  if(!(c.budget>0))e.push("Informe o orçamento diário.");
-  if(c.bid==="MANUAL_CPC"&&!(c.cpc>0))e.push("Informe o CPC máximo.");
-  if(!/^https:\/\/[^\s.]+\.[^\s]+$/.test(c.url||""))e.push("Informe a página final com https://.");
-  if(!c.addrs.length)e.push("Informe pelo menos uma região (um endereço ou cidade por linha).");
-  if(!c.groups.length)e.push("Crie pelo menos um grupo de anúncios.");
-  c.groups.forEach((g,i)=>{const n=`Grupo ${i+1}${g.name?` (${g.name})`:""}`;
-    if(!g.name.trim())e.push(`Grupo ${i+1}: dê um nome.`);
-    if(!g.kws.length)e.push(`${n}: inclua pelo menos uma palavra-chave.`);
-    if(g.kws.some(k=>/["\[\]]/.test(k)))e.push(`${n}: escreva as palavras-chave sem aspas nem colchetes. A correspondência é escolhida no campo ao lado.`);
-    if(g.titles.length<3||g.titles.length>15)e.push(`${n}: o anúncio precisa de 3 a 15 títulos (tem ${g.titles.length}).`);
-    g.titles.filter(t=>t.length>30).forEach(t=>e.push(`${n}: o título "${t}" passa de 30 caracteres (${t.length}).`));
-    if(g.descs.length<2||g.descs.length>4)e.push(`${n}: o anúncio precisa de 2 a 4 descrições (tem ${g.descs.length}).`);
-    g.descs.filter(t=>t.length>90).forEach(t=>e.push(`${n}: uma descrição passa de 90 caracteres (${t.length}).`))});
-  c.sitelinks.filter(t=>t.length>25).forEach(t=>e.push(`O sitelink "${t}" passa de 25 caracteres.`));
-  c.callouts.filter(t=>t.length>25).forEach(t=>e.push(`A frase de destaque "${t}" passa de 25 caracteres.`));
-  if(!c.eu)e.push("Confirme que a campanha não tem publicidade política da União Europeia.");
+// ---------- Conferência no padrão do Google Ads ----------
+// Cada problema traz o campo onde corrigir: {t:texto, f:seletor do campo, w:true quando é só aviso}.
+const UFS="AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split(" ");
+const KW_BAD=/[!@%^*()={};~`<>?\\|,"\[\]]/;               // caracteres que o Google não aceita em palavras-chave
+const TXT_OK=/^[\p{L}\p{N}\s.,;:!?%&+\-–'"()\/|$ºª°]*$/u;   // texto de anúncio sem emojis nem símbolos
+const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\s+/g," ").trim();
+const dupes=a=>{const seen=new Map(),d=[];a.forEach(x=>{const k=norm(x);if(!k)return;if(seen.has(k))d.push(x);else seen.set(k,1)});return d};
+const PHONE=/(\+?55\s?)?\(?\d{2}\)?\s?9?\d{4}[-\s.]?\d{4}/;
+function adText(t,max,where,f,o={}){const e=[];
+  if(t.length>max)e.push({t:`${where}: "${t}" passa de ${max} caracteres (${t.length}).`,f});
+  if(!TXT_OK.test(t))e.push({t:`${where}: "${t}" tem emoji ou símbolo que o Google não aceita.`,f});
+  if(o.noBang&&t.includes("!"))e.push({t:`${where}: "${t}" tem ponto de exclamação. O Google não aceita "!" nos títulos.`,f});
+  if(/([!?.,])\1/.test(t))e.push({t:`${where}: "${t}" repete pontuação. O Google reprova.`,f});
+  if(/\b(\p{L}+)\s+\1\b/iu.test(t))e.push({t:`${where}: "${t}" repete a mesma palavra em seguida.`,f});
+  if(PHONE.test(t))e.push({t:`${where}: "${t}" tem telefone no texto. O Google reprova; o WhatsApp vai pela página.`,f});
+  if(/\b(www\.|https?:)/i.test(t))e.push({t:`${where}: "${t}" tem endereço de site no texto.`,f});
+  if((t.match(/\b\p{Lu}{4,}\b/gu)||[]).some(w=>!/^(WHATSAPP|SEO|CNPJ)$/.test(w)))e.push({t:`${where}: "${t}" tem palavra toda em maiúsculas. O Google reprova excesso de maiúsculas.`,f});
   return e}
-// Dicas de boas práticas (não bloqueiam).
-function crTips(c){const t=[];c.groups.forEach((g,i)=>{if(g.titles.length<12)t.push(`Grupo ${i+1}: use 12 a 15 títulos para o anúncio chegar a força "Excelente" e entrar em mais leilões.`);if(g.descs.length<4)t.push(`Grupo ${i+1}: use as 4 descrições.`);if(g.kws.length>20)t.push(`Grupo ${i+1}: mais de 20 palavras-chave. Grupos menores e mais focados têm anúncios mais relevantes.`)});
-  if(c.bid!=="MAX_CONV")t.push("Para leads, o Google recomenda Maximizar conversões assim que a conversão de lead estiver medida.");
-  if(c.sitelinks.length<4)t.push("Use pelo menos 4 sitelinks: eles aumentam o tamanho do anúncio e a taxa de cliques.");
-  if(c.callouts.length<4)t.push("Use pelo menos 4 frases de destaque.");
-  if(c.budget>0&&c.bid==="MANUAL_CPC"&&c.cpc>0&&c.budget/c.cpc<10)t.push("O orçamento diário paga menos de 10 cliques no CPC informado. Considere aumentar o orçamento ou reduzir o número de grupos.");
-  return t}
+function briefCheck(b){const e=[],E=(t,f)=>e.push({t,f});
+  if(!b.biz)E("Informe o nome do negócio.","#bf-biz");else if(b.biz.length>30)E(`O nome do negócio tem ${b.biz.length} caracteres. Use até 30 para ele caber num título do anúncio.`,"#bf-biz");
+  let u=null;try{u=new URL(b.url)}catch(x){}
+  if(!u||u.protocol!=="https:"||!/\./.test(u.hostname))E("Informe a página do site que recebe o clique, começando com https://.","#bf-url");
+  else if(/(^|\.)(wa\.me|whatsapp\.com|instagram\.com|facebook\.com|linktr\.ee)$/.test(u.hostname))E("A página final precisa ser do site do cliente. Link direto de WhatsApp ou rede social é reprovado pelo Google na Pesquisa.","#bf-url");
+  if(!(+b.budgetM>0))E("Informe o orçamento mensal de mídia.","#bf-budget");else if(+b.budgetM/30.4<5)E("O orçamento mensal fica abaixo de R$ 5 por dia. Use pelo menos R$ 152 por mês.","#bf-budget");
+  if(!b.services.length)E("Liste pelo menos um serviço ou produto.","#bf-services");
+  if(b.services.length>6)E(`São ${b.services.length} serviços. Use no máximo 6 (cada um vira um grupo de anúncios).`,"#bf-services");
+  b.services.forEach(s=>{if(KW_BAD.test(s))E(`O serviço "${s}" tem símbolo que não pode virar palavra-chave (como vírgula, parênteses ou interrogação).`,"#bf-services");
+    if(s.length>25)E(`O serviço "${s}" tem ${s.length} caracteres. Use até 25 para virar título e sitelink.`,"#bf-services");
+    if(s.split(/\s+/).length>6)E(`O serviço "${s}" tem palavras demais. Escreva como o cliente pesquisaria, em até 6 palavras.`,"#bf-services")});
+  dupes(b.services).forEach(s=>E(`O serviço "${s}" aparece repetido.`,"#bf-services"));
+  if(!b.diffs.length)E("Liste pelo menos um diferencial.","#bf-diffs");
+  b.diffs.forEach(d=>{if(d.length>30)E(`O diferencial "${d}" tem ${d.length} caracteres. Use até 30 para virar título.`,"#bf-diffs");else adText(d,30,"Diferencial","#bf-diffs",{noBang:1}).forEach(x=>e.push(x))});
+  dupes(b.diffs).forEach(d=>E(`O diferencial "${d}" aparece repetido.`,"#bf-diffs"));
+  if(b.offer){if(b.offer.length>30)E(`A oferta tem ${b.offer.length} caracteres. Use até 30 para virar título.`,"#bf-offer");else adText(b.offer,30,"Oferta","#bf-offer",{noBang:1}).forEach(x=>e.push(x))}
+  if(!b.addrs.length&&!b.cities.length)E("Informe os endereços dos pinos ou as cidades atendidas.","#bf-addrs");
+  if(!b.addrs.length)b.cities.forEach(c=>{const uf=(c.match(/\s-\s*([A-Za-z]{2})\s*$/)||[])[1];if(!uf||!UFS.includes(uf.toUpperCase()))E(`Sem endereços, cada cidade vira um pino. Escreva "${c}" com a UF, assim: Campinas - SP.`,"#bf-cities")});
+  b.addrs.forEach(a=>{const uf=(a.match(/\s-\s*([A-Za-z]{2})\s*$/)||[])[1];
+    if(!uf||!UFS.includes(uf.toUpperCase()))E(`O endereço "${a}" precisa terminar com a cidade e a UF, assim: Av. Norte-Sul, 1000, Campinas - SP.`,"#bf-addrs")});
+  b.cities.forEach(c=>{if(KW_BAD.test(c.replace(/\s-\s*[A-Za-z]{2}$/,""))||/\d/.test(c))E(`A cidade "${c}" tem número ou símbolo. Escreva só o nome, uma por linha.`,"#bf-cities")});
+  b.avoid.forEach(a=>{if(KW_BAD.test(a))E(`O termo "${a}" tem símbolo que não pode virar palavra-chave negativa.`,"#bf-avoid")});
+  if(b.phone&&b.phone.replace(/\D/g,"").length<10)E("O WhatsApp precisa ter DDD e número.","#bf-phone");
+  return e}
+function crCheck(c){const e=[],E=(t,f,w)=>e.push({t,f,w});
+  if(!c.name.trim())E("Dê um nome à campanha.","#cf-name");
+  if(!/^\d{10}$/.test(String(c.cust||"").replace(/\D/g,"")))E("Informe o ID da conta do Google Ads com 10 dígitos.","#cf-cust");
+  if(!(+c.budget>0))E("Informe o orçamento diário.","#cf-budget");else if(+c.budget<5)E("Orçamento diário abaixo de R$ 5 quase não entra em leilão.","#cf-budget",1);
+  if(c.bid==="MANUAL_CPC"&&!(+c.cpc>0))E("Informe o CPC máximo.","#cf-cpc");
+  let u=null;try{u=new URL(c.url)}catch(x){}
+  if(!u||u.protocol!=="https:")E("Informe a página final com https://.","#cf-url");
+  if(!c.addrs.length)E("Informe pelo menos uma região (um endereço ou cidade por linha).","#cf-addrs");
+  c.addrs.forEach(a=>{const uf=(a.match(/\s-\s*([A-Za-z]{2})\s*$/)||[])[1];if(!uf||!UFS.includes(uf.toUpperCase()))E(`A região "${a}" precisa terminar com a cidade e a UF (ex.: Campinas - SP) para o Google achar o pino.`,"#cf-addrs")});
+  dupes(c.addrs).forEach(a=>E(`A região "${a}" aparece repetida.`,"#cf-addrs"));
+  c.neg.forEach(n=>{if(KW_BAD.test(n))E(`A negativa "${n}" tem símbolo que o Google não aceita.`,"#cf-neg")});
+  dupes(c.neg).forEach(n=>E(`A negativa "${n}" aparece repetida.`,"#cf-neg",1));
+  if(!c.groups.length)E("Crie pelo menos um grupo de anúncios.","#cf-addg");
+  const allKw=[];
+  c.groups.forEach((g,i)=>{const n=`Grupo ${i+1}${g.name?` (${g.name})`:""}`,F=k=>`#cf-groups .crg:nth-child(${i+1}) [data-f=${k}]`;
+    if(!g.name.trim())E(`Grupo ${i+1}: dê um nome.`,F("name"));
+    dupes(c.groups.map(x=>x.name)).includes(g.name)&&c.groups.findIndex(x=>norm(x.name)===norm(g.name))!==i&&E(`${n}: já existe outro grupo com esse nome.`,F("name"));
+    if(!g.kws.length)E(`${n}: inclua pelo menos uma palavra-chave.`,F("kws"));
+    g.kws.forEach(k=>{if(KW_BAD.test(k))E(`${n}: a palavra-chave "${k}" tem símbolo que o Google não aceita (aspas, colchetes, vírgula, parênteses, interrogação…). A correspondência é escolhida no campo ao lado.`,F("kws"));
+      if(k.length>80||k.split(/\s+/).length>10)E(`${n}: a palavra-chave "${k}" passa de 10 palavras ou 80 caracteres.`,F("kws"));
+      const neg=c.neg.find(x=>norm(k).includes(norm(x)));if(neg)E(`${n}: a palavra-chave "${k}" é bloqueada pela negativa "${neg}". Tire uma das duas.`,F("kws"))});
+    dupes(g.kws).forEach(k=>E(`${n}: a palavra-chave "${k}" está repetida.`,F("kws")));
+    g.kws.forEach(k=>{const o=allKw.find(x=>x.k===norm(k));if(o)E(`${n}: a palavra-chave "${k}" também está no grupo ${o.g+1}. Os dois grupos vão disputar o mesmo leilão.`,F("kws"),1);else allKw.push({k:norm(k),g:i})});
+    if(g.titles.length<3||g.titles.length>15)E(`${n}: o anúncio precisa de 3 a 15 títulos (tem ${g.titles.length}).`,F("titles"));
+    g.titles.forEach(t=>adText(t,30,n+", título",F("titles"),{noBang:1}).forEach(x=>e.push(x)));
+    dupes(g.titles).forEach(t=>E(`${n}: o título "${t}" está repetido.`,F("titles")));
+    if(g.descs.length<2||g.descs.length>4)E(`${n}: o anúncio precisa de 2 a 4 descrições (tem ${g.descs.length}).`,F("descs"));
+    g.descs.forEach(t=>adText(t,90,n+", descrição",F("descs")).forEach(x=>e.push(x)));
+    dupes(g.descs).forEach(t=>E(`${n}: a descrição "${t.slice(0,40)}…" está repetida.`,F("descs")));
+    if(g.titles.length&&g.titles.length<12)E(`${n}: use 12 a 15 títulos para o anúncio chegar a força "Excelente" e entrar em mais leilões.`,F("titles"),1);
+    if(g.descs.length&&g.descs.length<4)E(`${n}: use as 4 descrições.`,F("descs"),1);
+    if(g.kws.length>20)E(`${n}: mais de 20 palavras-chave. Grupos menores têm anúncios mais relevantes.`,F("kws"),1)});
+  c.sitelinks.forEach(t=>adText(t,25,"Sitelink","#cf-sl").forEach(x=>e.push(x)));dupes(c.sitelinks).forEach(t=>E(`O sitelink "${t}" está repetido.`,"#cf-sl"));
+  c.callouts.forEach(t=>adText(t,25,"Frase de destaque","#cf-co").forEach(x=>e.push(x)));dupes(c.callouts).forEach(t=>E(`A frase de destaque "${t}" está repetida.`,"#cf-co"));
+  if(c.sitelinks.length<4)E("Use pelo menos 4 sitelinks: eles aumentam o anúncio e a taxa de cliques.","#cf-sl",1);
+  if(c.callouts.length<4)E("Use pelo menos 4 frases de destaque.","#cf-co",1);
+  if(c.bid!=="MAX_CONV")E("Para leads, o Google recomenda Maximizar conversões assim que a conversão de lead estiver medida.","#cf-bid",1);
+  if(!c.eu)E("Confirme que a campanha não tem publicidade política da União Europeia (exigência do Google).","#cf-eu");
+  return e}
+const crErrors=c=>crCheck(c).filter(x=>!x.w).map(x=>x.t);
+// Arruma o que dá para arrumar sozinho: repetições, espaços e linhas vazias.
+function crTidy(c){const u=(a,n)=>uniq(a,n||999,999);c.addrs=u(c.addrs);c.neg=u(c.neg);c.sitelinks=u(c.sitelinks);c.callouts=u(c.callouts);
+  const seen=new Set();c.groups.forEach(g=>{g.kws=u(g.kws).filter(k=>{const n=norm(k);if(seen.has(n))return false;seen.add(n);return true});g.titles=u(g.titles);g.descs=u(g.descs);
+    g.titles=g.titles.map(t=>t.replace(/!/g,"").replace(/\s+/g," ").trim()).filter(Boolean);g.kws=g.kws.map(k=>k.replace(/["\[\]]/g,"").trim()).filter(Boolean)});return c}
 function crPlan(c){const mi=v=>Math.round((Number(v)||0)*1e6);
   return {conta:String(c.cust||"").replace(/\D/g,""),objetivo:"LEADS",campanha:{nome:c.name,canal:"SEARCH",redes:{pesquisa_google:true,parceiros_de_pesquisa:false,display:false},status:"PAUSED",orcamento_diario_micros:mi(c.budget),
       lance:c.bid==="MANUAL_CPC"?{estrategia:"MANUAL_CPC",cpc_micros:mi(c.cpc)}:c.bid==="MAX_CLICKS"?{estrategia:"MAXIMIZE_CLICKS",cpc_maximo_micros:c.cpc>0?mi(c.cpc):null}:{estrategia:"MAXIMIZE_CONVERSIONS",cpa_desejado_micros:c.tcpa>0?mi(c.tcpa):null},
@@ -1600,17 +1679,19 @@ function crPlan(c){const mi=v=>Math.round((Number(v)||0)*1e6);
     conversao:"Lead (WhatsApp) enviado pelo Focus Tracking como conversão offline pelo gclid"}}
 function crDownload(c){const b=new Blob([JSON.stringify(crPlan(c),null,2)],{type:"application/json"}),a=document.createElement("a");
   a.href=URL.createObjectURL(b);a.download=(c.name||"campanha").normalize("NFD").replace(/[^\w-]+/g,"-").replace(/^-|-$/g,"").toLowerCase()+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
-const CRST={pub:["Publicada pausada","ativo"],brief:["Briefing","arquivado"],plano:["Plano em revisão","pausado"],pronto:["Pronto para publicar","analise"]};
-const crState=c=>c.pub?"pub":c.step==="brief"?"brief":c.approved&&!crErrors(c).length?"pronto":"plano";
+const CRST={pub:["Publicada pausada","ativo"],brief:["Briefing","arquivado"],plano:["Plano em revisão","pausado"],erro:["Erro ao publicar","reprovado"]};
+const crState=c=>c.pub?"pub":c.step==="brief"?"brief":c.err?"erro":"plano";
 function crSave(c){c.updated=nowStr();const i=camps.findIndex(x=>x.id===c.id);if(i<0)camps.unshift(c);else camps[i]=c;saveCamps()}
-function crSteps(c){const s=crState(c),n=s==="brief"?1:s==="plano"?2:3;
-  return `<div class="wsteps">${["Briefing","Plano de ação","Publicar pausada"].map((t,i)=>`<span class="${i+1===n?"on":""}"><span class="snum">${i+1<n?"✓":i+1}</span>${t}</span>`).join("")}</div>`}
+// Passos no topo: 1 Briefing, 2 Plano de ação, 3 Publicação. Passos já feitos são clicáveis.
+function crSteps(c,n){return `<div class="wsteps crsteps">${["Briefing","Plano de ação","Publicação"].map((t,i)=>{const k=i+1,can=k<n&&k<3;
+  return `<${can?`button type="button" data-step="${k}"`:"span"} class="${k===n?"on":k<n?"done":""}"><span class="snum">${k<n?"✓":k}</span>${t}</${can?"button":"span"}>`}).join('<i class="sep"></i>')}</div>`}
+function crStepNav(c){document.querySelectorAll("#i-create [data-step]").forEach(b=>b.onclick=()=>{if(crCur&&$("#cf-name"))crRead();if(crCur&&$("#bf-biz"))crBriefRead(c);b.dataset.step==="1"?crBrief(c):crForm(c)})}
 function crList(){const box=$("#i-create");crCur=null;
   const rows=camps.map((c,i)=>{const st=CRST[crState(c)];return `<tr><td><button class="lk-name" type="button" data-ed="${i}">${esc(c.name||(c.brief&&c.brief.biz)||"Sem nome")}</button></td><td><span class="ptag">${PG}Google Ads · Pesquisa</span></td><td class="n mono">${c.step==="brief"?"—":c.groups.length}</td><td class="n mono">${c.budget>0?brl(+c.budget):"—"}</td>
     <td><span class="ist ${st[1]}">${st[0]}</span></td><td style="color:var(--muted);white-space:nowrap">${esc(c.updated||"")}</td>
     <td style="text-align:right;white-space:nowrap"><button class="link" data-ed="${i}">Abrir</button>${c.step!=="brief"?` · <button class="link" data-dl="${i}">Baixar plano</button>`:""} · <button class="link" data-rm="${i}" style="color:#c0392b">Excluir</button></td></tr>`}).join("");
   box.innerHTML=`<div class="crpick">
-      <button class="panel crcard" type="button" id="cr-g">${PG}<b>Google Ads · Pesquisa para leads</b><span>Comece pelo briefing do cliente. Depois de aprovado, ele vira o plano de ação, que você revisa e publica pausado na conta.</span></button>
+      <button class="panel crcard" type="button" id="cr-g">${PG}<b>Google Ads · Pesquisa para leads</b><span>1. Briefing do cliente · 2. Plano de ação para revisar · 3. Sobe pausada na conta.</span></button>
       <div class="panel crcard off" aria-disabled="true">${PM}<b>Meta Ads</b><span>Em breve.</span></div></div>
     <div class="panel"><div class="tbl-head"><h2>Campanhas criadas aqui</h2><span>${camps.length} ${camps.length===1?"campanha":"campanhas"}</span></div>
       <div class="tbl-wrap"><table><thead><tr><th>Campanha</th><th>Plataforma</th><th class="n">Grupos</th><th class="n">Orçamento/dia</th><th>Situação</th><th>Atualizada</th><th></th></tr></thead>
@@ -1618,58 +1699,76 @@ function crList(){const box=$("#i-create");crCur=null;
   $("#cr-g").onclick=()=>crOpen(newCamp());
   box.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>crOpen(JSON.parse(JSON.stringify(camps[+b.dataset.ed]))));
   box.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>crDownload(camps[+b.dataset.dl]));
-  box.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const c=camps[+b.dataset.rm];if(!confirm(`Excluir "${c.name||c.brief.biz||"Sem nome"}"?`))return;camps.splice(+b.dataset.rm,1);saveCamps();crList()})}
-const crOpen=c=>c.step==="brief"?crBrief(c):crForm(c);
+  box.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const c=camps[+b.dataset.rm];if(!confirm(`Excluir "${c.name||c.brief.biz||"Sem nome"}" desta lista? A campanha no Google Ads não é apagada.`))return;camps.splice(+b.dataset.rm,1);saveCamps();crList()})}
+const crOpen=c=>c.pub?crDone(c,{ok:true,pub:c.pub}):c.step==="brief"?crBrief(c):crForm(c);
 const backBtn='<button class="back" type="button" id="cf-back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Voltar para as campanhas criadas</button>';
 const fld=(id,label,val,o={})=>`<div class="field ${o.cls||""}"><label for="${id}">${label}${o.hint?` <small>${o.hint}</small>`:""}</label>${o.rows?`<textarea class="inp" id="${id}" rows="${o.rows}" placeholder="${esc(o.ph||"")}">${esc(val)}</textarea>`:`<input class="inp ${o.mono?"mono":""}" id="${id}" ${o.type?`type="${o.type}"`:""} ${o.step?`step="${o.step}"`:""} ${o.min!=null?`min="${o.min}"`:""} maxlength="${o.max||200}" value="${esc(val)}" placeholder="${esc(o.ph||"")}">`}</div>`;
-function crBrief(c){crCur=c;const b=c.brief,box=$("#i-create");
-  box.innerHTML=`${backBtn}${crSteps(c)}
-    <div class="panel"><div class="ph-pad" style="padding-bottom:0"><h2>Briefing do cliente</h2><p class="hint">Preencha com o cliente. Quando ele aprovar, o sistema monta o plano de ação da campanha de Pesquisa com objetivo de leads.</p></div>
+// Lista de problemas com botão que leva direto ao campo.
+function crIssues(box,list,title,okHtml){const er=list.filter(x=>!x.w),wa=list.filter(x=>x.w);
+  document.querySelectorAll("#i-create .inp.err,#i-create .sel.err").forEach(x=>x.classList.remove("err"));
+  er.forEach(x=>{const el=x.f&&document.querySelector(x.f);if(el&&el.classList)el.classList.add("err")});
+  const li=(x,i,k)=>`<li><span>${esc(x.t)}</span>${x.f&&document.querySelector(x.f)?`<button class="link" type="button" data-go="${k}${i}">Corrigir</button>`:""}</li>`;
+  box.hidden=false;box.className="crissues"+(er.length?" bad":"");
+  box.innerHTML=(er.length?`<b>${title} ${er.length} ${er.length===1?"item":"itens"}:</b><ul>${er.map((x,i)=>li(x,i,"e")).join("")}</ul>`:okHtml||"")
+    +(wa.length?`<p class="crtip"><b>Boas práticas do Google</b> (não impedem a publicação):</p><ul class="tips">${wa.map((x,i)=>li(x,i,"w")).join("")}</ul>`:"");
+  box.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const x=(b.dataset.go[0]==="e"?er:wa)[+b.dataset.go.slice(1)],el=document.querySelector(x.f);if(!el)return;
+    el.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>{try{el.focus()}catch(z){}},250)});
+  if(er.length)box.scrollIntoView({behavior:"smooth",block:"start"})}
+function crBriefRead(c){const b=c.brief;Object.assign(b,{biz:$("#bf-biz").value.trim(),seg:$("#bf-seg").value.trim(),phone:$("#bf-phone").value.trim(),url:$("#bf-url").value.trim(),budgetM:$("#bf-budget").value,ticket:$("#bf-ticket").value,
+    services:lines($("#bf-services").value),diffs:lines($("#bf-diffs").value),offer:$("#bf-offer").value.trim(),hours:$("#bf-hours").value.trim(),addrs:lines($("#bf-addrs").value),cities:lines($("#bf-cities").value),
+    radius:Math.max(1,Math.min(65,parseInt($("#bf-radius").value,10)||3)),avoid:lines($("#bf-avoid").value),notes:$("#bf-notes").value.trim()});return b}
+// Página 1: briefing.
+function crBrief(c){crCur=c;const b=c.brief,box=$("#i-create");c.step=c.step||"brief";
+  box.innerHTML=`${backBtn}${crSteps(c,1)}
+    <div class="panel"><div class="ph-pad" style="padding-bottom:0"><h2>Briefing do cliente</h2><p class="hint">Preencha com as informações do cliente e clique em Avançar. O sistema confere tudo no padrão do Google e monta o plano de ação.</p></div>
     <div class="form crf">
-      ${fld("bf-biz","Nome do negócio",b.biz,{cls:"wide",ph:"Clínica Vitta Estética"})}${fld("bf-seg","Segmento",b.seg,{ph:"Estética"})}${fld("bf-phone","WhatsApp",b.phone,{ph:"+55 19 99999-9999"})}
+      ${fld("bf-biz","Nome do negócio",b.biz,{cls:"wide",max:60,ph:"Clínica Vitta Estética",hint:"até 30 caracteres"})}${fld("bf-seg","Segmento",b.seg,{ph:"Estética"})}${fld("bf-phone","WhatsApp",b.phone,{ph:"+55 19 99999-9999"})}
       ${fld("bf-url","Página do site que recebe o clique",b.url,{cls:"wide",type:"url",max:300,ph:"https://"})}${fld("bf-budget","Orçamento mensal de mídia (R$)",b.budgetM,{type:"number",min:1,step:"0.01",mono:1,ph:"2500"})}${fld("bf-ticket","Ticket médio (R$)",b.ticket,{type:"number",min:0,step:"0.01",mono:1,ph:"opcional"})}
-      ${fld("bf-services","Serviços ou produtos para anunciar",b.services.join("\n"),{cls:"wide",rows:4,hint:"um por linha, vira um grupo de anúncios (até 6)",ph:"Botox\nPreenchimento labial\nLimpeza de pele"})}
-      ${fld("bf-diffs","Diferenciais",b.diffs.join("\n"),{cls:"wide",rows:4,hint:"um por linha, curtos",ph:"Médica dermatologista\n10 anos de experiência\nEstacionamento grátis"})}
-      ${fld("bf-offer","Oferta ou chamada principal",b.offer,{cls:"wide",max:80,ph:"Avaliação gratuita"})}${fld("bf-hours","Horário de atendimento",b.hours,{cls:"wide",ph:"seg a sex, 8h às 19h; sáb 8h às 12h"})}
-      ${fld("bf-addrs","Endereços para os pinos",b.addrs.join("\n"),{cls:"wide",rows:3,hint:"um por linha",ph:"Av. Norte-Sul, 1000, Campinas - SP"})}
+      ${fld("bf-services","Serviços ou produtos para anunciar",b.services.join("\n"),{cls:"wide",rows:4,hint:"um por linha, como o cliente pesquisa; cada um vira um grupo (até 6)",ph:"Botox\nPreenchimento labial\nLimpeza de pele"})}
+      ${fld("bf-diffs","Diferenciais",b.diffs.join("\n"),{cls:"wide",rows:4,hint:"um por linha, até 30 caracteres",ph:"Médica dermatologista\n10 anos de experiência\nEstacionamento grátis"})}
+      ${fld("bf-offer","Oferta ou chamada principal",b.offer,{cls:"wide",max:60,ph:"Avaliação gratuita",hint:"até 30 caracteres"})}${fld("bf-hours","Horário de atendimento",b.hours,{cls:"wide",ph:"seg a sex, 8h às 19h; sáb 8h às 12h"})}
+      ${fld("bf-addrs","Endereços para os pinos",b.addrs.join("\n"),{cls:"wide",rows:3,hint:"um por linha, terminando com cidade - UF",ph:"Av. Norte-Sul, 1000, Campinas - SP"})}
       ${fld("bf-cities","Cidades atendidas",b.cities.join("\n"),{rows:3,hint:"uma por linha",ph:"Campinas\nValinhos"})}${fld("bf-radius","Raio de cada pino (km)",b.radius,{type:"number",min:1,step:"1",mono:1})}
       ${fld("bf-avoid","Termos e públicos que o cliente não atende",b.avoid.join("\n"),{cls:"wide",rows:3,hint:"um por linha, viram negativas",ph:"plano de saúde\nsus"})}
-      ${fld("bf-notes","Observações do cliente",b.notes,{cls:"wide",rows:3,ph:"Restrições, tom de voz, o que não pode prometer"})}
-      <label class="sclose full" style="white-space:normal"><input type="checkbox" id="bf-ok" ${b.approved?"checked":""}>Briefing revisado e aprovado pelo cliente.</label></div></div>
+      ${fld("bf-notes","Observações do cliente",b.notes,{cls:"wide",rows:3,ph:"Restrições, tom de voz, o que não pode prometer"})}</div></div>
     <div id="cf-res" hidden></div>
-    <div class="jactions" style="margin-top:0"><button class="btn" type="button" id="bf-gen">Gerar plano de ação</button><button class="btn2" type="button" id="bf-save">Salvar briefing</button></div>`;
-  const read=()=>{Object.assign(b,{biz:$("#bf-biz").value.trim(),seg:$("#bf-seg").value.trim(),phone:$("#bf-phone").value.trim(),url:$("#bf-url").value.trim(),budgetM:$("#bf-budget").value,ticket:$("#bf-ticket").value,
-    services:lines($("#bf-services").value),diffs:lines($("#bf-diffs").value),offer:$("#bf-offer").value.trim(),hours:$("#bf-hours").value.trim(),addrs:lines($("#bf-addrs").value),cities:lines($("#bf-cities").value),
-    radius:Math.max(1,Math.min(65,parseInt($("#bf-radius").value,10)||3)),avoid:lines($("#bf-avoid").value),notes:$("#bf-notes").value.trim(),approved:$("#bf-ok").checked})};
-  $("#cf-back").onclick=()=>crList();
-  $("#bf-save").onclick=()=>{read();crSave(c);crList()};
-  $("#bf-gen").onclick=()=>{read();const e=briefErrors(b);if(!b.approved)e.push("Marque que o briefing foi aprovado pelo cliente.");
-    const r=$("#cf-res");if(e.length){r.hidden=false;r.className="result bad";r.innerHTML=`<b>Antes de gerar o plano:</b><ul style="margin:6px 0 0;padding-left:18px">${e.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;return}
-    if(b.addrs.length===0)b.addrs=b.cities.slice();genPlan(c);crSave(c);crForm(c);window.scrollTo(0,0)}}
+    <div class="jactions crnav"><button class="btn2" type="button" id="bf-save">Salvar rascunho</button><button class="btn" type="button" id="bf-gen">Avançar<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m9 18 6-6-6-6"/></svg></button></div>`;
+  $("#cf-back").onclick=()=>{crBriefRead(c);crSave(c);crList()};crStepNav(c);
+  $("#bf-save").onclick=()=>{crBriefRead(c);crSave(c);crList()};
+  $("#bf-gen").onclick=()=>{crBriefRead(c);const e=briefCheck(b),r=$("#cf-res");
+    if(e.length)return crIssues(r,e,"Antes de avançar, ajuste");
+    if(c.genAt&&c.genFrom!==JSON.stringify(b)&&!confirm("O briefing mudou. Gerar o plano de novo? As alterações feitas no plano serão substituídas."))return crForm(c);
+    const btn=$("#bf-gen");btn.disabled=true;btn.textContent="Conferindo o briefing…";r.hidden=false;r.className="crissues";r.innerHTML='<div class="crload"><div class="spin"></div><span>Conferindo no padrão do Google e montando o plano de ação…</span></div>';
+    setTimeout(()=>{if(!c.genAt||c.genFrom!==JSON.stringify(b)){genPlan(c);if(!c.addrs.length)c.addrs=b.cities.slice();crTidy(c);c.genAt=nowStr();c.genFrom=JSON.stringify(b)}
+      c.step="plano";crSave(c);crForm(c);window.scrollTo(0,0)},700)}}
 function crRead(){const c=crCur;c.name=$("#cf-name").value.trim();c.cust=$("#cf-cust").value.trim();c.budget=$("#cf-budget").value;c.bid=$("#cf-bid").value;c.cpc=$("#cf-cpc").value;c.tcpa=$("#cf-tcpa").value;c.url=$("#cf-url").value.trim();
   c.addrs=lines($("#cf-addrs").value);c.radius=Math.max(1,Math.min(65,parseInt($("#cf-radius").value,10)||3));c.presence=$("#cf-pres").checked;c.hours=$("#cf-hours").value.trim();c.neg=lines($("#cf-neg").value);
-  c.sitelinks=lines($("#cf-sl").value);c.callouts=lines($("#cf-co").value);c.eu=$("#cf-eu").checked;c.approved=$("#cf-ok").checked;
+  c.sitelinks=lines($("#cf-sl").value);c.callouts=lines($("#cf-co").value);c.eu=$("#cf-eu").checked;
   c.groups=[...document.querySelectorAll("#cf-groups .crg")].map(el=>({name:el.querySelector("[data-f=name]").value.trim(),match:el.querySelector("[data-f=match]").value,kws:lines(el.querySelector("[data-f=kws]").value),titles:lines(el.querySelector("[data-f=titles]").value),descs:lines(el.querySelector("[data-f=descs]").value)}));return c}
-function crCount(el){const t=lines(el.querySelector("[data-f=titles]").value),d=lines(el.querySelector("[data-f=descs]").value);
-  const tl=t.filter(x=>x.length>30).length,dl=d.filter(x=>x.length>90).length;
-  el.querySelector("[data-c=titles]").innerHTML=`${t.length} de 3 a 15${tl?` · <b class="bad">${tl} acima de 30 caracteres</b>`:""}`;
-  el.querySelector("[data-c=descs]").innerHTML=`${d.length} de 2 a 4${dl?` · <b class="bad">${dl} acima de 90 caracteres</b>`:""}`;
-  el.querySelector("[data-c=kws]").textContent=lines(el.querySelector("[data-f=kws]").value).length+" palavras-chave"}
-function crForm(c){crCur=c;const box=$("#i-create");
+function crCount(el){const t=lines(el.querySelector("[data-f=titles]").value),d=lines(el.querySelector("[data-f=descs]").value),k=lines(el.querySelector("[data-f=kws]").value);
+  const tl=t.filter(x=>x.length>30).length,dl=d.filter(x=>x.length>90).length,td=dupes(t).length,dd=dupes(d).length,kd=dupes(k).length;
+  el.querySelector("[data-c=titles]").innerHTML=`${t.length} de 3 a 15${tl?` · <b class="bad">${tl} acima de 30</b>`:""}${td?` · <b class="bad">${td} repetido${td>1?"s":""}</b>`:""}`;
+  el.querySelector("[data-c=descs]").innerHTML=`${d.length} de 2 a 4${dl?` · <b class="bad">${dl} acima de 90</b>`:""}${dd?` · <b class="bad">${dd} repetida${dd>1?"s":""}</b>`:""}`;
+  el.querySelector("[data-c=kws]").innerHTML=`${k.length} palavras-chave${kd?` · <b class="bad">${kd} repetida${kd>1?"s":""}</b>`:""}`}
+// Página 2: plano de ação para revisar e subir.
+function crForm(c){crCur=c;const box=$("#i-create");c.step="plano";
   const grp=(g,i)=>`<div class="crg panel"><div class="ch"><h2>Grupo de anúncios ${i+1}</h2>${c.groups.length>1?`<button class="link" type="button" data-rmg="${i}" style="color:#c0392b">Remover grupo</button>`:""}</div>
     <div class="form crf"><div class="field wide"><label>Nome do grupo</label><input class="inp" data-f="name" maxlength="80" value="${esc(g.name)}"></div>
     <div class="field"><label>Correspondência</label><select class="sel" data-f="match">${Object.entries(MATCH).map(([k,v])=>`<option value="${k}" ${g.match===k?"selected":""}>${v}</option>`).join("")}</select></div>
     <div class="field full"><label>Palavras-chave, uma por linha, sem aspas ou colchetes <small data-c="kws"></small></label><textarea class="inp" rows="4" data-f="kws">${esc(g.kws.join("\n"))}</textarea></div>
     <div class="field wide"><label>Títulos do anúncio, um por linha, até 30 caracteres <small data-c="titles"></small></label><textarea class="inp" rows="8" data-f="titles">${esc(g.titles.join("\n"))}</textarea></div>
     <div class="field wide"><label>Descrições, uma por linha, até 90 caracteres <small data-c="descs"></small></label><textarea class="inp" rows="8" data-f="descs">${esc(g.descs.join("\n"))}</textarea></div></div></div>`;
-  box.innerHTML=`${backBtn}${crSteps(c)}
-    ${c.brief&&c.brief.biz?`<div class="result">Plano de ação gerado a partir do briefing de <b>${esc(c.brief.biz)}</b>. Revise e ajuste cada campo antes de aprovar. <button class="link" type="button" id="cf-brief">Ver briefing</button></div>`:""}
+  const accOpts=gList();
+  box.innerHTML=`${backBtn}${crSteps(c,2)}
+    ${c.pub?`<div class="result">Este plano já foi publicado em ${esc(c.pub.at)}. Subir de novo cria uma campanha nova na conta.</div>`:`<div class="result">Plano de ação montado a partir do briefing${c.brief&&c.brief.biz?` de <b>${esc(c.brief.biz)}</b>`:""}. Revise e ajuste o que quiser. Ao subir, o sistema confere tudo de novo antes de enviar ao Google.</div>`}
     <div class="panel"><div class="ph-pad" style="padding-bottom:0"><h2 style="display:flex;align-items:center;gap:8px">${PG}Configuração da campanha</h2><p class="hint">Pesquisa Google, sem parceiros de pesquisa nem Display. Objetivo: leads. Nasce pausada.</p></div>
-    <div class="form crf">${fld("cf-name","Nome da campanha",c.name,{cls:"wide",max:120})}${fld("cf-cust","ID da conta (10 dígitos)",c.cust,{mono:1,max:12,ph:"0000000000"})}${fld("cf-url","Página final",c.url,{type:"url",max:300,ph:"https://"})}
+    <div class="form crf">${fld("cf-name","Nome da campanha",c.name,{cls:"wide",max:120})}
+      ${accOpts.length?`<div class="field"><label for="cf-cust">Conta do Google Ads</label><select class="sel" id="cf-cust">${accOpts.map(a=>`<option value="${a.id}" ${a.id===String(c.cust).replace(/\D/g,"")?"selected":""}>${esc(a.name)} · ${fmtCid(a.id)}</option>`).join("")}</select></div>`:fld("cf-cust","ID da conta (10 dígitos)",c.cust,{mono:1,max:12,ph:"0000000000"})}
+      ${fld("cf-url","Página final",c.url,{type:"url",max:300,ph:"https://"})}
       ${fld("cf-budget","Orçamento diário (R$)",c.budget,{type:"number",min:1,step:"0.01",mono:1})}
       <div class="field wide"><label for="cf-bid">Estratégia de lance</label><select class="sel" id="cf-bid">${Object.entries(BIDS).map(([k,v])=>`<option value="${k}" ${c.bid===k?"selected":""}>${v}</option>`).join("")}</select></div>
       ${fld("cf-cpc","CPC máximo (R$)",c.cpc,{type:"number",min:0,step:"0.01",mono:1,hint:"no CPC manual e como teto no Maximizar cliques"})}${fld("cf-tcpa","CPA desejado (R$)",c.tcpa,{type:"number",min:0,step:"0.01",mono:1,hint:"opcional, depois de 30 conversões"})}
-      ${fld("cf-addrs","Regiões, uma por linha",c.addrs.join("\n"),{cls:"wide",rows:4,hint:"cada linha vira um pino com o raio ao lado"})}${fld("cf-radius","Raio (km)",c.radius,{type:"number",min:1,step:"1",mono:1})}
+      ${fld("cf-addrs","Regiões, uma por linha",c.addrs.join("\n"),{cls:"wide",rows:4,hint:"cada linha vira um pino; termine com cidade - UF"})}${fld("cf-radius","Raio (km)",c.radius,{type:"number",min:1,step:"1",mono:1})}
       <label class="sclose" style="white-space:normal;align-self:center"><input type="checkbox" id="cf-pres" ${c.presence?"checked":""}>Só pessoas que estão ou costumam estar na região</label>
       ${fld("cf-hours","Horários dos anúncios",c.hours,{cls:"full",ph:"seg a sex, 8h às 19h"})}
       ${fld("cf-neg","Palavras-chave negativas da campanha",c.neg.join("\n"),{cls:"wide",rows:5,hint:"uma por linha"})}
@@ -1678,36 +1777,65 @@ function crForm(c){crCur=c;const box=$("#i-create");
     <div id="cf-groups" style="display:flex;flex-direction:column;gap:16px">${c.groups.map(grp).join("")}</div>
     ${c.groups.length<6?`<button class="btn2" type="button" id="cf-addg" style="align-self:flex-start">+ Adicionar grupo (${c.groups.length} de 6)</button>`:""}
     <div id="cf-res" hidden></div>
-    <div class="panel ph-pad"><label class="sclose" style="white-space:normal;font-size:14px;color:var(--fg)"><input type="checkbox" id="cf-ok" ${c.approved?"checked":""}><b>Plano revisado e aprovado.</b>&nbsp;A campanha pode ser publicada pausada na conta.</label></div>
-    <div class="jactions" style="margin-top:0"><button class="btn" type="button" id="cf-save">Salvar</button><button class="btn2" type="button" id="cf-check">Verificar</button><button class="btn2" type="button" id="cf-dl">Baixar plano (JSON)</button>
-      <button class="btn2" type="button" id="cf-val" ${LIVE&&co.g?"":"disabled"} title="${LIVE&&co.g?"Confere o plano na Google Ads API sem criar nada":"Liberado com o Google Ads conectado em Informações da empresa (sistema publicado)"}">Validar na conta</button>
-      <button class="btn2" type="button" id="cf-pub" ${LIVE&&co.g?"":"disabled"} title="${LIVE&&co.g?"Cria a campanha pausada na conta":"Liberado com o Google Ads conectado em Informações da empresa (sistema publicado)"}">Publicar na conta (pausada)</button></div>
-    ${c.pub?`<div class="result">Publicada pausada em ${esc(c.pub.at)} · campanha <span class="mono">${esc(c.pub.rn.split("/").pop())}</span> na conta <span class="mono">${fmtCid(c.pub.rn.split("/")[1])}</span>. Revise no Google Ads e ative quando quiser.</div>`:""}`;
+    <div class="jactions crnav"><button class="btn2" type="button" id="cf-prev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m15 18-6-6 6-6"/></svg>Briefing</button>
+      <span class="sp"></span><button class="link" type="button" id="cf-tidy">Tirar repetições</button><button class="link" type="button" id="cf-check">Conferir</button><button class="link" type="button" id="cf-dl">Baixar plano</button><button class="btn2" type="button" id="cf-save">Salvar rascunho</button>
+      <button class="btn" type="button" id="cf-pub">${c.pub?"Subir como nova campanha":"Subir campanha pausada"}</button></div>`;
   box.querySelectorAll("#cf-groups .crg").forEach(el=>{crCount(el);el.addEventListener("input",()=>crCount(el))});
-  $("#cf-back").onclick=()=>crList();
-  const vb=$("#cf-brief");if(vb)vb.onclick=()=>{crRead();c.step="brief";crBrief(c)};
+  box.addEventListener("input",e=>{if(e.target.classList)e.target.classList.remove("err")});
+  $("#cf-back").onclick=()=>{crRead();crSave(c);crList()};crStepNav(c);
+  $("#cf-prev").onclick=()=>{crRead();crSave(c);crBrief(c);window.scrollTo(0,0)};
   const addg=$("#cf-addg");if(addg)addg.onclick=()=>{crRead();c.groups.push(newGroup());crForm(c)};
   box.querySelectorAll("[data-rmg]").forEach(b=>b.onclick=()=>{crRead();c.groups.splice(+b.dataset.rmg,1);crForm(c)});
-  const res=(ok,html)=>{const r=$("#cf-res");r.hidden=false;r.className="result"+(ok?"":" bad");r.innerHTML=html};
-  const ul=a=>`<ul style="margin:6px 0 0;padding-left:18px">${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
-  $("#cf-check").onclick=()=>{crRead();const e=crErrors(c),t=crTips(c);
-    res(!e.length,(e.length?`<b>Falta ajustar ${e.length} ${e.length===1?"item":"itens"}:</b>${ul(e)}`:"<b>Tudo certo para publicar.</b> "+(LIVE&&co.g?"Use Validar na conta para conferir na Google Ads API antes de publicar.":"A publicação pausada é liberada com o Google Ads conectado em Informações da empresa."))+(t.length?`<p style="margin:10px 0 0"><b>Boas práticas do Google:</b></p>${ul(t)}`:""))};
-  $("#cf-save").onclick=()=>{crRead();if(c.approved&&crErrors(c).length){c.approved=false;$("#cf-ok").checked=false;$("#cf-check").click();return}crSave(c);crList()};
+  const r=$("#cf-res");
+  if(c.err&&c.err.length){crIssues(r,c.err.map(x=>({t:x.t,f:x.f})),"O Google recusou a publicação. Corrija")}
+  $("#cf-tidy").onclick=()=>{crRead();crTidy(c);c.err=null;crForm(c);crIssues($("#cf-res"),crCheck(c),"Ainda falta ajustar","<b>Repetições removidas.</b> ")};
+  $("#cf-check").onclick=()=>{crRead();crIssues(r,crCheck(c),"Falta ajustar",'<b class="ok-t">Tudo certo no padrão do Google.</b> ')};
+  $("#cf-save").onclick=()=>{crRead();crSave(c);crList()};
   $("#cf-dl").onclick=()=>crDownload(crRead());
-  const send=async validar=>{crRead();const e=crErrors(c);
-    if(e.length)return res(false,`<b>Falta ajustar ${e.length} ${e.length===1?"item":"itens"} antes:</b>${ul(e)}`);
-    if(!c.approved)return res(false,"<b>Marque o plano como revisado e aprovado antes.</b>");
+  $("#cf-pub").onclick=()=>{crRead();const e=crCheck(c);c.err=null;
+    if(e.some(x=>!x.w))return crIssues(r,e,"Antes de subir, ajuste");
     const cust=String(c.cust).replace(/\D/g,""),acc=gList().find(a=>a.id===cust);
-    if(!validar&&!confirm(`Criar a campanha "${c.name}" PAUSADA na conta ${fmtCid(cust)}${acc?" ("+acc.name+")":""}?\n\nNada é ativado: ela só gasta quando você ativar no Google Ads.`))return;
-    const bv=$("#cf-val"),bp=$("#cf-pub");bv.disabled=bp.disabled=true;res(true,validar?"Validando na Google Ads API…":"Publicando a campanha pausada…");
-    try{const x=await fetch("/api/google/publish",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({plano:crPlan(c),login:acc&&acc.login||(cust===co.gacc?co.glogin:""),validar})});
-      const j=await x.json().catch(()=>({}));
-      if(!x.ok||!j.ok){const d=(j.detalhes||[]).slice(0,8);res(false,`<b>${x.status===401?"A conexão com o Google Ads expirou. Conecte de novo em Informações da empresa.":validar?"A Google Ads API apontou problemas:":"A campanha não foi criada:"}</b>${d.length?ul(d):j.error?`<p style="margin:6px 0 0">${esc(j.error)}</p>`:""}`);return}
-      if(validar)res(true,`<b>Plano validado na conta ${fmtCid(cust)}.</b> A Google Ads API aceitou as ${j.operacoes} operações sem criar nada. Pode publicar.`);
-      else{c.pub={rn:j.campanha||`customers/${cust}/campaigns/0`,at:nowStr()};crSave(c);crForm(c);res(true,`<b>Campanha criada pausada.</b> ${j.criados} itens criados na conta ${fmtCid(cust)}. Revise no Google Ads e ative quando quiser.`)}}
-    catch(err){res(false,"<b>Não foi possível falar com o servidor agora.</b> Tente de novo.")}
-    finally{const v=$("#cf-val"),p2=$("#cf-pub");if(v)v.disabled=false;if(p2)p2.disabled=false}};
-  const bv=$("#cf-val"),bp=$("#cf-pub");if(bv&&!bv.disabled)bv.onclick=()=>send(true);if(bp&&!bp.disabled)bp.onclick=()=>send(false)}
+    if(!confirm(`Subir a campanha "${c.name}" PAUSADA na conta ${fmtCid(cust)}${acc?" ("+acc.name+")":""}?\n\nNada é ativado: ela só gasta quando você ativar no Google Ads.`))return;
+    crSave(c);crPublish(c,acc)}}
+// Página 3: publicando, concluída ou com erro.
+async function crPublish(c,acc){const box=$("#i-create"),cust=String(c.cust).replace(/\D/g,"");
+  const stage=t=>{box.innerHTML=`${crSteps(c,3)}<div class="panel crdone"><div class="spin"></div><h2>${t}</h2><p class="hint">Não feche esta página. Leva alguns segundos.</p></div>`};
+  stage("Conferindo o plano na Google Ads API…");window.scrollTo(0,0);
+  if(!LIVE){await new Promise(r=>setTimeout(r,900));stage("Criando a campanha pausada…");await new Promise(r=>setTimeout(r,700));
+    c.pub={rn:`customers/${cust}/campaigns/0`,at:nowStr(),demo:true};return crDone(c,{ok:true,pub:c.pub,demo:true})}
+  if(!co.g)return crDone(c,{ok:false,erros:[{t:"O Google Ads não está conectado. Conecte em Informações da empresa e tente de novo.",go:"empresa"}]});
+  const call=validar=>fetch("/api/google/publish",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({plano:crPlan(c),login:acc&&acc.login||(cust===co.gacc?co.glogin:""),validar})})
+    .then(async x=>{const j=await x.json().catch(()=>({}));j.status=x.status;return j}).catch(()=>({ok:false,status:0}));
+  let j=await call(true);
+  if(j.ok){stage("Criando a campanha pausada…");j=await call(false)}
+  if(!j.ok){const erros=j.status===401?[{t:"A conexão com o Google Ads expirou. Conecte de novo em Informações da empresa.",go:"empresa"}]
+      :j.status===0?[{t:"Não foi possível falar com o servidor agora. Confira a internet e tente de novo."}]
+      :(j.erros&&j.erros.length?j.erros:[{t:j.error||"A Google Ads API recusou o plano sem dizer o motivo."}]).map(x=>({t:x.t||x.msg||String(x),f:crField(x.onde),orig:x.orig}));
+    c.err=erros.filter(x=>x.f);crSave(c);return crDone(c,{ok:false,erros})}
+  c.err=null;c.approved=true;c.pub={rn:j.campanha||`customers/${cust}/campaigns/0`,at:nowStr(),n:j.criados};crSave(c);crDone(c,{ok:true,pub:c.pub})}
+// Onde corrigir cada erro devolvido pela API.
+function crField(o){if(!o)return null;const g=o.g!=null?`#cf-groups .crg:nth-child(${o.g+1}) `:"";
+  return {budget:"#cf-budget",campanha:"#cf-name",bid:"#cf-bid",url:"#cf-url",regioes:"#cf-addrs",neg:"#cf-neg",sl:"#cf-sl",co:"#cf-co",nome:g+"[data-f=name]",kws:g+"[data-f=kws]",titles:g+"[data-f=titles]",descs:g+"[data-f=descs]",grupo:g+"[data-f=kws]"}[o.sec]||null}
+function crDone(c,r){crCur=c;const box=$("#i-create"),cust=String(c.cust).replace(/\D/g,"");
+  if(r.ok){const id=(r.pub.rn||"").split("/").pop(),link=`https://ads.google.com/aw/adgroups?campaignId=${id}&__e=${cust}`;
+    const kw=c.groups.reduce((s,g)=>s+g.kws.length,0);
+    box.innerHTML=`${backBtn}${crSteps(c,3)}<div class="panel crdone ok"><div class="crbig ok">✓</div><h2>${r.demo?"Simulação concluída":"Campanha criada pausada"}</h2>
+      <p class="hint">${r.demo?"Esta é a prévia. No sistema publicado, com o Google Ads conectado, a campanha é criada de verdade na conta.":`Está na conta ${fmtCid(cust)} e não gasta nada até você ativar no Google Ads.`}</p>
+      <div class="kv"><span>Campanha</span><b>${esc(c.name)}</b></div><div class="kv"><span>Conta</span><b class="mono">${fmtCid(cust)}</b></div>
+      <div class="kv"><span>Grupos · palavras-chave</span><b>${c.groups.length} · ${kw}</b></div><div class="kv"><span>Orçamento diário</span><b>${brl(+c.budget)}</b></div><div class="kv"><span>Publicada em</span><b>${esc(r.pub.at)}</b></div>
+      <div class="jactions" style="justify-content:center">${r.demo||id==="0"?"":`<a class="btn" href="${link}" target="_blank" rel="noopener">Abrir no Google Ads</a>`}<button class="btn2" type="button" id="cd-plan">Ver o plano</button><button class="btn2" type="button" id="cd-new">Criar outra campanha</button></div>
+      ${r.demo||id==="0"?"":`<p class="hint" style="font-size:12px">Se o link abrir outra conta, troque para a conta ${fmtCid(cust)} no canto de cima do Google Ads.</p>`}</div>`;
+    $("#cd-plan").onclick=()=>crForm(c);$("#cd-new").onclick=()=>crOpen(newCamp())}
+  else{const er=r.erros||[];
+    box.innerHTML=`${backBtn}${crSteps(c,3)}<div class="panel crdone bad"><div class="crbig bad">!</div><h2>A campanha não foi publicada</h2>
+      <p class="hint">Nada foi criado na conta. Corrija ${er.length===1?"o item abaixo":"os itens abaixo"} e suba de novo.</p>
+      <ul class="crerrs">${er.map((x,i)=>`<li><span>${esc(x.t)}${x.orig&&x.orig!==x.t?`<small>${esc(x.orig)}</small>`:""}</span>${x.go?`<button class="btn2" type="button" data-go="${i}">Conectar</button>`:`<button class="btn2" type="button" data-fix="${i}">Corrigir</button>`}</li>`).join("")}</ul>
+      <div class="jactions" style="justify-content:center"><button class="btn" type="button" id="cd-fix">Voltar ao plano e corrigir</button></div></div>`;
+    $("#cd-fix").onclick=()=>{crForm(c);window.scrollTo(0,0)};
+    box.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{location.hash=er[+b.dataset.go].go});
+    box.querySelectorAll("[data-fix]").forEach(b=>b.onclick=()=>{const x=er[+b.dataset.fix];crForm(c);const el=x.f&&document.querySelector(x.f);
+      if(el){el.classList.add("err");el.scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>{try{el.focus()}catch(z){}},250)}else window.scrollTo(0,0)})}
+  $("#cf-back").onclick=()=>crList();crStepNav(c)}
 // ---------- contas, login e usuários (Supabase) ----------
 var sb=null,me=null,empId=null,papel="dono",cloudT=null,cloudReady=false;
 const PAPEL={dono:"Dono",admin:"Administrador",leitura:"Leitura"};
