@@ -6,6 +6,29 @@ const g = require("../../lib/google");
 
 const BID = { MANUAL_CPC: "MANUAL_CPC", MAXIMIZE_CLICKS: "MAXIMIZE_CLICKS", MAXIMIZE_CONVERSIONS: "MAXIMIZE_CONVERSIONS" };
 const MATCH = new Set(["EXACT", "PHRASE", "BROAD"]);
+const DAYS = new Set(["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"]);
+const UFN = { AC: "Acre", AL: "Alagoas", AP: "Amapá", AM: "Amazonas", BA: "Bahia", CE: "Ceará", DF: "Distrito Federal", ES: "Espírito Santo", GO: "Goiás", MA: "Maranhão", MT: "Mato Grosso", MS: "Mato Grosso do Sul", MG: "Minas Gerais", PA: "Pará", PB: "Paraíba", PR: "Paraná", PE: "Pernambuco", PI: "Piauí", RJ: "Rio de Janeiro", RN: "Rio Grande do Norte", RS: "Rio Grande do Sul", RO: "Rondônia", RR: "Roraima", SC: "Santa Catarina", SP: "São Paulo", SE: "Sergipe", TO: "Tocantins" };
+const nz = s => String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+// Converte cada área (cidade - UF, estado ou Brasil) no ID de localização do Google. Devolve {geo, erros}.
+async function resolveAreas(areas, token) {
+  const geo = [], erros = [];
+  for (const [i, a] of arr(areas, 50).entries()) {
+    const tipo = a && a.tipo, uf = a && String(a.uf || "").toUpperCase(), txt = tipo === "cidade" ? `${a.nome} - ${uf}` : tipo === "estado" ? (UFN[uf] || uf) + " (estado)" : "Brasil";
+    if (tipo === "pais") { geo.push({ rn: "geoTargetConstants/2076", txt }); continue; }
+    const want = tipo === "cidade" ? ["City", "Municipality"] : ["State"], name = tipo === "cidade" ? str(a.nome, 80) : UFN[uf];
+    if (!name || (tipo === "estado" && !UFN[uf])) { erros.push({ t: `Área "${txt}": não entendi essa área.`, onde: { sec: "areas", i, txt } }); continue; }
+    let sug = [];
+    try { const r = await g.ads("geoTargetConstants:suggest", token, { body: { locale: "pt", countryCode: "BR", locationNames: { names: [name] } } }); sug = r.geoTargetConstantSuggestions || []; }
+    catch (e) { erros.push({ t: `Área "${txt}": o Google não respondeu a busca da região (${e.message}).`, onde: { sec: "areas", i, txt } }); continue; }
+    const st = nz(UFN[uf] || "");
+    const hit = sug.map(x => x.geoTargetConstant || {}).find(x => x.status === "ENABLED" && x.countryCode === "BR" && want.includes(x.targetType) && nz(x.name) === nz(name) && (tipo !== "cidade" || nz(x.canonicalName).includes(st)));
+    const same = sug.map(x => x.geoTargetConstant || {}).filter(x => x.status === "ENABLED" && x.countryCode === "BR" && want.includes(x.targetType) && nz(x.name) === nz(name));
+    const pick = hit || (same.length === 1 ? same[0] : null);
+    if (pick) geo.push({ rn: pick.resourceName, txt });
+    else erros.push({ t: `Área "${txt}": o Google não achou essa ${tipo === "cidade" ? "cidade nessa UF" : "região"}. Confira o nome e a UF.`, onde: { sec: "areas", i, txt } });
+  }
+  return { geo, erros };
+}
 const str = (v, n) => String(v == null ? "" : v).replace(/\s+/g, " ").trim().slice(0, n);
 const arr = (v, max) => (Array.isArray(v) ? v : []).slice(0, max);
 
@@ -18,7 +41,7 @@ function readBody(req) {
 }
 
 // Monta as operações do mutate com nomes temporários (IDs negativos).
-function operations(customer, p) {
+function operations(customer, p, geo) {
   const c = p.campanha || {}, cust = `customers/${customer}`;
   let n = 0; const tmp = kind => `${cust}/${kind}/-${++n}`;
   const ops = [], where = []; ops.where = where;
@@ -40,7 +63,7 @@ function operations(customer, p) {
   add({ campaignOperation: { create: campaign } }, { sec: "campanha" });
   // Regiões: um pino (raio) por endereço ou cidade.
   const loc = p.localizacao || {}, raio = Math.max(1, Math.min(65, Number(loc.raio_km) || 3));
-  arr(loc.locais, 50).map(x => str(x, 200)).filter(Boolean).forEach((a, li) => {
+  arr(loc.pinos || loc.locais, 50).map(x => str(x, 200)).filter(Boolean).forEach((a, li) => {
     const parts = a.split(",").map(s => s.trim()).filter(Boolean), last = parts[parts.length - 1] || "";
     const uf = (last.match(/\s-\s*([A-Za-z]{2})$/) || [])[1];
     const address = { cityName: last.replace(/\s*-\s*[A-Za-z]{2}$/, "").trim(), countryCode: "BR" };
@@ -48,6 +71,14 @@ function operations(customer, p) {
     if (uf) address.provinceCode = uf.toUpperCase();
     add({ campaignCriterionOperation: { create: { campaign: camp, proximity: { address, radius: raio, radiusUnits: "KILOMETERS" } } } }, { sec: "regioes", i: li, txt: a });
   });
+  // Áreas inteiras (cidade, estado ou país), já convertidas em IDs de localização do Google.
+  (geo || []).forEach((g, ai) => add({ campaignCriterionOperation: { create: { campaign: camp, location: { geoTargetConstant: g.rn } } } }, { sec: "areas", i: ai, txt: g.txt }));
+  // Horários dos anúncios.
+  const ag = p.agenda;
+  if (ag && Array.isArray(ag.dias)) {
+    const ini = Math.max(0, Math.min(23, parseInt(ag.inicio, 10) || 0)), fim = Math.max(ini + 1, Math.min(24, parseInt(ag.fim, 10) || 24));
+    ag.dias.filter(d => DAYS.has(d)).forEach(d => add({ campaignCriterionOperation: { create: { campaign: camp, adSchedule: { dayOfWeek: d, startHour: ini, startMinute: "ZERO", endHour: fim, endMinute: "ZERO" } } } }, { sec: "agenda" }));
+  }
   arr(p.negativas, 200).map(x => str(x, 80)).filter(Boolean).forEach((t, ni) => add({ campaignCriterionOperation: { create: { campaign: camp, negative: true, keyword: { text: t, matchType: "PHRASE" } } } }, { sec: "neg", i: ni, txt: t }));
   arr(p.grupos, 6).forEach((gr, gi) => {
     const ag = tmp("adGroups");
@@ -72,7 +103,7 @@ function operations(customer, p) {
 }
 
 // Traduz o erro da API para o português e diz onde corrigir.
-const LABEL = { budget: "Orçamento", campanha: "Campanha", regioes: "Região", neg: "Negativa", nome: "Grupo", kws: "Palavra-chave", sl: "Sitelink", co: "Frase de destaque", titles: "Título", descs: "Descrição", url: "Página final" };
+const LABEL = { agenda: "Horários", areas: "Área", budget: "Orçamento", campanha: "Campanha", regioes: "Região", neg: "Negativa", nome: "Grupo", kws: "Palavra-chave", sl: "Sitelink", co: "Frase de destaque", titles: "Título", descs: "Descrição", url: "Página final" };
 const CODE = {
   TOO_LONG: "texto longo demais", TOO_SHORT: "texto curto demais", DUPLICATE_ELEMENT: "item repetido", INVALID_CHARACTERS: "tem caracteres não aceitos", ILLEGAL_CHARS: "tem caracteres não aceitos",
   EXCESSIVE_CAPITALIZATION: "excesso de maiúsculas", INVALID_PUNCTUATION: "pontuação não aceita", REPETITIVE_PUNCTUATION: "pontuação repetida", PHONE_NUMBER_IN_AD_TEXT: "telefone no texto do anúncio",
@@ -104,8 +135,10 @@ module.exports = async (req, res) => {
   let body; try { body = await readBody(req); } catch (e) { return m.send(res, 400, { error: "Corpo inválido" }); }
   const p = body.plano || {}, customer = g.cid(p.conta), login = g.cid(body.login), validar = body.validar !== false;
   if (!/^\d{10}$/.test(customer) || (login && !/^\d{10}$/.test(login))) return m.send(res, 400, { error: "ID da conta inválido" });
-  let ops; try { ops = operations(customer, p); } catch (e) { return m.send(res, 400, { error: e.message }); }
   const a = await g.auth(req, res); if (!a) return;
+  const areas = await resolveAreas((p.localizacao || {}).areas, a.token);
+  if (areas.erros.length) return m.send(res, 422, { ok: false, error: "Áreas não encontradas", erros: areas.erros });
+  let ops; try { ops = operations(customer, p, areas.geo); } catch (e) { return m.send(res, 400, { error: e.message }); }
   try {
     const r = await g.ads(`customers/${customer}/googleAds:mutate`, a.token, { body: { mutateOperations: ops, partialFailure: false, validateOnly: validar }, login: login || undefined });
     const created = (r.mutateOperationResponses || []).map(x => { const k = Object.keys(x)[0]; return x[k] && x[k].resourceName; }).filter(Boolean);
