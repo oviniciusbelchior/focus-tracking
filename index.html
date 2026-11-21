@@ -397,6 +397,9 @@ button.crcard:hover{border-color:var(--brand)}
 .crerrs li{display:flex;gap:14px;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid #fed7aa;background:#fff7ed;border-radius:8px;font-size:13.5px}
 .crerrs li small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}
 .crerrs li .btn2{flex:none}
+.crask{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-left,0px))}
+.crask-box{background:var(--surface,#fff);color:var(--fg);border-radius:12px;padding:22px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.crask-box h2{font-size:17px;margin:0}.crask-box p{margin:0;font-size:14px;color:var(--muted);overflow-wrap:anywhere}.crask-box .jactions{justify-content:flex-end;margin-top:6px}
 .crsec{margin:8px 0 -4px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}.crsec:first-child{border-top:0;padding-top:0;margin-top:0}.crsec b{color:var(--fg);font-size:14px;margin-right:4px}
 .crradio{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .crradio label{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;font-weight:400;font-size:12.5px;color:var(--muted)}
@@ -1255,7 +1258,7 @@ function gUI(){if(!LIVE)return gDemoUI();
   $("#g-hint").hidden=co.g;
   if(!co.g){setSt("#g-st","wait","Desconectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-on">Conectar</button>`;$("#g-area").innerHTML=msg;$("#g-on").onclick=()=>{location.href="/api/google/login"};return}
   setSt("#g-st","ok","Conectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-off">Desconectar</button>`;
-  $("#g-off").onclick=()=>{if(!confirm("Desconectar o Google Ads deste navegador?"))return;fetch("/api/google/logout",{method:"POST",credentials:"same-origin"}).catch(()=>{}).finally(()=>{gAccs=[];gMsg="";co.g=false;saveCo();gUI()})};
+  $("#g-off").onclick=async()=>{if(!await crAsk("Desconectar o Google Ads?","O acesso à conta Google Ads sai deste navegador. Você pode conectar de novo quando quiser.","Desconectar"))return;fetch("/api/google/logout",{method:"POST",credentials:"same-origin"}).catch(()=>{}).finally(()=>{gAccs=[];gMsg="";co.g=false;saveCo();gUI()})};
   const list=gList(),errs=(gAccs||[]).filter(a=>a.error);
   $("#g-area").innerHTML=msg+(list.length?`<div class="vgrid"><div class="field"><label for="g-acc">Conta de anúncios do cliente</label><select class="sel" id="g-acc"><option value="">Escolha a conta</option>${list.map(a=>`<option value="${esc(a.id)}" ${a.id===co.gacc?"selected":""}>${esc(a.name)} · ${fmtCid(a.id)}${a.test?" (teste)":""}${a.login?" · pela MCC "+fmtCid(a.login):""}</option>`).join("")}</select></div><div class="kv"><span>Contas acessíveis</span><b>${list.length}</b></div></div>`
     :`<div class="hintbar">Nenhuma conta de anúncios apareceu para este login do Google.${errs.length?" "+esc(errs[0].error):""}</div>`);
@@ -1750,10 +1753,16 @@ function crList(){const box=$("#i-create");crCur=null;
   $("#cr-g").onclick=()=>crOpen(newCamp());
   box.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>crOpen(JSON.parse(JSON.stringify(camps[+b.dataset.ed]))));
   box.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>crDownload(camps[+b.dataset.dl]));
-  box.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const c=camps[+b.dataset.rm];if(!confirm(`Excluir "${c.name||c.brief.biz||"Sem nome"}" desta lista? A campanha no Google Ads não é apagada.`))return;camps.splice(+b.dataset.rm,1);saveCamps();crList()})}
+  box.querySelectorAll("[data-rm]").forEach(b=>b.onclick=async()=>{const c=camps[+b.dataset.rm];if(!await crAsk("Excluir da lista?",`"${c.name||c.brief.biz||"Sem nome"}" sai desta lista. A campanha no Google Ads não é apagada.`,"Excluir"))return;camps.splice(+b.dataset.rm,1);saveCamps();crList()})}
 const crOpen=c=>c.pub?crDone(c,{ok:true,pub:c.pub}):c.step==="brief"?crBrief(c):crForm(c);
 const backBtn='<button class="back" type="button" id="cf-back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Voltar para as campanhas criadas</button>';
 const fld=(id,label,val,o={})=>`<div class="field ${o.cls||""}"><label for="${id}">${label}${o.hint?` <small>${o.hint}</small>`:""}</label>${o.rows?`<textarea class="inp" id="${id}" rows="${o.rows}" placeholder="${esc(o.ph||"")}">${esc(val)}</textarea>`:`<input class="inp ${o.mono?"mono":""}" id="${id}" ${o.type?`type="${o.type}"`:""} ${o.step?`step="${o.step}"`:""} ${o.min!=null?`min="${o.min}"`:""} maxlength="${o.max||200}" value="${esc(val)}" placeholder="${esc(o.ph||"")}">`}</div>`;
+// Confirmação dentro da página (sem a janela do navegador).
+function crAsk(title,text,ok){return new Promise(res=>{const d=document.createElement("div");d.className="crask";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");
+  d.innerHTML=`<div class="crask-box"><h2>${esc(title)}</h2><p>${esc(text).replace(/\n/g,"<br>")}</p><div class="jactions"><button class="btn2" type="button" data-a="0">Cancelar</button><button class="btn" type="button" data-a="1">${esc(ok)}</button></div></div>`;
+  const done=v=>{d.remove();removeEventListener("keydown",key);res(v)},key=e=>{if(e.key==="Escape")done(false)};
+  d.onclick=e=>{if(e.target===d)done(false);const a=e.target.closest("[data-a]");if(a)done(a.dataset.a==="1")};addEventListener("keydown",key);
+  document.body.appendChild(d);d.querySelector('[data-a="1"]').focus()})}
 function crStepNav(c){document.querySelectorAll("#i-create [data-step]").forEach(b=>b.onclick=()=>{crKeep(c);b.dataset.step==="1"?crBrief(c):crForm(c);window.scrollTo(0,0)})}
 // Guarda o que está na tela antes de trocar de página.
 function crKeep(c){if($("#bf-biz"))crBriefRead(c);if($("#cf-groups"))crRead()}
@@ -1814,10 +1823,10 @@ function crBrief(c){crCur=c;const b=c.brief,box=$("#i-create"),accOpts=gList(),d
   $("#bf-budget").addEventListener("input",e=>{const s=e.target.closest(".field").querySelector("small"),v=+e.target.value;if(s)s.textContent=v>0?`≈ ${brl(Math.round(v/30.4*100)/100)} por dia`:""});
   $("#cf-back").onclick=()=>{crBriefRead(c);crSave(c);crList()};crStepNav(c);
   $("#bf-save").onclick=()=>{crBriefRead(c);crSave(c);crList()};
-  $("#bf-gen").onclick=()=>{crBriefRead(c);const e=briefCheck(b),r=$("#cf-res");
+  $("#bf-gen").onclick=async()=>{crBriefRead(c);const e=briefCheck(b),r=$("#cf-res");
     if(e.length)return crIssues(r,e,"Antes de avançar, ajuste");
     const k=planKey(b),redo=!c.genAt||c.genFrom!==k;
-    if(c.genAt&&redo&&!confirm("Os serviços ou textos do briefing mudaram. Montar o plano de novo? As alterações feitas nos grupos e extensões serão substituídas.")){syncBrief(c);crSave(c);return crForm(c)}
+    if(c.genAt&&redo&&!await crAsk("Montar o plano de novo?","Os serviços ou textos do briefing mudaram. As alterações feitas nos grupos e extensões serão substituídas.","Montar de novo")){syncBrief(c);crSave(c);return crForm(c)}
     const btn=$("#bf-gen");btn.disabled=true;btn.textContent="Conferindo…";r.hidden=false;r.className="crissues";r.innerHTML='<div class="crload"><div class="spin"></div><span>Conferindo no padrão do Google e montando o plano de ação…</span></div>';
     setTimeout(()=>{syncBrief(c);if(redo){genPlan(c);crTidy(c);c.genAt=nowStr();c.genFrom=k}c.step="plano";crSave(c);crForm(c);window.scrollTo(0,0)},700)}}
 function crRead(){const c=crCur;
@@ -1874,10 +1883,10 @@ function crForm(c){crCur=c;syncBrief(c);const box=$("#i-create");c.step="plano";
   $("#cf-check").onclick=()=>{crRead();crIssues(r,crCheck(c),"Falta ajustar",'<b class="ok-t">Tudo certo no padrão do Google.</b> ')};
   $("#cf-save").onclick=()=>{crRead();crSave(c);crList()};
   $("#cf-dl").onclick=()=>crDownload(crRead());
-  $("#cf-pub").onclick=()=>{crRead();const e=crCheck(c);c.err=null;
+  $("#cf-pub").onclick=async()=>{crRead();const e=crCheck(c);c.err=null;
     if(e.some(x=>!x.w))return crIssues(r,e,"Antes de subir, ajuste");
     const acc=gList().find(a=>a.id===c.cust);
-    if(!confirm(`Subir a campanha "${c.name}" PAUSADA na conta ${fmtCid(c.cust)}${acc?" ("+acc.name+")":""}?\n\nNada é ativado: ela só gasta quando você ativar no Google Ads.`))return;
+    if(!await crAsk("Subir campanha pausada?",`"${c.name}" vai para a conta ${fmtCid(c.cust)}${acc?" ("+acc.name+")":""}.\nNada é ativado: ela só gasta quando você ativar no Google Ads.`,"Subir pausada"))return;
     crSave(c);crPublish(c,acc)}}
 // Página 3: publicando, concluída ou com erro.
 async function crPublish(c,acc){const box=$("#i-create"),cust=c.cust;
@@ -1939,7 +1948,7 @@ async function usUI(){const body=$("#us-body"),adm=papel!=="leitura";$("#us-new"
   body.innerHTML=rows.map((r,i)=>`<tr><td>${esc(r.email)}${me&&r.user_id===me.id?' <span style="color:var(--muted)">(você)</span>':""}</td><td>${PAPEL[r.papel]}</td><td>${r.ativo?'<span class="ok-t">Ativo</span>':'<span style="color:#c2410c">Convite pendente</span>'}</td><td style="color:var(--muted);white-space:nowrap">${dBR(r.created_at)}</td>
     <td style="text-align:right;white-space:nowrap">${adm&&!r.ativo?`<button class="link" data-cp="${i}">Copiar link</button> · `:""}${adm&&r.papel!=="dono"&&!(me&&r.user_id===me.id)?`<button class="link" data-rm="${i}" style="color:#c0392b">${r.ativo?"Remover":"Cancelar"}</button>`:""}</td></tr>`).join("")||'<tr><td colspan="5" style="color:var(--muted)">Ninguém ainda.</td></tr>';
   body.querySelectorAll("[data-cp]").forEach(b=>b.onclick=()=>{const t=invLink(rows[+b.dataset.cp].email);try{navigator.clipboard.writeText(t).then(()=>{b.textContent="Copiado";setTimeout(()=>b.textContent="Copiar link",1500)})}catch(e){}});
-  body.querySelectorAll("[data-rm]").forEach(b=>b.onclick=async()=>{const r=rows[+b.dataset.rm];if(!confirm((r.ativo?"Remover o acesso de ":"Cancelar o convite de ")+r.email+"?"))return;
+  body.querySelectorAll("[data-rm]").forEach(b=>b.onclick=async()=>{const r=rows[+b.dataset.rm];if(!await crAsk(r.ativo?"Remover acesso?":"Cancelar convite?",(r.ativo?"Remover o acesso de ":"Cancelar o convite de ")+r.email+"?",r.ativo?"Remover":"Cancelar convite"))return;
     if(sb&&empId){const q=r.ativo?sb.from("membros").delete().eq("empresa_id",empId).eq("user_id",r.user_id):sb.from("convites").delete().eq("id",r.id);const x=await q;if(x.error){alert("Não foi possível remover: "+x.error.message);return}}
     else usDemo=usDemo.filter(u=>u!==r);usUI()})}
 $("#us-form").onsubmit=async e=>{e.preventDefault();const em=$("#us-email").value.trim().toLowerCase(),pp=$("#us-papel").value,res=$("#us-res"),b=$("#us-go");
