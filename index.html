@@ -523,11 +523,11 @@ details.more summary:hover{color:var(--fg)}
     <div class="filters">
       <div class="seg" id="i-period">
         <button data-p="today" aria-pressed="false">Hoje</button>
-        <button data-p="7" aria-pressed="false">7 dias</button>
-        <button data-p="14" aria-pressed="false">14 dias</button>
-        <button data-p="28" aria-pressed="false">28 dias</button>
-        <button data-p="month" aria-pressed="true">Este mês</button>
+        <button data-p="7" aria-pressed="false">Últimos 7 dias</button>
+        <button data-p="14" aria-pressed="false">Últimos 14 dias</button>
+        <button data-p="30" aria-pressed="false">Últimos 30 dias</button>
         <button data-p="last" aria-pressed="false">Mês passado</button>
+        <button data-p="month" aria-pressed="true">Mês atual</button>
         <button data-p="custom" aria-pressed="false">Personalizado</button>
       </div>
       <div class="custom" id="i-custom" hidden>
@@ -535,12 +535,9 @@ details.more summary:hover{color:var(--fg)}
       </div>
     </div>
     <div class="ifil" id="i-fil">
-      <label>Conta: <select id="i-acc"></select></label>
       <label>Campanha: <select id="i-camp"></select></label>
       <label>Conjunto: <select id="i-set"></select></label>
       <label>Anúncio: <select id="i-ad"></select></label>
-      <label>Status: <select id="i-st"><option value="">Todos</option><option value="ativo">Ativos</option><option value="pausado">Pausados</option></select></label>
-      <label title="A partir de qual etapa da jornada de compra a conversa conta como lead qualificado">Qualificado a partir de: <select id="i-q"></select></label>
       <button class="clr" type="button" id="i-clr" hidden>Limpar filtros</button>
     </div>
     <div class="hintbar" id="i-demo" hidden>Dados de exemplo. No sistema publicado aparecem as campanhas reais da conta de anúncios conectada.</div>
@@ -1285,11 +1282,11 @@ if(LIVE){const MSG={ok:[1,"Facebook conectado."],cancelado:[0,"Login cancelado n
 // ---------- inspetor de campanha ----------
 // Métricas do Meta Ads (/api/meta/insights) cruzadas com as conversas do WhatsApp (leads) por campanha, conjunto e anúncio.
 const ins={lv:"campaign",p:"month",acc:"",camp:"",set:"",ad:"",st:"",q:null,sort:"spend",dir:-1,cache:{},err:"",loading:false,req:0};
-try{const s=JSON.parse(localStorage.getItem("ft-ins")||"{}");if(s.p)ins.p=s.p;if(Number.isInteger(s.q))ins.q=s.q;if(s.acc)ins.acc=String(s.acc)}catch(e){}
+try{const s=JSON.parse(localStorage.getItem("ft-ins")||"{}");if(["today","7","14","30","last","month","custom"].includes(s.p))ins.p=s.p;if(Number.isInteger(s.q))ins.q=s.q;if(s.acc)ins.acc=String(s.acc)}catch(e){}
 const insSave=()=>{try{localStorage.setItem("ft-ins",JSON.stringify({p:ins.p,q:ins.q,acc:ins.acc}))}catch(e){}};
 $("#i-to").value=iso(today);$("#i-from").value=iso(new Date(today.getTime()-13*DAY));$("#i-to").max=iso(today);$("#i-from").max=iso(today);
 function insRange(){const t=today;let f=t,u=t;
-  if(["7","14","28"].includes(ins.p))f=new Date(t.getFullYear(),t.getMonth(),t.getDate()-(+ins.p-1));
+  if(["7","14","30"].includes(ins.p))f=new Date(t.getFullYear(),t.getMonth(),t.getDate()-(+ins.p-1));
   else if(ins.p==="month")f=new Date(t.getFullYear(),t.getMonth(),1);
   else if(ins.p==="last"){f=new Date(t.getFullYear(),t.getMonth()-1,1);u=new Date(t.getFullYear(),t.getMonth(),0)}
   else if(ins.p==="custom"){const a=new Date($("#i-from").value+"T00:00"),b=new Date($("#i-to").value+"T00:00");if(!isNaN(a)&&!isNaN(b)&&a<=b){f=a;u=b}}
@@ -1380,8 +1377,7 @@ async function inspetor(force){
   $("#i-range").textContent=r.since===r.until?brD(r.since):brD(r.since)+" a "+brD(r.until);
   $("#i-demo").hidden=LIVE;
   if(!accs.some(a=>a.id===ins.acc))ins.acc=accs[0]?accs[0].id:"";
-  insFill("#i-acc",accs.map(a=>[a.id,a.n]),ins.acc,"Nenhuma conta",!accs.length);$("#i-acc").closest("label").classList.remove("on");
-  const q=qIdx();$("#i-q").innerHTML=stages.map((s,i)=>i?`<option value="${i}" ${i===q?"selected":""}>${esc(s.name)}</option>`:"").join("");
+  const q=qIdx();
   const tbl=$("#i-tbl"),empty=(t,p,btn)=>{tbl.innerHTML=`<div class="iempty"><b>${t}</b><span>${p}</span>${btn||""}</div>`;$("#i-kpis").innerHTML="";$("#i-note").textContent="";["campaign","adset","ad"].forEach(l=>$("#ic-"+l).textContent="0");["#i-camp","#i-set","#i-ad"].forEach(id=>insFill(id,[],"","",true))};
   const goCo='<button class="btn" type="button" onclick="location.hash=\'empresa\'">Ir para Informações da empresa</button>';
   if(need&&!metaChecked){tbl.innerHTML='<div class="iempty"><span>Verificando a conexão com o Meta Ads…</span></div>';return}
@@ -1397,9 +1393,8 @@ async function inspetor(force){
   if(ins.camp&&!camps.some(c=>c.id===ins.camp))ins.camp="";
   if(ins.set&&!sets.some(c=>c.id===ins.set))ins.set="";
   insFill("#i-camp",camps.map(c=>[c.id,c.name]).sort((a,b)=>a[1].localeCompare(b[1])),ins.camp,"Todas");
-  insFill("#i-set",sets.filter(s=>!ins.camp||s.campId===ins.camp).map(c=>[c.id,c.name]).sort((a,b)=>a[1].localeCompare(b[1])),ins.set,"Todos",lv==="campaign");
-  insFill("#i-ad",data.ad.filter(a=>(!ins.camp||a.campId===ins.camp)&&(!ins.set||a.setId===ins.set)).map(c=>[c.id,c.name]).sort((a,b)=>a[1].localeCompare(b[1])),ins.ad,"Todos",lv!=="ad");
-  $("#i-st").value=ins.st;$("#i-st").closest("label").classList.toggle("on",!!ins.st);
+  insFill("#i-set",sets.filter(s=>!ins.camp||s.campId===ins.camp).map(c=>[c.id,c.name]).sort((a,b)=>a[1].localeCompare(b[1])),ins.set,"Todos");
+  insFill("#i-ad",data.ad.filter(a=>(!ins.camp||a.campId===ins.camp)&&(!ins.set||a.setId===ins.set)).map(c=>[c.id,c.name]).sort((a,b)=>a[1].localeCompare(b[1])),ins.ad,"Todos");
   $("#i-clr").hidden=!(ins.camp||ins.set||ins.ad||ins.st);
   const pass=(x,l)=>(!ins.camp||x.campId===ins.camp)&&(l==="campaign"||!ins.set||(l==="adset"?x.id:x.setId)===ins.set)&&(l!=="ad"||!ins.ad||x.id===ins.ad)&&(!ins.st||x.status===ins.st);
   ["campaign","adset","ad"].forEach(l=>$("#ic-"+l).textContent=data[l].filter(x=>pass(x,l)).length);
@@ -1441,12 +1436,10 @@ async function inspetor(force){
 document.querySelectorAll(".itabs [data-lv]").forEach(b=>b.onclick=()=>{ins.lv=b.dataset.lv;inspetor()});
 document.querySelectorAll("#i-period button").forEach(b=>b.onclick=()=>{ins.p=b.dataset.p;insSave();inspetor()});
 ["#i-from","#i-to"].forEach(id=>$(id).onchange=()=>inspetor());
-$("#i-acc").onchange=e=>{ins.acc=e.target.value;ins.camp=ins.set=ins.ad="";insSave();inspetor()};
 $("#i-camp").onchange=e=>{ins.camp=e.target.value;ins.set=ins.ad="";inspetor()};
-$("#i-set").onchange=e=>{ins.set=e.target.value;ins.ad="";inspetor()};
-$("#i-ad").onchange=e=>{ins.ad=e.target.value;inspetor()};
-$("#i-st").onchange=e=>{ins.st=e.target.value;inspetor()};
-$("#i-q").onchange=e=>{ins.q=+e.target.value;insSave();inspetor()};
+// Escolher um conjunto ou anúncio abre a aba do nível correspondente.
+$("#i-set").onchange=e=>{ins.set=e.target.value;ins.ad="";if(ins.set&&ins.lv==="campaign")ins.lv="adset";inspetor()};
+$("#i-ad").onchange=e=>{ins.ad=e.target.value;if(ins.ad)ins.lv="ad";inspetor()};
 $("#i-clr").onclick=()=>{ins.camp=ins.set=ins.ad=ins.st="";inspetor()};
 $("#i-reload").onclick=()=>inspetor(true);
 // ---------- contas, login e usuários (Supabase) ----------
