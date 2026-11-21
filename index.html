@@ -899,13 +899,16 @@ const safeLogo=v=>typeof v==="string"&&/^data:image\/(png|jpe?g|gif|webp);base64
 const cleanId=v=>String(v==null?"":v).replace(/[^\w.:\/@+-]/g,"").slice(0,80);
 const cleanDt=v=>String(v==null?"":v).replace(/[^\d\/: ]/g,"").slice(0,20);
 function cleanDados(d){
-  if(d.co){["acct","px","pixel","bm","gacc","wa"].forEach(k=>{if(d.co[k]!=null)d.co[k]=cleanId(d.co[k])});d.co.accs=Array.isArray(d.co.accs)?d.co.accs.map(cleanId):[];d.co.logo=safeLogo(d.co.logo)}
+  if(d.co){["acct","px","pixel","bm","gacc","glogin","wa"].forEach(k=>{if(d.co[k]!=null)d.co[k]=cleanId(d.co[k])});d.co.accs=Array.isArray(d.co.accs)?d.co.accs.map(cleanId):[];d.co.logo=safeLogo(d.co.logo)}
   if(Array.isArray(d.stages))d.stages=d.stages.filter(x=>x&&typeof x==="object").slice(0,8).map(x=>({name:String(x.name||"").slice(0,40),close:!!x.close,meta:cleanId(x.meta),google:cleanId(x.google)}));
   if(Array.isArray(d.events))d.events=d.events.filter(x=>x&&typeof x==="object").map(x=>({id:cleanId(x.id),plat:x.plat==="google"?"google":"meta",name:String(x.name||"").slice(0,120),desc:String(x.desc||"").slice(0,500),src:x.src==="manual"?"manual":"sync",created:cleanDt(x.created),link:x.link?cleanId(x.link):null}));
   if(Array.isArray(d.links))d.links=d.links.filter(x=>x&&typeof x==="object").map(x=>({id:cleanId(x.id),name:String(x.name||"").slice(0,120),text:String(x.text||"").slice(0,1000),delay:Math.min(3,Math.max(1,parseInt(x.delay,10)||2)),created:cleanDt(x.created),m:(Array.isArray(x.m)?x.m:[0,0,0,0]).slice(0,4).map(n=>Number(n)||0),ck:x.ck!=null?(Number(x.ck)||0)%16777216:undefined}));
   const S=(v,n)=>String(v==null?"":v).slice(0,n),L=(a,m,n)=>(Array.isArray(a)?a:[]).slice(0,m).map(x=>S(x,n));
-  if(Array.isArray(d.camps))d.camps=d.camps.filter(x=>x&&typeof x==="object").slice(0,200).map(x=>({id:cleanId(x.id),plat:"google",name:S(x.name,120),cust:S(x.cust,12).replace(/[^\d-]/g,""),budget:S(x.budget,12).replace(/[^\d.]/g,""),cpc:S(x.cpc,12).replace(/[^\d.]/g,""),url:S(x.url,300),geo:S(x.geo,300),hours:S(x.hours,200),neg:L(x.neg,200,80),eu:!!x.eu,updated:cleanDt(x.updated),
-    groups:(Array.isArray(x.groups)?x.groups:[]).filter(g=>g&&typeof g==="object").slice(0,4).map(g=>({name:S(g.name,80),match:MATCH[g.match]?g.match:"PHRASE",kws:L(g.kws,200,80),titles:L(g.titles,15,60),descs:L(g.descs,4,180)}))}));
+  if(Array.isArray(d.camps))d.camps=d.camps.filter(x=>x&&typeof x==="object").slice(0,200).map(x=>{const bf=x.brief&&typeof x.brief==="object"?x.brief:{};const num=v=>S(v,12).replace(/[^\d.]/g,"");
+    return {id:cleanId(x.id),plat:"google",step:x.step==="brief"?"brief":"plano",name:S(x.name,120),cust:S(x.cust,12).replace(/[^\d-]/g,""),budget:num(x.budget),bid:BIDS[x.bid]?x.bid:"MAX_CONV",cpc:num(x.cpc),tcpa:num(x.tcpa),url:S(x.url,300),
+      radius:Math.max(1,Math.min(65,parseInt(x.radius,10)||3)),addrs:L(x.addrs,50,200),presence:x.presence!==false,hours:S(x.hours,200),neg:L(x.neg,200,80),sitelinks:L(x.sitelinks,10,50),callouts:L(x.callouts,10,50),eu:!!x.eu,approved:!!x.approved,updated:cleanDt(x.updated),pub:x.pub&&typeof x.pub==="object"&&/^customers\/\d+\/campaigns\/\d+$/.test(x.pub.rn||"")?{rn:x.pub.rn,at:cleanDt(x.pub.at)}:null,
+      brief:{biz:S(bf.biz,120),seg:S(bf.seg,80),url:S(bf.url,300),phone:S(bf.phone,30),services:L(bf.services,6,80),cities:L(bf.cities,20,80),addrs:L(bf.addrs,50,200),radius:Math.max(1,Math.min(65,parseInt(bf.radius,10)||3)),hours:S(bf.hours,200),budgetM:num(bf.budgetM),ticket:num(bf.ticket),offer:S(bf.offer,80),diffs:L(bf.diffs,15,60),avoid:L(bf.avoid,100,80),notes:S(bf.notes,1000),approved:!!bf.approved},
+      groups:(Array.isArray(x.groups)?x.groups:[]).filter(g=>g&&typeof g==="object").slice(0,6).map(g=>({name:S(g.name,80),match:MATCH[g.match]?g.match:"PHRASE",kws:L(g.kws,200,80),titles:L(g.titles,15,60),descs:L(g.descs,4,180)}))}});
   return d}
 
 // ---------- tabs ----------
@@ -1124,7 +1127,7 @@ function doSync(pl,btn){if(!(pl==="meta"?co.fb:co.g)){location.hash="empresa";re
 $("#sync-meta").onclick=e=>doSync("meta",e.currentTarget);$("#sync-google").onclick=e=>doSync("google",e.currentTarget);
 
 // ---------- empresa ----------
-const DEF_CO={name:"",seg:"",site:"",phone:"",tpl:"",pixel:"",token:"",auto:true,value:true,untr:false,test:"",wa:"off",fb:false,bm:"",accs:[],px:"",g:false,gacc:"",logo:""};
+const DEF_CO={name:"",seg:"",site:"",phone:"",tpl:"",pixel:"",token:"",auto:true,value:true,untr:false,test:"",wa:"off",fb:false,bm:"",accs:[],px:"",g:false,gacc:"",glogin:"",logo:""};
 let co;try{co=Object.assign({},DEF_CO,JSON.parse(localStorage.getItem("ft-company")||"{}"))}catch(e){co=Object.assign({},DEF_CO)}
 let coT;const saveCo=()=>{try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}cloudSave();const sv=$("#co-saved");sv.hidden=false;clearTimeout(coT);coT=setTimeout(()=>sv.hidden=true,1500)};
 // Na Vercel (LIVE) o login é real; na prévia continua simulado.
@@ -1198,11 +1201,26 @@ $("#fb-test").onclick=()=>{const tk=$("#co-token");if(!co.pixel){$("#co-pixel").
   const ev=evById(stages[closeIdx()].meta)||{name:"Purchase"};const t=new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   $("#fb-res").hidden=false;$("#fb-res").innerHTML=`<span class="ok-t">Evento de teste recebido.</span> ${esc(ev.name)} com valor R$ 1,00 chegou ao pixel <span class="mono">${esc(co.pixel)}</span>${co.test?` com o código <span class="mono">${esc(co.test)}</span>`:""}. Confira em Gerenciador de Eventos, aba Eventos de teste.`;
   testLog.unshift([new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})+" "+t,"Evento de teste",{name:stages[closeIdx()].name},ev,"1,00","Teste recebido"]);fbLog()};
-function gUI(){$("#g-hint").hidden=co.g;
+function gDemoUI(){$("#g-hint").hidden=co.g;
   if(co.g){setSt("#g-st","ok","Conectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-off">Desconectar</button>`;$("#g-off").onclick=()=>{co.g=false;saveCo();gUI()};
     $("#g-area").innerHTML=`<div class="vgrid"><div class="field"><label for="g-acc">Conta de anúncios</label><select class="sel" id="g-acc"><option value="482-193-5567" ${co.gacc==="482-193-5567"?"selected":""}>Conta de anúncios · 482-193-5567</option><option value="901-334-2210" ${co.gacc==="901-334-2210"?"selected":""}>Conta de administrador (MCC) · 901-334-2210</option></select></div><div class="kv"><span>Ações de conversão</span><b>${events.filter(e=>e.plat==="google").length} sincronizadas · <button class="link" type="button" onclick="location.hash='eventos'">ver eventos</button></b></div></div>`;
     $("#g-acc").onchange=e=>{co.gacc=e.target.value;saveCo()}}
   else{setSt("#g-st","wait","Desconectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-on">Conectar</button>`;$("#g-area").innerHTML="";$("#g-on").onclick=()=>{co.g=true;co.gacc=co.gacc||"482-193-5567";saveCo();gUI()}}}
+// Google Ads real (sistema publicado): OAuth em /api/google/login e contas em /api/google/accounts.
+var gAccs=[],gMsg="",gChecked=!LIVE;
+const fmtCid=id=>String(id||"").replace(/\D/g,"").replace(/^(\d{3})(\d{3})(\d{4})$/,"$1-$2-$3");
+const gList=()=>(gAccs||[]).filter(a=>!a.manager&&!a.error);
+function gUI(){if(!LIVE)return gDemoUI();
+  const msg=gMsg?`<div class="result ${gMsg.ok?"":"bad"}" style="margin-bottom:12px">${esc(gMsg.t)}</div>`:"";
+  if(!gChecked){setSt("#g-st","wait","Verificando…");$("#g-btns").innerHTML="";$("#g-area").innerHTML="";$("#g-hint").hidden=true;return}
+  $("#g-hint").hidden=co.g;
+  if(!co.g){setSt("#g-st","wait","Desconectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-on">Conectar</button>`;$("#g-area").innerHTML=msg;$("#g-on").onclick=()=>{location.href="/api/google/login"};return}
+  setSt("#g-st","ok","Conectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-off">Desconectar</button>`;
+  $("#g-off").onclick=()=>{if(!confirm("Desconectar o Google Ads deste navegador?"))return;fetch("/api/google/logout",{method:"POST",credentials:"same-origin"}).catch(()=>{}).finally(()=>{gAccs=[];gMsg="";co.g=false;saveCo();gUI()})};
+  const list=gList(),errs=(gAccs||[]).filter(a=>a.error);
+  $("#g-area").innerHTML=msg+(list.length?`<div class="vgrid"><div class="field"><label for="g-acc">Conta de anúncios do cliente</label><select class="sel" id="g-acc"><option value="">Escolha a conta</option>${list.map(a=>`<option value="${esc(a.id)}" ${a.id===co.gacc?"selected":""}>${esc(a.name)} · ${fmtCid(a.id)}${a.test?" (teste)":""}${a.login?" · pela MCC "+fmtCid(a.login):""}</option>`).join("")}</select></div><div class="kv"><span>Contas acessíveis</span><b>${list.length}</b></div></div>`
+    :`<div class="hintbar">Nenhuma conta de anúncios apareceu para este login do Google.${errs.length?" "+esc(errs[0].error):""}</div>`);
+  const sel=$("#g-acc");if(sel)sel.onchange=e=>{const a=list.find(x=>x.id===e.target.value);co.gacc=a?a.id:"";co.glogin=a&&a.login||"";saveCo()}}
 
 // ---------- mensagens rastreadas ----------
 // Código oculto: ID do clique (24 bits, sequencial por empresa) em base 4, 12 caracteres invisíveis de tamanho fixo no fim da mensagem.
@@ -1308,6 +1326,16 @@ if(LIVE){const MSG={ok:[1,"Facebook conectado."],cancelado:[0,"Login cancelado n
     if(d.connected){metaUser=d.user;BMS=d.bms||[];co.fb=true;if(!BMS.some(b=>b.id===co.bm)){co.bm=BMS[0]?BMS[0].id:"";co.accs=[];co.px="";co.pixel=""}}
     else{co.fb=false;metaUser=null;if(d.error)metaMsg={ok:false,t:"A conexão com o Facebook expirou. Conecte de novo."}}
     try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}refresh()}).catch(()=>{co.fb=false;refresh()})}
+if(LIVE){const GM={ok:[1,"Google Ads conectado. Escolha a conta do cliente."],cancelado:[0,"Login cancelado no Google."],erro_estado:[0,"A sessão de login expirou. Tente de novo."],sem_refresh:[0,"O Google não devolveu o acesso permanente. Remova o Focus Tracking em myaccount.google.com/permissions e conecte de novo."],erro:[0,"Não foi possível concluir o login no Google. Tente de novo."]};
+  let gq=null;try{gq=new URLSearchParams(location.search).get("google");if(gq)history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+  if(gq&&GM[gq])gMsg={ok:!!GM[gq][0],t:GM[gq][1]};
+  fetch("/api/google/accounts",{credentials:"same-origin"}).then(async r=>{const d=await r.json().catch(()=>({}));
+    co.g=!!d.connected;gAccs=d.accounts||[];
+    if(d.error)gMsg={ok:false,t:d.connected?"Conectado, mas a Google Ads API recusou a leitura das contas: "+d.error:d.error};
+    const ok=gList();if(co.g&&!ok.some(a=>a.id===co.gacc)&&ok.length===1){co.gacc=ok[0].id;co.glogin=ok[0].login||""}
+    if(co.g){const a=ok.find(x=>x.id===co.gacc);if(a)co.glogin=a.login||""}})
+  .catch(()=>{co.g=false}).finally(()=>{gChecked=true;try{localStorage.setItem("ft-company",JSON.stringify(co))}catch(e){}
+    if(!$("#v-empresa").hidden)gUI();if(!$("#v-inspetor").hidden)inspetor()})}
 // ---------- inspetor de campanha ----------
 // Métricas do Meta Ads (/api/meta/insights) cruzadas com as conversas do WhatsApp (leads) por campanha, conjunto e anúncio.
 const ins={src:"",lv:"campaign",p:"month",acc:"",camp:"",set:"",ad:"",st:"",q:null,sort:"spend",dir:-1,cache:{},err:"",loading:false,req:0};
@@ -1402,7 +1430,7 @@ const insKey=r=>[ins.src,ins.acc,r.since,r.until,LIVE?"":stages.length+"-"+close
 async function insLoad(force){const r=insRange(),acc=ins.acc,key=insKey(r);
   if(force)delete ins.cache[key];if(ins.cache[key])return ins.cache[key];
   if(!LIVE)return ins.cache[key]=demoData(acc,r,ins.src);
-  const get=lv=>fetch(`/api/meta/insights?act=${encodeURIComponent(acc)}&level=${lv}&since=${r.since}&until=${r.until}`,{credentials:"same-origin"})
+  const G=ins.src==="google",get=lv=>fetch(G?`/api/google/insights?cid=${encodeURIComponent(acc)}${co.glogin?"&login="+encodeURIComponent(co.glogin):""}&level=${lv}&since=${r.since}&until=${r.until}`:`/api/meta/insights?act=${encodeURIComponent(acc)}&level=${lv}&since=${r.since}&until=${r.until}`,{credentials:"same-origin"})
     .then(async x=>{const j=await x.json().catch(()=>({}));if(!x.ok){const e=new Error(j.error||"Erro "+x.status);e.status=x.status;throw e}return j.rows||[]});
   const [c,s,a]=await Promise.all(["campaign","adset","ad"].map(get));
   return ins.cache[key]={campaign:c,adset:s,ad:a}}
@@ -1421,7 +1449,7 @@ async function inspetor(force){
   if(cr){if(!crCur||!$("#cf-name"))crList();return}
   const P=ipl();$("#il-adset").textContent=P.sets;$("#il-ad").textContent=P.ads;$("#if-set").textContent=P.set+":";
   const G=ins.src==="google",COLS=G?ICOLS.filter(c=>c.k!=="reach"&&c.k!=="freq"):ICOLS;
-  const r=insRange(),accs=G?[{id:co.gacc||"google",n:"Google Ads"}]:insAccs(),need=LIVE&&(G?!co.g:!co.fb);
+  const r=insRange(),accs=G?[{id:LIVE?co.gacc:co.gacc||"google",n:"Google Ads"}].filter(a=>a.id):insAccs(),need=LIVE&&(G?!co.g:!co.fb);
   document.querySelectorAll("#i-period button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.p===ins.p));$("#i-custom").hidden=ins.p!=="custom";
   document.querySelectorAll(".itabs [data-lv]").forEach(b=>b.setAttribute("aria-selected",b.dataset.lv===ins.lv));
   $("#i-range").textContent=r.since===r.until?brD(r.since):brD(r.since)+" a "+brD(r.until);
@@ -1430,7 +1458,8 @@ async function inspetor(force){
   const q=qIdx();
   const tbl=$("#i-tbl"),empty=(t,p,btn)=>{tbl.innerHTML=`<div class="iempty"><b>${t}</b><span>${p}</span>${btn||""}</div>`;$("#i-kpis").innerHTML="";$("#i-note").textContent="";["campaign","adset","ad"].forEach(l=>$("#ic-"+l).textContent="0");["#i-camp","#i-set","#i-ad"].forEach(id=>insFill(id,[],"","",true))};
   const goCo='<button class="btn" type="button" onclick="location.hash=\'empresa\'">Ir para Informações da empresa</button>';
-  if(G&&LIVE&&!need)return empty("Campanhas do Google Ads ainda não aparecem aqui","A leitura das campanhas do Google Ads entra quando conectarmos a Google Ads API (OAuth no Google Cloud). As conversas que chegam pelo Google já aparecem no Painel e em Conversas.");
+  if(G&&LIVE&&!gChecked){tbl.innerHTML='<div class="iempty"><span>Verificando a conexão com o Google Ads…</span></div>';return}
+  if(G&&LIVE&&!need&&!co.gacc)return empty("Escolha a conta do Google Ads","Em Informações da empresa, escolha a conta de anúncios do cliente no Google Ads.",goCo);
   if(need&&G)return empty("Conecte o Google Ads para ver as campanhas","Em Informações da empresa, conecte o Google Ads.",goCo);
   if(need&&!metaChecked){tbl.innerHTML='<div class="iempty"><span>Verificando a conexão com o Meta Ads…</span></div>';return}
   if(need)return empty("Conecte o Meta Ads para ver as campanhas","Em Informações da empresa, conecte o Facebook e marque as contas de anúncio do cliente.",goCo);
@@ -1438,7 +1467,7 @@ async function inspetor(force){
   const my=++ins.req;let data;
   if(!ins.cache[insKey(r)]||force)tbl.innerHTML=`<div class="iempty"><span>Carregando campanhas do ${P.n}…</span></div>`;
   try{data=await insLoad(force)}catch(e){if(my!==ins.req)return;
-    if(e.status===401){co.fb=false;return empty("A conexão com o Facebook expirou","Conecte de novo em Informações da empresa para ver as campanhas.",goCo)}
+    if(e.status===401){if(G)co.g=false;else co.fb=false;return empty(G?"A conexão com o Google Ads expirou":"A conexão com o Facebook expirou","Conecte de novo em Informações da empresa para ver as campanhas.",goCo)}
     empty("Não foi possível buscar as campanhas agora",esc(e.message||""),'<button class="btn2" type="button" id="i-retry">Tentar de novo</button>');$("#i-retry").onclick=()=>inspetor(true);return}
   if(my!==ins.req)return;
   const lv=ins.lv,camps=data.campaign,sets=data.adset;
@@ -1463,7 +1492,7 @@ async function inspetor(force){
   const key=ins.sort==="name"||ICOLS.some(c=>c.k===ins.sort)?ins.sort:"spend",dir=ins.dir;
   rows.sort((a,b)=>{const x=a[key],y=b[key];if(x==null&&y==null)return 0;if(x==null)return 1;if(y==null)return -1;return (typeof x==="string"?x.localeCompare(y):x-y)*dir});
   if(!rows.length){tbl.innerHTML=`<div class="iempty"><b>Nenhum ${ipl().lvn[lv]} com veiculação neste período</b><span>Troque o período ou os filtros.</span></div>`}
-  else{const nMeta=ICOLS.filter(c=>c.g==="meta").length,nWa=ICOLS.filter(c=>c.g==="wa").length;
+  else{const nMeta=COLS.filter(c=>c.g==="meta").length,nWa=COLS.filter(c=>c.g==="wa").length;
     const qm=h=>`<span class="q" title="${esc(h)}">?</span>`;
     const th=c=>`<th class="${c.f?"n":""} ${c.g==="wa"?"iw":""}" data-k="${c.k}" ${c.k===key?`aria-sort="${dir<0?"descending":"ascending"}"`:""} title="Ordenar por ${esc(c.t)}">${esc(c.t)}<span class="ar">${c.k===key?(dir<0?"↓":"↑"):"⇅"}</span>${qm(c.h)}</th>`;
     const name=x=>{const par=lv==="adset"?x.camp:lv==="ad"?(x.camp||"")+(x.set?" › "+x.set:""):"";
@@ -1473,9 +1502,9 @@ async function inspetor(force){
     const cell=(c,x)=>c.k==="status"?`<td><span class="ist ${esc(x.status)}">${IST[x.status]||"—"}</span></td>`:c.k==="tipo"?`<td><span class="itipo">${esc(x.tipo||"—")}</span></td>`
       :`<td class="n mono ${c.g==="wa"?"iw":""} ${c.good&&x[c.k]>0?"good":""} ${c.k==="roas"&&x.roas>=1?"good":""}">${ifmt(c.f,x[c.k])}</td>`;
     tbl.innerHTML=`<div class="tbl-wrap"><table><thead><tr class="grp"><th></th><th colspan="2" style="background:var(--surface-2)"></th><th colspan="${nMeta}" class="g-meta">${P.n.toUpperCase()}</th><th colspan="${nWa}" class="g-wa">WHATSAPP · FOCUS TRACKING</th></tr>
-      <tr class="cols"><th data-k="name" ${key==="name"?`aria-sort="${dir<0?"descending":"ascending"}"`:""}>${lv==="campaign"?"Campanha":lv==="adset"?P.setCol:P.adCol}<span class="ar">${key==="name"?(dir<0?"↓":"↑"):"⇅"}</span></th>${ICOLS.map(th).join("")}</tr></thead>
-      <tbody>${rows.map(x=>`<tr><td>${name(x)}</td>${ICOLS.map(c=>cell(c,x)).join("")}</tr>`).join("")}</tbody>
-      <tfoot><tr><td>Total · ${rows.length} ${rows.length===1?ipl().lvn[lv]:ipl().lvp[lv]}</td><td></td><td></td>${ICOLS.slice(2).map(c=>`<td class="n mono">${ifmt(c.f,tot[c.k])}</td>`).join("")}</tr></tfoot></table></div>`;
+      <tr class="cols"><th data-k="name" ${key==="name"?`aria-sort="${dir<0?"descending":"ascending"}"`:""}>${lv==="campaign"?"Campanha":lv==="adset"?P.setCol:P.adCol}<span class="ar">${key==="name"?(dir<0?"↓":"↑"):"⇅"}</span></th>${COLS.map(th).join("")}</tr></thead>
+      <tbody>${rows.map(x=>`<tr><td>${name(x)}</td>${COLS.map(c=>cell(c,x)).join("")}</tr>`).join("")}</tbody>
+      <tfoot><tr><td>Total · ${rows.length} ${rows.length===1?ipl().lvn[lv]:ipl().lvp[lv]}</td><td></td><td></td>${COLS.slice(2).map(c=>`<td class="n mono">${ifmt(c.f,tot[c.k])}</td>`).join("")}</tr></tfoot></table></div>`;
     tbl.querySelectorAll("thead tr.cols th[data-k]").forEach(h=>h.onclick=e=>{if(e.target.classList.contains("q"))return;const k=h.dataset.k;if(ins.sort===k)ins.dir=-ins.dir;else{ins.sort=k;ins.dir=k==="name"||k==="status"||k==="tipo"?1:-1}inspetor()});
     tbl.querySelectorAll("[data-drill]").forEach(b=>b.onclick=()=>{const id=b.dataset.drill;if(lv==="campaign"){ins.camp=id;ins.set="";ins.ad="";ins.lv="adset"}else{const x=rows.find(y=>y.id===id);ins.camp=x?x.campId:ins.camp;ins.set=id;ins.ad="";ins.lv="ad"}inspetor()});}
   // Destaques e explicação
@@ -1494,22 +1523,53 @@ $("#i-set").onchange=e=>{ins.set=e.target.value;ins.ad="";if(ins.set&&ins.lv==="
 $("#i-ad").onchange=e=>{ins.ad=e.target.value;if(ins.ad)ins.lv="ad";inspetor()};
 $("#i-clr").onclick=()=>{ins.camp=ins.set=ins.ad=ins.st="";inspetor()};
 $("#i-reload").onclick=()=>inspetor(true);
-// ---------- criar campanha (rascunhos) ----------
-// Rascunhos de campanha seguindo o plano de Pesquisa do Google Ads (campanha pausada, CPC manual, até 4 grupos).
-// O envio pela Google Ads API entra depois que o OAuth do Google Cloud estiver configurado.
+// ---------- criar campanha: briefing -> plano de ação -> configuração -> publicar pausada ----------
+// Campanha de Pesquisa no Google Ads com objetivo de leads. O briefing aprovado gera o plano seguindo as boas práticas
+// do Google (grupos por serviço, anúncio responsivo completo, negativas, raio por endereço, recursos, lance por conversão).
+// A publicação pela Google Ads API entra quando o OAuth do Google Cloud estiver configurado.
 let camps;try{camps=JSON.parse(localStorage.getItem("ft-camps"))}catch(e){}
 if(!Array.isArray(camps))camps=[];
 const saveCamps=()=>{try{localStorage.setItem("ft-camps",JSON.stringify(camps))}catch(e){}cloudSave()};
 const MATCH={EXACT:"Exata",PHRASE:"Frase",BROAD:"Ampla"};
+const BIDS={MAX_CONV:"Maximizar conversões (recomendado para leads)",MAX_CLICKS:"Maximizar cliques (conta sem conversões ainda)",MANUAL_CPC:"CPC manual"};
 const lines=v=>String(v||"").split(/\n/).map(x=>x.trim()).filter(Boolean);
 const newGroup=()=>({name:"",match:"PHRASE",kws:[],titles:[],descs:[]});
+const NEG_BASE=["emprego","vaga","vagas","trabalhe conosco","curso","cursos","apostila","pdf","salário","estágio","faculdade","o que é","como fazer","youtube","download","gratuito online"];
 let crCur=null;
+const newCamp=()=>({id:rid(),plat:"google",step:"brief",brief:{biz:co.name||"",seg:co.seg||"",url:/^https:/.test(co.site||"")?co.site:"",phone:co.phone||"",services:[],cities:[],addrs:[],radius:3,hours:"",budgetM:"",ticket:"",offer:"",diffs:[],avoid:[],notes:"",approved:false},
+  name:"",cust:(co.gacc||"").replace(/\D/g,""),budget:"",bid:"MAX_CONV",cpc:"",tcpa:"",url:"",radius:3,addrs:[],presence:true,hours:"",neg:[],sitelinks:[],callouts:[],groups:[newGroup()],eu:false,approved:false,updated:""});
+const cap=s=>String(s||"").trim().replace(/^\p{L}/u,c=>c.toUpperCase());
+const titleCase=s=>String(s||"").trim().split(/\s+/).map(w=>/^(de|da|do|das|dos|e|em|com|para|a|o)$/i.test(w)?w.toLowerCase():cap(w)).join(" ").replace(/^\p{L}/u,c=>c.toUpperCase());
+const cut=(s,n)=>{s=String(s).replace(/\s+/g," ").trim();if(s.length<=n)return s;
+  const ps=s.match(/[^.!?]+[.!?]/g)||[];let o="";for(const x of ps){if((o+x).trim().length>n)break;o+=x}if(o.trim().length>=40)return o.trim();const t=s.slice(0,n-1).replace(/[\s,.;:–-]+\S*$/,"");return (t||s.slice(0,n-1)).replace(/[\s,;:–-]+$/,"")+"."};
+const uniq=(a,n,max)=>{const seen=new Set(),o=[];a.forEach(x=>{x=String(x||"").replace(/\s+/g," ").trim();const k=x.toLowerCase();if(x&&x.length<=n&&!seen.has(k)&&o.length<max){seen.add(k);o.push(x)}});return o};
+function briefErrors(b){const e=[];if(!b.biz.trim())e.push("Informe o nome do negócio.");if(!/^https:\/\/[^\s.]+\.[^\s]+$/.test(b.url||""))e.push("Informe a página do site com https://.");
+  if(!b.services.length)e.push("Liste pelo menos um serviço ou produto.");if(b.services.length>6)e.push("Use no máximo 6 serviços (cada um vira um grupo de anúncios).");
+  if(!b.addrs.length&&!b.cities.length)e.push("Informe os endereços ou as cidades atendidas.");if(!(+b.budgetM>0))e.push("Informe o orçamento mensal de mídia.");
+  if(!b.diffs.length)e.push("Liste pelo menos um diferencial.");return e}
+// Gera o plano de ação a partir do briefing aprovado.
+function genPlan(c){const b=c.brief,city=b.cities[0]||"",B=b.biz.trim(),O=b.offer.trim(),D=b.diffs,daily=Math.max(10,Math.round(+b.budgetM/30.4*100)/100);
+  c.name=`Pesquisa | Leads | ${B}${city?" | "+city:""}`.slice(0,120);c.url=b.url;c.budget=String(daily);c.radius=+b.radius||3;c.addrs=b.addrs.slice();c.presence=true;c.hours=b.hours;
+  c.bid="MAX_CONV";c.cpc=String(Math.max(1,Math.round(daily/12*100)/100));c.tcpa=b.ticket&&+b.ticket>0?"":"";
+  c.neg=uniq(NEG_BASE.filter(n=>!(O+" "+b.services.join(" ")).toLowerCase().includes(n)).concat(b.avoid),80,200);
+  c.groups=b.services.slice(0,6).map(s=>{const S=titleCase(s),sl=s.toLowerCase().trim();
+    const kws=uniq([sl,...b.cities.slice(0,3).map(ci=>`${sl} ${ci.toLowerCase()}`),`${sl} perto de mim`,`${sl} preço`,`${sl} valor`,`agendar ${sl}`,`onde fazer ${sl}`],80,20);
+    const titles=uniq([city?`${S} em ${titleCase(city)}`:"",S,`${S} | ${B}`,O?cap(O):"",...D.map(cap),"Agende pelo WhatsApp","Fale Conosco no WhatsApp",`${S} com Especialistas`,"Agende Seu Horário","Atendimento Rápido",`${S} Perto de Você`,"Resposta em Minutos","Orçamento Sem Compromisso",B,city?`${B} em ${titleCase(city)}`:"","Agende Hoje Mesmo"],30,15);
+    const descs=uniq([cut(`${S}${city?" em "+titleCase(city):""} com ${(D[0]||"atendimento especializado").replace(/^\p{Lu}(?=\p{Ll})/u,c=>c.toLowerCase())}. ${O?cap(O)+".":"Fale com a gente."} Chame no WhatsApp.`,90),
+      cut(`${B}: ${D.slice(0,2).join(" e ").replace(/ e (\p{Lu})(?=\p{Ll})/u,(m,c)=>" e "+c.toLowerCase())||"atendimento de confiança"}. Agende pelo WhatsApp.`,90),
+      cut(`${b.hours?"Atendimento "+b.hours+". ":""}Fale com nossa equipe pelo WhatsApp, sem compromisso.`,90),
+      cut(`${O?cap(O)+". ":""}Tire suas dúvidas sobre ${sl} e agende o melhor horário para você.`,90)],90,4);
+    return {name:S,match:"PHRASE",kws,titles,descs}});
+  c.sitelinks=uniq(b.services.map(titleCase).concat(["Fale no WhatsApp","Como Chegar"]),25,6);
+  c.callouts=uniq(D.map(cap).concat(["Atendimento Rápido","Agende pelo WhatsApp","Sem Compromisso"]),25,8);
+  c.step="plano";c.approved=false;return c}
 function crErrors(c){const e=[];
   if(!c.name.trim())e.push("Dê um nome à campanha.");
   if(!/^\d{10}$/.test(String(c.cust||"").replace(/\D/g,"")))e.push("Informe o ID da conta do Google Ads com 10 dígitos.");
   if(!(c.budget>0))e.push("Informe o orçamento diário.");
-  if(!(c.cpc>0))e.push("Informe o CPC máximo.");
+  if(c.bid==="MANUAL_CPC"&&!(c.cpc>0))e.push("Informe o CPC máximo.");
   if(!/^https:\/\/[^\s.]+\.[^\s]+$/.test(c.url||""))e.push("Informe a página final com https://.");
+  if(!c.addrs.length)e.push("Informe pelo menos uma região (um endereço ou cidade por linha).");
   if(!c.groups.length)e.push("Crie pelo menos um grupo de anúncios.");
   c.groups.forEach((g,i)=>{const n=`Grupo ${i+1}${g.name?` (${g.name})`:""}`;
     if(!g.name.trim())e.push(`Grupo ${i+1}: dê um nome.`);
@@ -1519,31 +1579,76 @@ function crErrors(c){const e=[];
     g.titles.filter(t=>t.length>30).forEach(t=>e.push(`${n}: o título "${t}" passa de 30 caracteres (${t.length}).`));
     if(g.descs.length<2||g.descs.length>4)e.push(`${n}: o anúncio precisa de 2 a 4 descrições (tem ${g.descs.length}).`);
     g.descs.filter(t=>t.length>90).forEach(t=>e.push(`${n}: uma descrição passa de 90 caracteres (${t.length}).`))});
+  c.sitelinks.filter(t=>t.length>25).forEach(t=>e.push(`O sitelink "${t}" passa de 25 caracteres.`));
+  c.callouts.filter(t=>t.length>25).forEach(t=>e.push(`A frase de destaque "${t}" passa de 25 caracteres.`));
   if(!c.eu)e.push("Confirme que a campanha não tem publicidade política da União Europeia.");
   return e}
+// Dicas de boas práticas (não bloqueiam).
+function crTips(c){const t=[];c.groups.forEach((g,i)=>{if(g.titles.length<12)t.push(`Grupo ${i+1}: use 12 a 15 títulos para o anúncio chegar a força "Excelente" e entrar em mais leilões.`);if(g.descs.length<4)t.push(`Grupo ${i+1}: use as 4 descrições.`);if(g.kws.length>20)t.push(`Grupo ${i+1}: mais de 20 palavras-chave. Grupos menores e mais focados têm anúncios mais relevantes.`)});
+  if(c.bid!=="MAX_CONV")t.push("Para leads, o Google recomenda Maximizar conversões assim que a conversão de lead estiver medida.");
+  if(c.sitelinks.length<4)t.push("Use pelo menos 4 sitelinks: eles aumentam o tamanho do anúncio e a taxa de cliques.");
+  if(c.callouts.length<4)t.push("Use pelo menos 4 frases de destaque.");
+  if(c.budget>0&&c.bid==="MANUAL_CPC"&&c.cpc>0&&c.budget/c.cpc<10)t.push("O orçamento diário paga menos de 10 cliques no CPC informado. Considere aumentar o orçamento ou reduzir o número de grupos.");
+  return t}
 function crPlan(c){const mi=v=>Math.round((Number(v)||0)*1e6);
-  return {conta:String(c.cust||"").replace(/\D/g,""),campanha:{nome:c.name,rede:"SEARCH",status:"PAUSED",orcamento_diario_micros:mi(c.budget),lance:"MANUAL_CPC",cpc_micros:mi(c.cpc),publicidade_politica_ue:false},
-    negativas:c.neg,grupos:c.groups.map(g=>({nome:g.name,status:"PAUSED",palavras_chave:g.kws.map(k=>({texto:k,correspondencia:g.match})),anuncio:{titulos:g.titles,descricoes:g.descs,url_final:c.url}})),
-    revisar_na_interface:{regioes:c.geo,horarios:c.hours,recursos:"sitelinks, frases de destaque, chamadas",conversoes:"conferir ações principais"}}}
+  return {conta:String(c.cust||"").replace(/\D/g,""),objetivo:"LEADS",campanha:{nome:c.name,canal:"SEARCH",redes:{pesquisa_google:true,parceiros_de_pesquisa:false,display:false},status:"PAUSED",orcamento_diario_micros:mi(c.budget),
+      lance:c.bid==="MANUAL_CPC"?{estrategia:"MANUAL_CPC",cpc_micros:mi(c.cpc)}:c.bid==="MAX_CLICKS"?{estrategia:"MAXIMIZE_CLICKS",cpc_maximo_micros:c.cpc>0?mi(c.cpc):null}:{estrategia:"MAXIMIZE_CONVERSIONS",cpa_desejado_micros:c.tcpa>0?mi(c.tcpa):null},
+      publicidade_politica_ue:false},
+    localizacao:{tipo:"RAIO",raio_km:+c.radius||3,locais:c.addrs,opcao:c.presence?"PRESENCE":"PRESENCE_OR_INTEREST"},horarios:c.hours,negativas:c.neg,
+    grupos:c.groups.map(g=>({nome:g.name,status:"PAUSED",palavras_chave:g.kws.map(k=>({texto:k,correspondencia:g.match})),anuncio:{titulos:g.titles,descricoes:g.descs,url_final:c.url}})),
+    recursos:{sitelinks:c.sitelinks.map(s=>({texto:s,url:c.url})),frases_de_destaque:c.callouts,telefone:(c.brief&&c.brief.phone)||""},
+    conversao:"Lead (WhatsApp) enviado pelo Focus Tracking como conversão offline pelo gclid"}}
 function crDownload(c){const b=new Blob([JSON.stringify(crPlan(c),null,2)],{type:"application/json"}),a=document.createElement("a");
   a.href=URL.createObjectURL(b);a.download=(c.name||"campanha").normalize("NFD").replace(/[^\w-]+/g,"-").replace(/^-|-$/g,"").toLowerCase()+".json";document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+const CRST={pub:["Publicada pausada","ativo"],brief:["Briefing","arquivado"],plano:["Plano em revisão","pausado"],pronto:["Pronto para publicar","analise"]};
+const crState=c=>c.pub?"pub":c.step==="brief"?"brief":c.approved&&!crErrors(c).length?"pronto":"plano";
+function crSave(c){c.updated=nowStr();const i=camps.findIndex(x=>x.id===c.id);if(i<0)camps.unshift(c);else camps[i]=c;saveCamps()}
+function crSteps(c){const s=crState(c),n=s==="brief"?1:s==="plano"?2:3;
+  return `<div class="wsteps">${["Briefing","Plano de ação","Publicar pausada"].map((t,i)=>`<span class="${i+1===n?"on":""}"><span class="snum">${i+1<n?"✓":i+1}</span>${t}</span>`).join("")}</div>`}
 function crList(){const box=$("#i-create");crCur=null;
-  const rows=camps.map((c,i)=>{const ok=!crErrors(c).length;return `<tr><td><button class="lk-name" type="button" data-ed="${i}">${esc(c.name||"Sem nome")}</button></td><td><span class="ptag">${PG}Google Ads · Pesquisa</span></td><td class="n mono">${c.groups.length}</td><td class="n mono">${c.budget>0?brl(+c.budget):"—"}</td>
-    <td>${ok?'<span class="ist analise">Pronto para enviar</span>':'<span class="ist arquivado">Rascunho</span>'}</td><td style="color:var(--muted);white-space:nowrap">${esc(c.updated||"")}</td>
-    <td style="text-align:right;white-space:nowrap"><button class="link" data-ed="${i}">Editar</button> · <button class="link" data-dl="${i}">Baixar plano</button> · <button class="link" data-rm="${i}" style="color:#c0392b">Excluir</button></td></tr>`}).join("");
+  const rows=camps.map((c,i)=>{const st=CRST[crState(c)];return `<tr><td><button class="lk-name" type="button" data-ed="${i}">${esc(c.name||(c.brief&&c.brief.biz)||"Sem nome")}</button></td><td><span class="ptag">${PG}Google Ads · Pesquisa</span></td><td class="n mono">${c.step==="brief"?"—":c.groups.length}</td><td class="n mono">${c.budget>0?brl(+c.budget):"—"}</td>
+    <td><span class="ist ${st[1]}">${st[0]}</span></td><td style="color:var(--muted);white-space:nowrap">${esc(c.updated||"")}</td>
+    <td style="text-align:right;white-space:nowrap"><button class="link" data-ed="${i}">Abrir</button>${c.step!=="brief"?` · <button class="link" data-dl="${i}">Baixar plano</button>`:""} · <button class="link" data-rm="${i}" style="color:#c0392b">Excluir</button></td></tr>`}).join("");
   box.innerHTML=`<div class="crpick">
-      <button class="panel crcard" type="button" id="cr-g">${PG}<b>Google Ads · Pesquisa</b><span>Campanha de pesquisa com até 4 grupos, palavras-chave, negativas e anúncios responsivos. Nasce pausada.</span></button>
-      <div class="panel crcard off" aria-disabled="true">${PM}<b>Meta Ads</b><span>Em breve. Entra nos próximos passos.</span></div></div>
-    <div class="panel"><div class="tbl-head"><h2>Campanhas criadas aqui</h2><span>${camps.length} ${camps.length===1?"rascunho":"rascunhos"}</span></div>
+      <button class="panel crcard" type="button" id="cr-g">${PG}<b>Google Ads · Pesquisa para leads</b><span>Comece pelo briefing do cliente. Depois de aprovado, ele vira o plano de ação, que você revisa e publica pausado na conta.</span></button>
+      <div class="panel crcard off" aria-disabled="true">${PM}<b>Meta Ads</b><span>Em breve.</span></div></div>
+    <div class="panel"><div class="tbl-head"><h2>Campanhas criadas aqui</h2><span>${camps.length} ${camps.length===1?"campanha":"campanhas"}</span></div>
       <div class="tbl-wrap"><table><thead><tr><th>Campanha</th><th>Plataforma</th><th class="n">Grupos</th><th class="n">Orçamento/dia</th><th>Situação</th><th>Atualizada</th><th></th></tr></thead>
-      <tbody>${rows||'<tr><td colspan="7" style="color:var(--muted)">Nenhuma campanha ainda. Escolha a plataforma acima para começar.</td></tr>'}</tbody></table></div></div>
-    <p class="inote">Por enquanto as campanhas ficam salvas aqui como rascunho e você baixa o plano pronto. O envio direto para a conta (criando a campanha pausada) é liberado quando conectarmos a Google Ads API.</p>`;
-  $("#cr-g").onclick=()=>crForm({id:rid(),plat:"google",name:"",cust:(co.gacc||"").replace(/\D/g,""),budget:"",cpc:"",url:co.site&&/^https:/.test(co.site)?co.site:"",geo:"",hours:"",neg:[],groups:[newGroup()],eu:false,updated:""});
-  box.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>crForm(JSON.parse(JSON.stringify(camps[+b.dataset.ed]))));
+      <tbody>${rows||'<tr><td colspan="7" style="color:var(--muted)">Nenhuma campanha ainda. Escolha a plataforma acima para começar.</td></tr>'}</tbody></table></div></div>`;
+  $("#cr-g").onclick=()=>crOpen(newCamp());
+  box.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>crOpen(JSON.parse(JSON.stringify(camps[+b.dataset.ed]))));
   box.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>crDownload(camps[+b.dataset.dl]));
-  box.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const c=camps[+b.dataset.rm];if(!confirm(`Excluir o rascunho "${c.name||"Sem nome"}"?`))return;camps.splice(+b.dataset.rm,1);saveCamps();crList()})}
-function crRead(){const c=crCur;c.name=$("#cf-name").value.trim();c.cust=$("#cf-cust").value.trim();c.budget=$("#cf-budget").value;c.cpc=$("#cf-cpc").value;c.url=$("#cf-url").value.trim();
-  c.geo=$("#cf-geo").value.trim();c.hours=$("#cf-hours").value.trim();c.neg=lines($("#cf-neg").value);c.eu=$("#cf-eu").checked;
+  box.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{const c=camps[+b.dataset.rm];if(!confirm(`Excluir "${c.name||c.brief.biz||"Sem nome"}"?`))return;camps.splice(+b.dataset.rm,1);saveCamps();crList()})}
+const crOpen=c=>c.step==="brief"?crBrief(c):crForm(c);
+const backBtn='<button class="back" type="button" id="cf-back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Voltar para as campanhas criadas</button>';
+const fld=(id,label,val,o={})=>`<div class="field ${o.cls||""}"><label for="${id}">${label}${o.hint?` <small>${o.hint}</small>`:""}</label>${o.rows?`<textarea class="inp" id="${id}" rows="${o.rows}" placeholder="${esc(o.ph||"")}">${esc(val)}</textarea>`:`<input class="inp ${o.mono?"mono":""}" id="${id}" ${o.type?`type="${o.type}"`:""} ${o.step?`step="${o.step}"`:""} ${o.min!=null?`min="${o.min}"`:""} maxlength="${o.max||200}" value="${esc(val)}" placeholder="${esc(o.ph||"")}">`}</div>`;
+function crBrief(c){crCur=c;const b=c.brief,box=$("#i-create");
+  box.innerHTML=`${backBtn}${crSteps(c)}
+    <div class="panel"><div class="ph-pad" style="padding-bottom:0"><h2>Briefing do cliente</h2><p class="hint">Preencha com o cliente. Quando ele aprovar, o sistema monta o plano de ação da campanha de Pesquisa com objetivo de leads.</p></div>
+    <div class="form crf">
+      ${fld("bf-biz","Nome do negócio",b.biz,{cls:"wide",ph:"Clínica Vitta Estética"})}${fld("bf-seg","Segmento",b.seg,{ph:"Estética"})}${fld("bf-phone","WhatsApp",b.phone,{ph:"+55 19 99999-9999"})}
+      ${fld("bf-url","Página do site que recebe o clique",b.url,{cls:"wide",type:"url",max:300,ph:"https://"})}${fld("bf-budget","Orçamento mensal de mídia (R$)",b.budgetM,{type:"number",min:1,step:"0.01",mono:1,ph:"2500"})}${fld("bf-ticket","Ticket médio (R$)",b.ticket,{type:"number",min:0,step:"0.01",mono:1,ph:"opcional"})}
+      ${fld("bf-services","Serviços ou produtos para anunciar",b.services.join("\n"),{cls:"wide",rows:4,hint:"um por linha, vira um grupo de anúncios (até 6)",ph:"Botox\nPreenchimento labial\nLimpeza de pele"})}
+      ${fld("bf-diffs","Diferenciais",b.diffs.join("\n"),{cls:"wide",rows:4,hint:"um por linha, curtos",ph:"Médica dermatologista\n10 anos de experiência\nEstacionamento grátis"})}
+      ${fld("bf-offer","Oferta ou chamada principal",b.offer,{cls:"wide",max:80,ph:"Avaliação gratuita"})}${fld("bf-hours","Horário de atendimento",b.hours,{cls:"wide",ph:"seg a sex, 8h às 19h; sáb 8h às 12h"})}
+      ${fld("bf-addrs","Endereços para os pinos",b.addrs.join("\n"),{cls:"wide",rows:3,hint:"um por linha",ph:"Av. Norte-Sul, 1000, Campinas - SP"})}
+      ${fld("bf-cities","Cidades atendidas",b.cities.join("\n"),{rows:3,hint:"uma por linha",ph:"Campinas\nValinhos"})}${fld("bf-radius","Raio de cada pino (km)",b.radius,{type:"number",min:1,step:"1",mono:1})}
+      ${fld("bf-avoid","Termos e públicos que o cliente não atende",b.avoid.join("\n"),{cls:"wide",rows:3,hint:"um por linha, viram negativas",ph:"plano de saúde\nsus"})}
+      ${fld("bf-notes","Observações do cliente",b.notes,{cls:"wide",rows:3,ph:"Restrições, tom de voz, o que não pode prometer"})}
+      <label class="sclose full" style="white-space:normal"><input type="checkbox" id="bf-ok" ${b.approved?"checked":""}>Briefing revisado e aprovado pelo cliente.</label></div></div>
+    <div id="cf-res" hidden></div>
+    <div class="jactions" style="margin-top:0"><button class="btn" type="button" id="bf-gen">Gerar plano de ação</button><button class="btn2" type="button" id="bf-save">Salvar briefing</button></div>`;
+  const read=()=>{Object.assign(b,{biz:$("#bf-biz").value.trim(),seg:$("#bf-seg").value.trim(),phone:$("#bf-phone").value.trim(),url:$("#bf-url").value.trim(),budgetM:$("#bf-budget").value,ticket:$("#bf-ticket").value,
+    services:lines($("#bf-services").value),diffs:lines($("#bf-diffs").value),offer:$("#bf-offer").value.trim(),hours:$("#bf-hours").value.trim(),addrs:lines($("#bf-addrs").value),cities:lines($("#bf-cities").value),
+    radius:Math.max(1,Math.min(65,parseInt($("#bf-radius").value,10)||3)),avoid:lines($("#bf-avoid").value),notes:$("#bf-notes").value.trim(),approved:$("#bf-ok").checked})};
+  $("#cf-back").onclick=()=>crList();
+  $("#bf-save").onclick=()=>{read();crSave(c);crList()};
+  $("#bf-gen").onclick=()=>{read();const e=briefErrors(b);if(!b.approved)e.push("Marque que o briefing foi aprovado pelo cliente.");
+    const r=$("#cf-res");if(e.length){r.hidden=false;r.className="result bad";r.innerHTML=`<b>Antes de gerar o plano:</b><ul style="margin:6px 0 0;padding-left:18px">${e.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;return}
+    if(b.addrs.length===0)b.addrs=b.cities.slice();genPlan(c);crSave(c);crForm(c);window.scrollTo(0,0)}}
+function crRead(){const c=crCur;c.name=$("#cf-name").value.trim();c.cust=$("#cf-cust").value.trim();c.budget=$("#cf-budget").value;c.bid=$("#cf-bid").value;c.cpc=$("#cf-cpc").value;c.tcpa=$("#cf-tcpa").value;c.url=$("#cf-url").value.trim();
+  c.addrs=lines($("#cf-addrs").value);c.radius=Math.max(1,Math.min(65,parseInt($("#cf-radius").value,10)||3));c.presence=$("#cf-pres").checked;c.hours=$("#cf-hours").value.trim();c.neg=lines($("#cf-neg").value);
+  c.sitelinks=lines($("#cf-sl").value);c.callouts=lines($("#cf-co").value);c.eu=$("#cf-eu").checked;c.approved=$("#cf-ok").checked;
   c.groups=[...document.querySelectorAll("#cf-groups .crg")].map(el=>({name:el.querySelector("[data-f=name]").value.trim(),match:el.querySelector("[data-f=match]").value,kws:lines(el.querySelector("[data-f=kws]").value),titles:lines(el.querySelector("[data-f=titles]").value),descs:lines(el.querySelector("[data-f=descs]").value)}));return c}
 function crCount(el){const t=lines(el.querySelector("[data-f=titles]").value),d=lines(el.querySelector("[data-f=descs]").value);
   const tl=t.filter(x=>x.length>30).length,dl=d.filter(x=>x.length>90).length;
@@ -1552,35 +1657,57 @@ function crCount(el){const t=lines(el.querySelector("[data-f=titles]").value),d=
   el.querySelector("[data-c=kws]").textContent=lines(el.querySelector("[data-f=kws]").value).length+" palavras-chave"}
 function crForm(c){crCur=c;const box=$("#i-create");
   const grp=(g,i)=>`<div class="crg panel"><div class="ch"><h2>Grupo de anúncios ${i+1}</h2>${c.groups.length>1?`<button class="link" type="button" data-rmg="${i}" style="color:#c0392b">Remover grupo</button>`:""}</div>
-    <div class="form crf"><div class="field wide"><label>Nome do grupo</label><input class="inp" data-f="name" maxlength="80" value="${esc(g.name)}" placeholder="Ex.: Instalação de ar-condicionado"></div>
+    <div class="form crf"><div class="field wide"><label>Nome do grupo</label><input class="inp" data-f="name" maxlength="80" value="${esc(g.name)}"></div>
     <div class="field"><label>Correspondência</label><select class="sel" data-f="match">${Object.entries(MATCH).map(([k,v])=>`<option value="${k}" ${g.match===k?"selected":""}>${v}</option>`).join("")}</select></div>
-    <div class="field full"><label>Palavras-chave, uma por linha, sem aspas ou colchetes <small data-c="kws"></small></label><textarea class="inp" rows="3" data-f="kws">${esc(g.kws.join("\n"))}</textarea></div>
-    <div class="field wide"><label>Títulos do anúncio, um por linha, até 30 caracteres <small data-c="titles"></small></label><textarea class="inp" rows="6" data-f="titles">${esc(g.titles.join("\n"))}</textarea></div>
-    <div class="field wide"><label>Descrições, uma por linha, até 90 caracteres <small data-c="descs"></small></label><textarea class="inp" rows="6" data-f="descs">${esc(g.descs.join("\n"))}</textarea></div></div></div>`;
-  box.innerHTML=`<button class="back" type="button" id="cf-back"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Voltar para as campanhas criadas</button>
-    <div class="panel"><div class="ph-pad" style="padding-bottom:0"><h2 style="display:flex;align-items:center;gap:8px">${PG}Nova campanha de Pesquisa no Google Ads</h2><p class="hint">A campanha é criada pausada, com CPC manual e só na rede de Pesquisa. Ativação depois da revisão.</p></div>
-    <div class="form crf"><div class="field wide"><label for="cf-name">Nome da campanha</label><input class="inp" id="cf-name" maxlength="120" value="${esc(c.name)}" placeholder="Ex.: Pesquisa | Ar-condicionado | Campinas"></div>
-      <div class="field"><label for="cf-cust">ID da conta (10 dígitos)</label><input class="inp mono" id="cf-cust" maxlength="12" inputmode="numeric" value="${esc(c.cust)}" placeholder="0000000000"></div>
-      <div class="field"><label for="cf-url">Página final</label><input class="inp" id="cf-url" type="url" maxlength="300" value="${esc(c.url)}" placeholder="https://"></div>
-      <div class="field"><label for="cf-budget">Orçamento diário (R$)</label><input class="inp mono" id="cf-budget" type="number" min="1" step="0.01" value="${esc(c.budget)}" placeholder="80,00"></div>
-      <div class="field"><label for="cf-cpc">CPC máximo (R$)</label><input class="inp mono" id="cf-cpc" type="number" min="0.01" step="0.01" value="${esc(c.cpc)}" placeholder="3,50"></div>
-      <div class="field"><label for="cf-geo">Regiões atendidas</label><input class="inp" id="cf-geo" maxlength="300" value="${esc(c.geo)}" placeholder="Campinas e Valinhos"></div>
-      <div class="field"><label for="cf-hours">Horários</label><input class="inp" id="cf-hours" maxlength="200" value="${esc(c.hours)}" placeholder="Seg a sex, 8h às 18h"></div>
-      <div class="field full"><label for="cf-neg">Palavras-chave negativas da campanha, uma por linha</label><textarea class="inp" id="cf-neg" rows="3">${esc(c.neg.join("\n"))}</textarea></div>
+    <div class="field full"><label>Palavras-chave, uma por linha, sem aspas ou colchetes <small data-c="kws"></small></label><textarea class="inp" rows="4" data-f="kws">${esc(g.kws.join("\n"))}</textarea></div>
+    <div class="field wide"><label>Títulos do anúncio, um por linha, até 30 caracteres <small data-c="titles"></small></label><textarea class="inp" rows="8" data-f="titles">${esc(g.titles.join("\n"))}</textarea></div>
+    <div class="field wide"><label>Descrições, uma por linha, até 90 caracteres <small data-c="descs"></small></label><textarea class="inp" rows="8" data-f="descs">${esc(g.descs.join("\n"))}</textarea></div></div></div>`;
+  box.innerHTML=`${backBtn}${crSteps(c)}
+    ${c.brief&&c.brief.biz?`<div class="result">Plano de ação gerado a partir do briefing de <b>${esc(c.brief.biz)}</b>. Revise e ajuste cada campo antes de aprovar. <button class="link" type="button" id="cf-brief">Ver briefing</button></div>`:""}
+    <div class="panel"><div class="ph-pad" style="padding-bottom:0"><h2 style="display:flex;align-items:center;gap:8px">${PG}Configuração da campanha</h2><p class="hint">Pesquisa Google, sem parceiros de pesquisa nem Display. Objetivo: leads. Nasce pausada.</p></div>
+    <div class="form crf">${fld("cf-name","Nome da campanha",c.name,{cls:"wide",max:120})}${fld("cf-cust","ID da conta (10 dígitos)",c.cust,{mono:1,max:12,ph:"0000000000"})}${fld("cf-url","Página final",c.url,{type:"url",max:300,ph:"https://"})}
+      ${fld("cf-budget","Orçamento diário (R$)",c.budget,{type:"number",min:1,step:"0.01",mono:1})}
+      <div class="field wide"><label for="cf-bid">Estratégia de lance</label><select class="sel" id="cf-bid">${Object.entries(BIDS).map(([k,v])=>`<option value="${k}" ${c.bid===k?"selected":""}>${v}</option>`).join("")}</select></div>
+      ${fld("cf-cpc","CPC máximo (R$)",c.cpc,{type:"number",min:0,step:"0.01",mono:1,hint:"no CPC manual e como teto no Maximizar cliques"})}${fld("cf-tcpa","CPA desejado (R$)",c.tcpa,{type:"number",min:0,step:"0.01",mono:1,hint:"opcional, depois de 30 conversões"})}
+      ${fld("cf-addrs","Regiões, uma por linha",c.addrs.join("\n"),{cls:"wide",rows:4,hint:"cada linha vira um pino com o raio ao lado"})}${fld("cf-radius","Raio (km)",c.radius,{type:"number",min:1,step:"1",mono:1})}
+      <label class="sclose" style="white-space:normal;align-self:center"><input type="checkbox" id="cf-pres" ${c.presence?"checked":""}>Só pessoas que estão ou costumam estar na região</label>
+      ${fld("cf-hours","Horários dos anúncios",c.hours,{cls:"full",ph:"seg a sex, 8h às 19h"})}
+      ${fld("cf-neg","Palavras-chave negativas da campanha",c.neg.join("\n"),{cls:"wide",rows:5,hint:"uma por linha"})}
+      ${fld("cf-sl","Sitelinks",c.sitelinks.join("\n"),{rows:5,hint:"até 25 caracteres"})}${fld("cf-co","Frases de destaque",c.callouts.join("\n"),{rows:5,hint:"até 25 caracteres"})}
       <label class="sclose full" style="white-space:normal"><input type="checkbox" id="cf-eu" ${c.eu?"checked":""}>Confirmo que esta campanha não tem publicidade política da União Europeia.</label></div></div>
     <div id="cf-groups" style="display:flex;flex-direction:column;gap:16px">${c.groups.map(grp).join("")}</div>
-    ${c.groups.length<4?`<button class="btn2" type="button" id="cf-addg" style="align-self:flex-start">+ Adicionar grupo (${c.groups.length} de 4)</button>`:""}
+    ${c.groups.length<6?`<button class="btn2" type="button" id="cf-addg" style="align-self:flex-start">+ Adicionar grupo (${c.groups.length} de 6)</button>`:""}
     <div id="cf-res" hidden></div>
-    <div class="jactions" style="margin-top:0"><button class="btn" type="button" id="cf-save">Salvar rascunho</button><button class="btn2" type="button" id="cf-check">Verificar</button><button class="btn2" type="button" id="cf-dl">Baixar plano (JSON)</button>
-      <button class="btn2" type="button" disabled title="Liberado quando a Google Ads API estiver conectada" style="opacity:.5;cursor:not-allowed">Criar no Google Ads (pausada)</button></div>`;
+    <div class="panel ph-pad"><label class="sclose" style="white-space:normal;font-size:14px;color:var(--fg)"><input type="checkbox" id="cf-ok" ${c.approved?"checked":""}><b>Plano revisado e aprovado.</b>&nbsp;A campanha pode ser publicada pausada na conta.</label></div>
+    <div class="jactions" style="margin-top:0"><button class="btn" type="button" id="cf-save">Salvar</button><button class="btn2" type="button" id="cf-check">Verificar</button><button class="btn2" type="button" id="cf-dl">Baixar plano (JSON)</button>
+      <button class="btn2" type="button" id="cf-val" ${LIVE&&co.g?"":"disabled"} title="${LIVE&&co.g?"Confere o plano na Google Ads API sem criar nada":"Liberado com o Google Ads conectado em Informações da empresa (sistema publicado)"}">Validar na conta</button>
+      <button class="btn2" type="button" id="cf-pub" ${LIVE&&co.g?"":"disabled"} title="${LIVE&&co.g?"Cria a campanha pausada na conta":"Liberado com o Google Ads conectado em Informações da empresa (sistema publicado)"}">Publicar na conta (pausada)</button></div>
+    ${c.pub?`<div class="result">Publicada pausada em ${esc(c.pub.at)} · campanha <span class="mono">${esc(c.pub.rn.split("/").pop())}</span> na conta <span class="mono">${fmtCid(c.pub.rn.split("/")[1])}</span>. Revise no Google Ads e ative quando quiser.</div>`:""}`;
   box.querySelectorAll("#cf-groups .crg").forEach(el=>{crCount(el);el.addEventListener("input",()=>crCount(el))});
   $("#cf-back").onclick=()=>crList();
+  const vb=$("#cf-brief");if(vb)vb.onclick=()=>{crRead();c.step="brief";crBrief(c)};
   const addg=$("#cf-addg");if(addg)addg.onclick=()=>{crRead();c.groups.push(newGroup());crForm(c)};
   box.querySelectorAll("[data-rmg]").forEach(b=>b.onclick=()=>{crRead();c.groups.splice(+b.dataset.rmg,1);crForm(c)});
   const res=(ok,html)=>{const r=$("#cf-res");r.hidden=false;r.className="result"+(ok?"":" bad");r.innerHTML=html};
-  $("#cf-check").onclick=()=>{const e=crErrors(crRead());res(!e.length,e.length?`<b>Falta ajustar ${e.length} ${e.length===1?"item":"itens"}:</b><ul style="margin:6px 0 0;padding-left:18px">${e.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"Tudo certo. A campanha está pronta para enviar quando a Google Ads API estiver conectada.")};
-  $("#cf-save").onclick=()=>{crRead();c.updated=nowStr();const i=camps.findIndex(x=>x.id===c.id);if(i<0)camps.unshift(c);else camps[i]=c;saveCamps();crList()};
-  $("#cf-dl").onclick=()=>crDownload(crRead())}
+  const ul=a=>`<ul style="margin:6px 0 0;padding-left:18px">${a.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+  $("#cf-check").onclick=()=>{crRead();const e=crErrors(c),t=crTips(c);
+    res(!e.length,(e.length?`<b>Falta ajustar ${e.length} ${e.length===1?"item":"itens"}:</b>${ul(e)}`:"<b>Tudo certo para publicar.</b> "+(LIVE&&co.g?"Use Validar na conta para conferir na Google Ads API antes de publicar.":"A publicação pausada é liberada com o Google Ads conectado em Informações da empresa."))+(t.length?`<p style="margin:10px 0 0"><b>Boas práticas do Google:</b></p>${ul(t)}`:""))};
+  $("#cf-save").onclick=()=>{crRead();if(c.approved&&crErrors(c).length){c.approved=false;$("#cf-ok").checked=false;$("#cf-check").click();return}crSave(c);crList()};
+  $("#cf-dl").onclick=()=>crDownload(crRead());
+  const send=async validar=>{crRead();const e=crErrors(c);
+    if(e.length)return res(false,`<b>Falta ajustar ${e.length} ${e.length===1?"item":"itens"} antes:</b>${ul(e)}`);
+    if(!c.approved)return res(false,"<b>Marque o plano como revisado e aprovado antes.</b>");
+    const cust=String(c.cust).replace(/\D/g,""),acc=gList().find(a=>a.id===cust);
+    if(!validar&&!confirm(`Criar a campanha "${c.name}" PAUSADA na conta ${fmtCid(cust)}${acc?" ("+acc.name+")":""}?\n\nNada é ativado: ela só gasta quando você ativar no Google Ads.`))return;
+    const bv=$("#cf-val"),bp=$("#cf-pub");bv.disabled=bp.disabled=true;res(true,validar?"Validando na Google Ads API…":"Publicando a campanha pausada…");
+    try{const x=await fetch("/api/google/publish",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({plano:crPlan(c),login:acc&&acc.login||(cust===co.gacc?co.glogin:""),validar})});
+      const j=await x.json().catch(()=>({}));
+      if(!x.ok||!j.ok){const d=(j.detalhes||[]).slice(0,8);res(false,`<b>${x.status===401?"A conexão com o Google Ads expirou. Conecte de novo em Informações da empresa.":validar?"A Google Ads API apontou problemas:":"A campanha não foi criada:"}</b>${d.length?ul(d):j.error?`<p style="margin:6px 0 0">${esc(j.error)}</p>`:""}`);return}
+      if(validar)res(true,`<b>Plano validado na conta ${fmtCid(cust)}.</b> A Google Ads API aceitou as ${j.operacoes} operações sem criar nada. Pode publicar.`);
+      else{c.pub={rn:j.campanha||`customers/${cust}/campaigns/0`,at:nowStr()};crSave(c);crForm(c);res(true,`<b>Campanha criada pausada.</b> ${j.criados} itens criados na conta ${fmtCid(cust)}. Revise no Google Ads e ative quando quiser.`)}}
+    catch(err){res(false,"<b>Não foi possível falar com o servidor agora.</b> Tente de novo.")}
+    finally{const v=$("#cf-val"),p2=$("#cf-pub");if(v)v.disabled=false;if(p2)p2.disabled=false}};
+  const bv=$("#cf-val"),bp=$("#cf-pub");if(bv&&!bv.disabled)bv.onclick=()=>send(true);if(bp&&!bp.disabled)bp.onclick=()=>send(false)}
 // ---------- contas, login e usuários (Supabase) ----------
 var sb=null,me=null,empId=null,papel="dono",cloudT=null,cloudReady=false;
 const PAPEL={dono:"Dono",admin:"Administrador",leitura:"Leitura"};
