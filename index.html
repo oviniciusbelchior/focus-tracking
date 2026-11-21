@@ -1252,9 +1252,9 @@ function gDemoUI(){$("#g-hint").hidden=co.g;
     $("#g-acc").onchange=e=>{co.gacc=e.target.value;saveCo()}}
   else{setSt("#g-st","wait","Desconectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-on">Conectar</button>`;$("#g-area").innerHTML="";$("#g-on").onclick=()=>{co.g=true;co.gacc=co.gacc||"482-193-5567";saveCo();gUI()}}}
 // Google Ads real (sistema publicado): OAuth em /api/google/login e contas em /api/google/accounts.
-var gAccs=[],gMsg="",gChecked=!LIVE;
+var gAccs=[],gMsg="",gChecked=!LIVE,gDirect=0;
 const fmtCid=id=>String(id||"").replace(/\D/g,"").replace(/^(\d{3})(\d{3})(\d{4})$/,"$1-$2-$3");
-const gList=()=>(gAccs||[]).filter(a=>!a.manager&&!a.error);
+const gList=()=>(gAccs||[]).filter(a=>!a.manager&&!a.error&&(!a.status||a.status==="ENABLED"));
 function gUI(){if(!LIVE)return gDemoUI();
   const msg=gMsg?`<div class="result ${gMsg.ok?"":"bad"}" style="margin-bottom:12px">${esc(gMsg.t)}</div>`:"";
   if(!gChecked){setSt("#g-st","wait","Verificando…");$("#g-btns").innerHTML="";$("#g-area").innerHTML="";$("#g-hint").hidden=true;return}
@@ -1262,9 +1262,11 @@ function gUI(){if(!LIVE)return gDemoUI();
   if(!co.g){setSt("#g-st","wait","Desconectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-on">Conectar</button>`;$("#g-area").innerHTML=msg;$("#g-on").onclick=()=>{location.href="/api/google/login"};return}
   setSt("#g-st","ok","Conectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-off">Desconectar</button>`;
   $("#g-off").onclick=async()=>{if(!await crAsk("Desconectar o Google Ads?","O acesso à conta Google Ads sai deste navegador. Você pode conectar de novo quando quiser.","Desconectar"))return;fetch("/api/google/logout",{method:"POST",credentials:"same-origin"}).catch(()=>{}).finally(()=>{gAccs=[];gMsg="";co.g=false;saveCo();gUI()})};
-  const list=gList(),errs=(gAccs||[]).filter(a=>a.error);
+  const list=gList(),errs=(gAccs||[]).filter(a=>a.error),mccs=(gAccs||[]).filter(a=>a.manager);
+  const mccHtml=mccs.length?`<div class="hintbar" style="margin-top:12px">MCC${mccs.length>1?"s":""}: ${mccs.map(a=>`${esc(a.name)} · ${fmtCid(a.id)}${a.clients!=null?` (${a.clients} conta${a.clients===1?"":"s"})`:""}`).join("; ")}</div>`:"";
+  const errHtml=errs.length?`<div class="result bad" style="margin-top:12px">${errs.map(a=>`${esc(a.name)}: ${esc(a.error)}`).join("<br>")}</div>`:"";
   $("#g-area").innerHTML=msg+(list.length?`<div class="vgrid"><div class="field"><label for="g-acc">Conta de anúncios do cliente</label><select class="sel" id="g-acc"><option value="">Escolha a conta</option>${list.map(a=>`<option value="${esc(a.id)}" ${a.id===co.gacc?"selected":""}>${esc(a.name)} · ${fmtCid(a.id)}${a.test?" (teste)":""}${a.login?" · pela MCC "+fmtCid(a.login):""}</option>`).join("")}</select></div><div class="kv"><span>Contas acessíveis</span><b>${list.length}</b></div></div>`
-    :`<div class="hintbar">Nenhuma conta de anúncios apareceu para este login do Google.${errs.length?" "+esc(errs[0].error):""}</div>`);
+    :`<div class="hintbar">Nenhuma conta de anúncios ativa apareceu para este login do Google. O Google devolveu ${gDirect} acesso${gDirect===1?"":"s"} direto${gDirect===1?"":"s"}. Confira se você entrou com o e-mail que tem acesso às contas e à MCC no Google Ads.</div>`)+mccHtml+errHtml;
   const sel=$("#g-acc");if(sel)sel.onchange=e=>{const a=list.find(x=>x.id===e.target.value);co.gacc=a?a.id:"";co.glogin=a&&a.login||"";saveCo()}}
 
 // ---------- mensagens rastreadas ----------
@@ -1375,7 +1377,7 @@ if(LIVE){const GM={ok:[1,"Google Ads conectado. Escolha a conta do cliente."],ca
   let gq=null;try{gq=new URLSearchParams(location.search).get("google");if(gq)history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
   if(gq&&GM[gq])gMsg={ok:!!GM[gq][0],t:GM[gq][1]};
   fetch("/api/google/accounts",{credentials:"same-origin"}).then(async r=>{const d=await r.json().catch(()=>({}));
-    co.g=!!d.connected;gAccs=d.accounts||[];
+    co.g=!!d.connected;gAccs=d.accounts||[];gDirect=d.direct||0;
     if(d.error)gMsg={ok:false,t:d.connected?"Conectado, mas a Google Ads API recusou a leitura das contas: "+d.error:d.error};
     const ok=gList();if(co.g&&!ok.some(a=>a.id===co.gacc)&&ok.length===1){co.gacc=ok[0].id;co.glogin=ok[0].login||""}
     if(co.g){const a=ok.find(x=>x.id===co.gacc);if(a)co.glogin=a.login||""}})
