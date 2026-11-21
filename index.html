@@ -1602,10 +1602,10 @@ function syncBrief(c){const b=c.brief;c.name=(b.campName||autoName(b)).trim();c.
 // O que muda o conteúdo do plano (grupos, anúncios e extensões). Mudar só orçamento, conta ou lance não refaz o plano.
 const planKey=b=>JSON.stringify([b.biz,b.services,b.mode,b.diffs,b.offer,b.hours,briefCities(b),b.avoid]);
 // Sitelinks: sempre 6. Quem somos, serviços, prova social e contato fecham o anúncio completo.
-const SL_ROLES=["Quem somos","Serviços","Serviço 1 ou diferenciais","Serviço 2 ou depoimentos","Depoimentos ou localização","Contato"];
+const SL_ROLES=["Quem somos","Serviços","Serviço 1 ou diferenciais","Serviço 2 ou missão e valores","Depoimentos ou localização","Contato"];
 function SL_PLAN(b){const sv=b.services.map(titleCase).filter(x=>x&&x.length<=25);
   const l=sv.length>=2?["Quem Somos","Nossos Serviços",sv[0],sv[1],"Depoimentos","Fale Conosco"]
-    :["Quem Somos",sv[0]||"Nossos Serviços","Nossos Diferenciais","Depoimentos",b.addrs.length?"Como Chegar":"Nossos Valores","Fale Conosco"];
+    :["Quem Somos",sv[0]||"Nossos Serviços","Nossos Diferenciais","Depoimentos",b.addrs.length?"Como Chegar":"Missão e Valores","Fale Conosco"];
   return uniq(l,25,6)}
 // Intenções de busca: cada uma vira um grupo no modo "por intenção".
 const INTENTS=[
