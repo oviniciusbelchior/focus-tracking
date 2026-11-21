@@ -1262,12 +1262,19 @@ function gUI(){if(!LIVE)return gDemoUI();
   if(!co.g){setSt("#g-st","wait","Desconectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-on">Conectar</button>`;$("#g-area").innerHTML=msg;$("#g-on").onclick=()=>{location.href="/api/google/login"};return}
   setSt("#g-st","ok","Conectado");$("#g-btns").innerHTML=`<button class="mini" type="button" id="g-off">Desconectar</button>`;
   $("#g-off").onclick=async()=>{if(!await crAsk("Desconectar o Google Ads?","O acesso à conta Google Ads sai deste navegador. Você pode conectar de novo quando quiser.","Desconectar"))return;fetch("/api/google/logout",{method:"POST",credentials:"same-origin"}).catch(()=>{}).finally(()=>{gAccs=[];gMsg="";co.g=false;saveCo();gUI()})};
-  const list=gList(),errs=(gAccs||[]).filter(a=>a.error),mccs=(gAccs||[]).filter(a=>a.manager);
-  const mccHtml=mccs.length?`<div class="hintbar" style="margin-top:12px">MCC${mccs.length>1?"s":""}: ${mccs.map(a=>`${esc(a.name)} · ${fmtCid(a.id)}${a.clients!=null?` (${a.clients} conta${a.clients===1?"":"s"})`:""}`).join("; ")}</div>`:"";
-  const errHtml=errs.length?`<div class="result bad" style="margin-top:12px">${errs.map(a=>`${esc(a.name)}: ${esc(a.error)}`).join("<br>")}</div>`:"";
-  $("#g-area").innerHTML=msg+(list.length?`<div class="vgrid"><div class="field"><label for="g-acc">Conta de anúncios do cliente</label><select class="sel" id="g-acc"><option value="">Escolha a conta</option>${list.map(a=>`<option value="${esc(a.id)}" ${a.id===co.gacc?"selected":""}>${esc(a.name)} · ${fmtCid(a.id)}${a.test?" (teste)":""}${a.login?" · pela MCC "+fmtCid(a.login):""}</option>`).join("")}</select></div><div class="kv"><span>Contas acessíveis</span><b>${list.length}</b></div></div>`
-    :`<div class="hintbar">Nenhuma conta de anúncios ativa apareceu para este login do Google. O Google devolveu ${gDirect} acesso${gDirect===1?"":"s"} direto${gDirect===1?"":"s"}. Confira se você entrou com o e-mail que tem acesso às contas e à MCC no Google Ads.</div>`)+mccHtml+errHtml;
-  const sel=$("#g-acc");if(sel)sel.onchange=e=>{const a=list.find(x=>x.id===e.target.value);co.gacc=a?a.id:"";co.glogin=a&&a.login||"";saveCo()}}
+  // Passo 1: MCC (ou conta direta). Passo 2: contas dentro da MCC escolhida.
+  const all=gAccs||[],tops=all.filter(a=>a.direct),list=gList();
+  const top=tops.find(a=>a.id===(co.glogin||co.gacc))||(tops.length===1?tops[0]:null);
+  const kids=top?(top.manager?list.filter(a=>a.login===top.id):(!top.error&&list.some(a=>a.id===top.id)?[top]:[])):[];
+  const errs=all.filter(a=>a.error);
+  const opt1=tops.map(a=>`<option value="${esc(a.id)}" ${top&&top.id===a.id?"selected":""}>${a.manager?"MCC · ":""}${a.name&&a.name!==a.id?esc(a.name)+" · ":""}${fmtCid(a.id)}${a.manager&&a.clients!=null?` (${a.clients} conta${a.clients===1?"":"s"})`:""}${a.error?" · sem acesso":""}</option>`).join("");
+  const opt2=kids.map(a=>`<option value="${esc(a.id)}" ${a.id===co.gacc?"selected":""}>${esc(a.name)} · ${fmtCid(a.id)}${a.test?" (teste)":""}</option>`).join("");
+  const why=errs.length?`<div class="result bad" style="margin-top:12px">${/approved for use with test accounts|NOT_APPROVED_FOR_PRODUCTION/i.test(errs.map(a=>a.error).join(" "))?"O projeto do Google Cloud ainda está no nível Teste da Google Ads API, que só abre contas de teste. Peça o nível Exploração em console.cloud.google.com/google/ads-apis/overview e conecte de novo.<br>":""}${errs.map(a=>`${fmtCid(a.id)}: ${esc(a.error)}`).join("<br>")}</div>`:"";
+  $("#g-area").innerHTML=msg+(tops.length?`<div class="vgrid"><div class="field"><label for="g-top">1. MCC ou conta</label><select class="sel" id="g-top"><option value="">Escolha a MCC</option>${opt1}</select></div>
+    <div class="field"><label for="g-acc">2. Conta de anúncios do cliente</label><select class="sel" id="g-acc" ${kids.length?"":"disabled"}><option value="">${top?(kids.length?"Escolha a conta":"Nenhuma conta liberada nesta MCC"):"Escolha a MCC primeiro"}</option>${opt2}</select></div></div>`
+    :`<div class="hintbar">Nenhuma conta apareceu para este login do Google. Confira se você entrou com o e-mail que tem acesso às contas e à MCC no Google Ads.</div>`)+why;
+  const s1=$("#g-top");if(s1)s1.onchange=e=>{const t=tops.find(x=>x.id===e.target.value);co.glogin=t&&t.manager?t.id:"";co.gacc=t&&!t.manager?t.id:"";saveCo();gUI()};
+  const s2=$("#g-acc");if(s2)s2.onchange=e=>{const a=kids.find(x=>x.id===e.target.value);co.gacc=a?a.id:"";co.glogin=a&&a.login||"";saveCo()}}
 
 // ---------- mensagens rastreadas ----------
 // Código oculto: ID do clique (24 bits, sequencial por empresa) em base 4, 12 caracteres invisíveis de tamanho fixo no fim da mensagem.
