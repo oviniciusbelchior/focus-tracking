@@ -58,6 +58,69 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--brand);outline-
 @media (max-width:780px){.side-tg{display:none}}
 @media (prefers-reduced-motion:reduce){.side-tg svg{transition:none}}
 
+/* Clientes (subcontas): seletor na barra lateral e página de clientes */
+.csw-wrap{position:relative;margin-top:8px}
+.csw{display:flex;align-items:center;gap:10px;width:100%;border:1px solid var(--side-line);background:var(--side-2);color:var(--side-fg);border-radius:9px;padding:8px 10px;text-align:left;cursor:pointer;font:inherit}
+.csw:hover{border-color:#3d3d42}
+.csw .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.csw b{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.csw small{font-size:11.5px;color:var(--side-muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.csw small .conn-dot{margin:0}
+.csw svg.ch{flex:none;color:var(--side-muted)}
+.cav{width:30px;height:30px;border-radius:8px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;overflow:hidden;background:var(--c,#55565c)}
+.cav img{width:100%;height:100%;object-fit:contain;background:#fff}
+.cav.lg{width:40px;height:40px;border-radius:10px;font-size:14px}
+.cpop{position:absolute;left:0;bottom:calc(100% + 8px);width:320px;max-width:calc(100vw - 32px);background:var(--surface);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 48px rgba(0,0,0,.28);z-index:40;display:flex;flex-direction:column;max-height:min(520px,calc(100vh - 120px))}
+.cpop .q{padding:10px;border-bottom:1px solid var(--line)}
+.cpop .q input{width:100%}
+.cpop .lst{overflow-y:auto;padding:4px 0}
+.cpop .lbl{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);padding:8px 14px 4px}
+.crow{display:flex;align-items:center;gap:10px;padding:8px 14px;width:100%;border:0;background:none;text-align:left;font:inherit;color:inherit;cursor:pointer}
+.crow:hover,.crow:focus-visible{background:var(--surface-2)}
+.crow.cur{background:var(--brand-soft)}
+.crow .tx{flex:1;min-width:0}.crow b{display:block;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.crow small{color:var(--muted);font-size:12px}
+.crow .star{color:var(--brand);font-size:13px}
+.cpop .foot{border-top:1px solid var(--line);display:flex;gap:8px;padding:10px;flex-wrap:wrap}
+.cpop .foot .btn,.cpop .foot .btn2{flex:1;justify-content:center;font-size:13px;padding:8px 10px}
+.cpop .empty{padding:14px;color:var(--muted);font-size:13px}
+.app.side-mini .csw{justify-content:center;padding:6px 0}
+.app.side-mini .csw .tx,.app.side-mini .csw svg.ch{display:none}
+.cdots{display:flex;gap:4px;flex-wrap:wrap}
+.cdot{font-size:11px;padding:2px 7px;border-radius:5px;font-weight:700;white-space:nowrap}
+.cdot.m{background:#e8f0fd;color:#1f6fe5}.cdot.g{background:#fff3e6;color:#b45309}.cdot.w{background:var(--accent-soft);color:var(--accent)}.cdot.off{background:var(--surface-2);color:var(--faint);font-weight:400}
+.cl-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.cl-tools .inp{max-width:320px}
+.cl-list{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.cl-head,.cl-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.3fr) 160px 370px;gap:14px;align-items:center;padding:12px 16px}
+.cl-head{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;background:var(--surface-2)}
+.cl-row{border-top:1px solid var(--line)}
+.cl-row.cur{background:#fffaf7}
+.cl-row.off{opacity:.62}
+.cl-name{display:flex;align-items:center;gap:12px;min-width:0}
+.cl-name .tx{min-width:0}.cl-name b{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cl-name small{color:var(--muted);font-size:12.5px}
+.cl-st{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.cpill{font-size:11.5px;padding:3px 8px;border-radius:999px;font-weight:700;white-space:nowrap}
+.cpill.on{background:var(--accent-soft);color:var(--accent)}.cpill.offp{background:var(--surface-2);color:var(--muted)}.cpill.pr{background:var(--brand-soft);color:var(--brand)}.cpill.here{background:var(--fg);color:#fff}
+.cl-act{display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.cl-act .btn{padding:7px 12px;font-size:13px}
+.ibtn{border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:7px;padding:6px 9px;font:inherit;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.ibtn:hover{color:var(--fg);border-color:#cfcfd3}
+.ibtn.pr{color:var(--brand);border-color:#ffd0bd;background:var(--brand-soft)}
+.ibtn.dz:hover{color:#c0392b;border-color:#f0c4bf}
+.cl-empty{padding:28px 16px;text-align:center;color:var(--muted)}
+.crask-box .inp{width:100%}
+@media (max-width:1100px){.cl-head,.cl-row{grid-template-columns:minmax(0,1.6fr) minmax(0,1.3fr) 140px}.cl-act{grid-column:1/-1;justify-content:flex-start}}
+@media (max-width:900px){.cl-head{display:none}.cl-row{grid-template-columns:minmax(0,1fr);gap:10px}.cl-act{justify-content:flex-start}}
+@media (max-width:780px){
+  .side{grid-template-columns:auto minmax(0,1fr) auto}
+  .side .brand{font-size:0;gap:0;padding:0 0 8px}
+  .side .brand .side-tg{display:none}
+  .csw-wrap{grid-row:1;grid-column:2;margin:0 0 8px;min-width:0}
+  .csw{padding:6px 8px;gap:8px}.csw .cav{width:26px;height:26px;font-size:11px}
+  .user{grid-column:3}
+  .cpop{position:fixed;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));top:calc(64px + env(safe-area-inset-top,0px));bottom:auto;width:auto;max-width:none;max-height:calc(100vh - 90px)}
+}
+
 /* Main */
 .main{min-width:0;padding-block:28px 48px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
 .inner{max-width:1340px;margin:0 auto 0 calc(min(150px,6vw))}
@@ -524,6 +587,7 @@ button.crcard:hover{border-color:var(--brand)}
 <aside class="side">
   <div class="brand"><span class="logo"><i></i></span>Focus Tracking<button class="side-tg" type="button" id="side-tg" aria-label="Recolher menu" title="Recolher menu" aria-expanded="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M16 10l-2 2 2 2"/></svg></button></div>
   <nav class="nav" aria-label="Menu">
+    <button class="nav-item" data-tab="clientes"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><path d="M17.5 14v7M14 17.5h7"/></svg>Clientes</button>
     <button class="nav-item" data-tab="painel"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Painel</button>
     <button class="nav-item" data-tab="inspetor"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M8 11h6M11 8v6"/></svg>Inspetor de campanha</button>
     <button class="nav-item" data-tab="conversas"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="10" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg>Conversas</button>
@@ -533,11 +597,28 @@ button.crcard:hover{border-color:var(--brand)}
     <button class="nav-item" data-tab="empresa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/><path d="M16 9h2a2 2 0 0 1 2 2v10"/><path d="M8 7h4M8 11h4M8 15h4M3 21h18"/></svg>Informações da empresa</button>
     <button class="nav-item" data-tab="usuarios"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg>Usuários</button>
   </nav>
-  <div class="wa"><span class="conn-dot"></span>WhatsApp desconectado</div>
+  <div class="csw-wrap" id="csw-wrap">
+    <button class="csw" type="button" id="csw" aria-haspopup="dialog" aria-expanded="false" title="Trocar de cliente"><span class="cav" id="csw-av"></span><span class="tx"><b id="csw-name">Cliente</b><small><span class="conn-dot" id="csw-dot"></span><span id="csw-wa">WhatsApp desconectado</span></small></span><svg class="ch" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5-5 5 5M7 9l5-5 5 5" transform="translate(0 2.5)"/></svg></button>
+    <div class="cpop" id="cpop" role="dialog" aria-label="Trocar de cliente" hidden>
+      <div class="q"><input class="inp" id="cpop-q" placeholder="Buscar cliente" aria-label="Buscar cliente" autocomplete="off"></div>
+      <div class="lst" id="cpop-lst"></div>
+      <div class="foot"><button class="btn2" type="button" id="cpop-all">Ver todos os clientes</button><button class="btn" type="button" id="cpop-new">+ Novo cliente</button></div>
+    </div>
+  </div>
   <div class="user"><span class="av" id="u-av">VB</span><div style="flex:1;min-width:0"><b id="u-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Vinicius Belchior</b><small id="u-role">Proprietário</small></div><button type="button" id="u-out" aria-label="Sair" title="Sair" style="border:0;background:none;color:inherit;padding:4px;cursor:pointer;display:grid"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
 </aside>
 
 <main class="main"><div class="inner">
+  <!-- CLIENTES -->
+  <section class="view" id="v-clientes" hidden>
+    <div class="head">
+      <div><h1>Clientes</h1><p class="sub" id="cl-sub">Uma subconta para cada cliente ativo da agência.</p></div>
+      <button class="btn" type="button" id="cl-new"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>Novo cliente</button>
+    </div>
+    <div class="cl-tools"><input class="inp" id="cl-q" placeholder="Buscar por nome ou segmento" aria-label="Buscar cliente" autocomplete="off"><span class="seg" id="cl-f"><button type="button" data-f="on" aria-pressed="true">Ativos</button><button type="button" data-f="off" aria-pressed="false">Desativados</button><button type="button" data-f="all" aria-pressed="false">Todos</button></span></div>
+    <div class="cl-list"><div class="cl-head"><span>Cliente</span><span>Conexões</span><span>Situação</span><span></span></div><div id="cl-body"></div></div>
+    <p class="note" id="cl-note">A estrela marca o cliente principal: é nele que o sistema abre quando você entra. Cliente desativado sai do seletor, mas os dados ficam guardados e dá para reativar.</p>
+  </section>
   <!-- PAINEL -->
   <section class="view" id="v-painel">
     <div class="head">
@@ -1006,11 +1087,11 @@ function cleanDados(d){
   return d}
 
 // ---------- tabs ----------
-const VIEWS=["painel","inspetor","conversas","jornada","eventos","links","empresa","usuarios"];
+const VIEWS=["clientes","painel","inspetor","conversas","jornada","eventos","links","empresa","usuarios"];
 function show(t){if(!VIEWS.includes(t))t="painel";
   document.querySelectorAll(".nav-item[data-tab]").forEach(b=>{if(b.dataset.tab===t){b.setAttribute("aria-current","page");try{b.scrollIntoView({block:"nearest",inline:"nearest"})}catch(e){}}else b.removeAttribute("aria-current")});
   VIEWS.forEach(v=>$("#v-"+v).hidden=v!==t);
-  if(t==="painel")drawChart();if(t==="inspetor")inspetor();if(t==="jornada")editor();if(t==="conversas")board();if(t==="eventos")evTable();if(t==="empresa")company();if(t==="links")lkShow("list");if(t==="usuarios")usUI();}
+  if(t==="painel")drawChart();if(t==="inspetor")inspetor();if(t==="jornada")editor();if(t==="conversas")board();if(t==="eventos")evTable();if(t==="empresa")company();if(t==="links")lkShow("list");if(t==="usuarios")usUI();if(t==="clientes")clUI();closePop();}
 document.querySelectorAll(".nav-item[data-tab]").forEach(b=>b.onclick=()=>{location.hash=b.dataset.tab});
 addEventListener("hashchange",()=>show(location.hash.slice(1)));
 // Recolher o menu da esquerda (fica salvo neste navegador).
@@ -1271,7 +1352,7 @@ function waUI(){clearInterval(qrTimer);const box=$("#wa-box"),off=$("#wa-off-wra
     drawQR();$("#qr-done").onclick=()=>{co.wa="on";saveCo();waUI()};$("#wa-new").onclick=genQR;
     let t=45;const tick=()=>{const e=$("#qr-exp");if(e)e.textContent=t>0?`O código expira em ${t} s`:"O código expirou. Gere um novo.";t--;if(t<-1)clearInterval(qrTimer)};tick();qrTimer=setInterval(tick,1000)}
   else{box.className="wa-box off";box.innerHTML=`WhatsApp desconectado<button class="btn" id="wa-gen" type="button">Gerar QR code</button>`;$("#wa-gen").onclick=genQR}
-  const dot=document.querySelector(".wa");if(dot){dot.lastChild.textContent=co.wa==="on"?"WhatsApp conectado":"WhatsApp desconectado";dot.querySelector(".conn-dot").style.background=co.wa==="on"?"var(--accent)":"var(--faint)"}
+  if(typeof cswUI==="function")cswUI();
 }
 function genQR(){if(!co.phone||co.phone.replace(/\D/g,"").length<12){basicEdit(true);$("#co-phone").focus();$("#co-phone").setCustomValidity("Informe o número com DDI e DDD");$("#co-phone").reportValidity();return}$("#co-phone").setCustomValidity("");co.wa="qr";waUI()}
 $("#tk-show").onclick=e=>{const i=$("#co-token");i.type=i.type==="password"?"text":"password";e.currentTarget.textContent=i.type==="password"?"Mostrar":"Ocultar"};
@@ -2434,6 +2515,101 @@ function mDone(c,r){mCur=c;const box=$("#i-create"),b=c.brief,act=String(b.act).
       <div class="jactions" style="justify-content:center"><button class="btn" type="button" id="cd-fix">Voltar à revisão</button></div></div>`;
     $("#cd-fix").onclick=()=>{mReview(c);window.scrollTo(0,0)}}
   $("#cf-back").onclick=()=>crList();mStepNav(c)}
+// ---------- clientes (subcontas) ----------
+// Cada cliente é uma empresa no banco. Trocar de cliente guarda a escolha nesta aba e recarrega a página com os dados dele.
+// Ao abrir o sistema numa aba nova, entra no cliente principal (estrela); sem principal e com vários clientes, abre a página Clientes.
+var clients=[],clF="on";
+const CL_COLORS=["#c2417a","#1f6fe5","#18a058","#6b4fd8","#d97706","#0e7490","#b91c1c","#4d7c0f"];
+const clColor=s=>{let h=0;for(const ch of String(s||""))h=(h*31+ch.charCodeAt(0))>>>0;return CL_COLORS[h%CL_COLORS.length]};
+const clIni=n=>esc((n||"?").split(/\s+/).filter(Boolean).map(w=>w[0]).slice(0,2).join("").toUpperCase()||"?");
+const clCur=()=>clients.find(c=>c.id===empId);
+// Para o cliente aberto, usa os dados da tela (co), que podem ter mudado depois de carregar a lista.
+const clCo=c=>c.id===empId?co:(c.co||{});
+const clName=c=>clCo(c).name||c.nome||"Sem nome";
+function clAv(c,cls){const x=clCo(c),lg=safeLogo(x.logo);return `<span class="cav${cls?" "+cls:""}" style="--c:${clColor(c.id)}">${lg?`<img src="${esc(lg)}" alt="">`:clIni(clName(c))}</span>`}
+function clDots(c){const x=clCo(c),m=(x.accs||[]).length,g=x.gacc,w=x.wa==="on";
+  return `<span class="cdots"><span class="cdot ${m?"m":"off"}" title="Meta Ads">${m?`Meta · ${m} conta${m>1?"s":""}`:"Sem Meta"}</span><span class="cdot ${g?"g":"off"}" title="Google Ads">${g?"Google · "+esc(g):"Sem Google"}</span><span class="cdot ${w?"w":"off"}" title="WhatsApp">${w?"WhatsApp":"Sem WhatsApp"}</span></span>`}
+const canNew=()=>clients.some(c=>c.papel==="dono");
+const canEdit=c=>c.papel==="dono"||c.papel==="admin";
+function cswUI(){const c=clCur()||{id:empId||"x",nome:co.name},on=co.wa==="on";
+  $("#csw-av").outerHTML=clAv(c).replace('<span class="cav"','<span class="cav" id="csw-av"');
+  $("#csw-name").textContent=clName(c);$("#csw-wa").textContent=on?"WhatsApp conectado":"WhatsApp desconectado";
+  $("#csw-dot").style.background=on?"var(--accent)":"var(--faint)";$("#csw").title="Trocar de cliente · "+clName(c)}
+function popList(){const q=$("#cpop-q").value.trim().toLowerCase(),act=clients.filter(c=>c.ativo&&(!q||clName(c).toLowerCase().includes(q)));
+  act.sort((a,b)=>(b.id===empId)-(a.id===empId)||(b.principal-a.principal)||clName(a).localeCompare(clName(b),"pt-BR"));
+  $("#cpop-lst").innerHTML=(act.length?`<div class="lbl">Clientes ativos · ${clients.filter(c=>c.ativo).length}</div>`:"")+act.map(c=>`<button type="button" class="crow${c.id===empId?" cur":""}" data-cl="${esc(c.id)}">${clAv(c)}<span class="tx"><b>${esc(clName(c))}</b><small>${c.id===empId?"Aberto agora":esc(clCo(c).seg||"Cliente")}</small></span>${c.principal?'<span class="star" title="Cliente principal">★</span>':""}</button>`).join("")||`<div class="empty">${q?"Nenhum cliente com esse nome.":"Nenhum cliente ativo."}</div>`;
+  $("#cpop-lst").querySelectorAll("[data-cl]").forEach(b=>b.onclick=()=>{const id=b.dataset.cl;if(id===empId){closePop();return}clGo(id,"painel")})}
+function openPop(){$("#cpop").hidden=false;$("#csw").setAttribute("aria-expanded","true");$("#cpop-q").value="";$("#cpop-new").hidden=!canNew();popList();if(matchMedia("(hover:hover)").matches)$("#cpop-q").focus()}
+function closePop(){const p=$("#cpop");if(p&&!p.hidden){p.hidden=true;$("#csw").setAttribute("aria-expanded","false")}}
+$("#csw").onclick=e=>{e.stopPropagation();$("#cpop").hidden?openPop():closePop()};
+$("#cpop").onclick=e=>e.stopPropagation();
+document.addEventListener("click",closePop);
+addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#cpop").hidden){closePop();$("#csw").focus()}});
+$("#cpop-q").oninput=popList;
+$("#cpop-q").onkeydown=e=>{if(e.key==="Enter"){const b=$("#cpop-lst [data-cl]");if(b)b.click()}};
+$("#cpop-all").onclick=()=>{closePop();location.hash="clientes"};
+$("#cpop-new").onclick=()=>{closePop();clNew()};
+// Página Clientes
+function clUI(){const q=$("#cl-q").value.trim().toLowerCase(),nOn=clients.filter(c=>c.ativo).length,nOff=clients.length-nOn;
+  $("#cl-sub").textContent=`${nOn} cliente${nOn===1?"":"s"} ativo${nOn===1?"":"s"}`+(nOff?` · ${nOff} desativado${nOff===1?"":"s"}`:"")+". Uma subconta para cada cliente da agência.";
+  $("#cl-new").hidden=!canNew();
+  document.querySelectorAll("#cl-f button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.f===clF)));
+  const rows=clients.filter(c=>(clF==="all"||(clF==="on")===c.ativo)&&(!q||(clName(c)+" "+(clCo(c).seg||"")).toLowerCase().includes(q)))
+    .sort((a,b)=>(b.principal-a.principal)||clName(a).localeCompare(clName(b),"pt-BR"));
+  $("#cl-body").innerHTML=rows.map(c=>{const here=c.id===empId,ed=canEdit(c);
+    return `<div class="cl-row${here?" cur":""}${c.ativo?"":" off"}"><div class="cl-name">${clAv(c,"lg")}<span class="tx"><b>${esc(clName(c))}</b><small>${esc(clCo(c).seg||"Segmento não informado")}${clCo(c).site?" · "+esc(clCo(c).site.replace(/^https?:\/\//,"").replace(/\/$/,"")):""}</small></span></div>
+      <div>${clDots(c)}</div>
+      <div class="cl-st">${c.ativo?'<span class="cpill on">Ativo</span>':'<span class="cpill offp">Desativado</span>'}${c.principal?'<span class="cpill pr">★ Principal</span>':""}${here?'<span class="cpill here">Aberto agora</span>':""}</div>
+      <div class="cl-act">${c.ativo?`<button class="btn" type="button" data-go="${esc(c.id)}">${here?"Ir para o painel":"Acessar"}</button>${ed?`<button class="ibtn" type="button" data-cfg="${esc(c.id)}">Configurar</button>`:""}<button class="ibtn${c.principal?" pr":""}" type="button" data-pr="${esc(c.id)}" aria-pressed="${c.principal}" title="${c.principal?"Deixar de ser o principal":"Marcar como principal"}">${c.principal?"★":"☆"} Principal</button>`:""}
+        ${ed?`<button class="ibtn${c.ativo?" dz":""}" type="button" data-off="${esc(c.id)}">${c.ativo?"Desativar":"Reativar"}</button>`:""}</div></div>`}).join("")
+    ||`<div class="cl-empty">${q?"Nenhum cliente encontrado com essa busca.":clF==="off"?"Nenhum cliente desativado.":"Nenhum cliente ativo. Crie o primeiro em Novo cliente."}</div>`;
+  const B=$("#cl-body");
+  B.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>clGo(b.dataset.go,"painel"));
+  B.querySelectorAll("[data-cfg]").forEach(b=>b.onclick=()=>clGo(b.dataset.cfg,"empresa"));
+  B.querySelectorAll("[data-pr]").forEach(b=>b.onclick=()=>clPrincipal(b.dataset.pr));
+  B.querySelectorAll("[data-off]").forEach(b=>b.onclick=()=>clToggle(b.dataset.off))}
+$("#cl-q").oninput=clUI;
+document.querySelectorAll("#cl-f button").forEach(b=>b.onclick=()=>{clF=b.dataset.f;clUI()});
+$("#cl-new").onclick=()=>clNew();
+// Abre outro cliente: guarda a escolha nesta aba e recarrega.
+function clGo(id,tab){if(id===empId){location.hash=tab;show(tab);return}
+  try{sessionStorage.setItem("ft-emp",id)}catch(e){}
+  if(!sb)demoSwap(id);
+  clearTimeout(cloudT);
+  history.replaceState(null,"","#"+tab);location.reload()}
+async function clPrincipal(id){const c=clients.find(x=>x.id===id);if(!c)return;const on=!c.principal;
+  if(sb){const r=await sb.rpc("marcar_principal",{p_empresa:on?id:null});if(r.error){alert("Não foi possível salvar: "+r.error.message);return}}
+  clients.forEach(x=>x.principal=on&&x.id===id);demoKeep();clUI();cswUI()}
+async function clToggle(id){const c=clients.find(x=>x.id===id);if(!c)return;const off=c.ativo;
+  if(off&&!await crAsk("Desativar cliente?",`${clName(c)} sai do seletor e para de aparecer na lista de ativos. Os dados, conexões e campanhas continuam guardados, e dá para reativar quando quiser.`,"Desativar"))return;
+  if(sb){const r=await sb.from("empresas").update({ativo:!off}).eq("id",id);if(r.error){alert("Não foi possível salvar: "+r.error.message);return}
+    if(off&&c.principal)await sb.rpc("marcar_principal",{p_empresa:null})}
+  c.ativo=!off;if(off)c.principal=false;demoKeep();
+  // Desativou o cliente aberto: vai para outro ativo, se houver.
+  if(off&&id===empId){const nx=clients.find(x=>x.ativo&&x.principal)||clients.find(x=>x.ativo);if(nx){clGo(nx.id,"clientes");return}}
+  clUI();cswUI()}
+function crPrompt(title,text,label,ok){return new Promise(res=>{const d=document.createElement("div");d.className="crask";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");
+  d.innerHTML=`<form class="crask-box"><h2>${esc(title)}</h2><p>${esc(text)}</p><div class="field"><label for="crp-in">${esc(label)}</label><input class="inp" id="crp-in" maxlength="120" autocomplete="off"></div><div class="result bad" id="crp-e" hidden></div><div class="jactions"><button class="btn2" type="button" data-a="0">Cancelar</button><button class="btn" type="submit">${esc(ok)}</button></div></form>`;
+  const done=v=>{d.remove();removeEventListener("keydown",key);res(v)},key=e=>{if(e.key==="Escape")done(null)};
+  d.onclick=e=>{if(e.target===d||e.target.closest('[data-a="0"]'))done(null)};
+  d.querySelector("form").onsubmit=e=>{e.preventDefault();const v=d.querySelector("#crp-in").value.trim();if(!v){const er=d.querySelector("#crp-e");er.hidden=false;er.textContent="Digite o nome do cliente.";return}done(v)};
+  addEventListener("keydown",key);document.body.appendChild(d);d.querySelector("#crp-in").focus()})}
+async function clNew(){const nm=await crPrompt("Novo cliente","Dê um nome para a subconta. Depois você configura logo, WhatsApp, Meta Ads, Google Ads e site em Informações da empresa.","Nome do cliente","Criar e configurar");
+  if(!nm)return;let id;
+  if(sb){const r=await sb.rpc("criar_cliente",{p_nome:nm});if(r.error){alert(/sem_permissao/.test(r.error.message)?"Só o dono da agência cria clientes.":"Não foi possível criar: "+r.error.message);return}id=r.data}
+  else{id="demo-"+Date.now().toString(36);clients.push({id,nome:nm,ativo:true,principal:false,papel:"dono",co:{name:nm},dados:{co:Object.assign({},DEF_CO,{name:nm})}});demoKeep()}
+  clGo(id,"empresa")}
+// Sem banco (prévia fora da Vercel): os clientes ficam neste navegador.
+const DEMO_KEYS={co:"ft-company",stages:"ft-stages",events:"ft-events",links:"ft-links",camps:"ft-camps",mcamps:"ft-mcamps"};
+function demoKeep(){if(sb)return;try{localStorage.setItem("ft-clients",JSON.stringify(clients.map(c=>Object.assign({},c,c.id===empId?{co:co}:{}))))}catch(e){}}
+function demoSwap(id){try{const cur=clients.find(c=>c.id===empId);if(cur){cur.dados={};for(const k in DEMO_KEYS){const v=localStorage.getItem(DEMO_KEYS[k]);if(v)cur.dados[k]=JSON.parse(v)}cur.co=co}
+  const nx=clients.find(c=>c.id===id),d=(nx&&nx.dados)||{};for(const k in DEMO_KEYS){if(d[k]!=null)localStorage.setItem(DEMO_KEYS[k],JSON.stringify(d[k]));else localStorage.removeItem(DEMO_KEYS[k])}
+  localStorage.setItem("ft-emp",id);localStorage.setItem("ft-clients",JSON.stringify(clients))}catch(e){}}
+function demoInit(){let list=null;try{list=JSON.parse(localStorage.getItem("ft-clients"))}catch(e){}
+  if(!Array.isArray(list)||!list.length)list=[{id:"demo-1",nome:co.name||"Minha empresa",ativo:true,principal:true,papel:"dono"}];
+  clients=list.filter(c=>c&&typeof c==="object").map(c=>({id:cleanId(c.id),nome:String(c.nome||"").slice(0,120),ativo:c.ativo!==false,principal:!!c.principal,papel:"dono",co:c.co&&typeof c.co==="object"?c.co:{},dados:c.dados&&typeof c.dados==="object"?c.dados:null}));
+  let cur=null;try{cur=localStorage.getItem("ft-emp")}catch(e){}
+  empId=clients.some(c=>c.id===cur)?cur:clients[0].id;demoKeep()}
 // ---------- contas, login e usuários (Supabase) ----------
 var sb=null,me=null,empId=null,papel="dono",cloudT=null,cloudReady=false;
 const PAPEL={dono:"Dono",admin:"Administrador",leitura:"Leitura"};
@@ -2505,24 +2681,38 @@ async function cloudInit(){
   const {data:{session}}=await sb.auth.getSession();
   if(!session){location.replace("/login");return}
   me=session.user;
-  const m=await sb.from("membros").select("empresa_id,papel").eq("user_id",me.id).limit(1).maybeSingle();
-  if(!m.data){document.documentElement.style.visibility="";document.body.innerHTML='<div style="font:15px Arial;padding:40px;max-width:520px">Sua conta ainda não tem acesso a nenhuma empresa. Peça um novo convite ao dono da conta.<p><a href="#" id="lo" style="color:#ff5a1f">Sair</a></p></div>';document.getElementById("lo").onclick=e=>{e.preventDefault();sb.auth.signOut().finally(()=>location.replace("/login"))};return}
-  empId=m.data.empresa_id;papel=m.data.papel;
+  const ms=await sb.from("membros").select("empresa_id,papel,principal").eq("user_id",me.id);
+  const mm=ms.data||[];
+  if(!mm.length){document.documentElement.style.visibility="";document.body.innerHTML='<div style="font:15px Arial;padding:40px;max-width:520px">Sua conta ainda não tem acesso a nenhuma empresa. Peça um novo convite ao dono da conta.<p><a href="#" id="lo" style="color:#ff5a1f">Sair</a></p></div>';document.getElementById("lo").onclick=e=>{e.preventDefault();sb.auth.signOut().finally(()=>location.replace("/login"))};return}
+  // Lista de clientes (só o resumo de cada um) e escolha de qual abrir.
+  const es=await sb.from("empresas").select("id,nome,ativo,co:dados->co").in("id",mm.map(x=>x.empresa_id));
+  clients=(es.data||[]).map(x=>{const mb=mm.find(y=>y.empresa_id===x.id)||{};const c0=x.co&&typeof x.co==="object"?cleanDados({co:x.co}).co:{};
+    return {id:x.id,nome:String(x.nome||""),ativo:x.ativo!==false,principal:!!mb.principal,papel:mb.papel||"leitura",co:c0}});
+  if(!clients.length)clients=mm.map(x=>({id:x.empresa_id,nome:"",ativo:true,principal:!!x.principal,papel:x.papel,co:{}}));
+  let pick=null,toList=false;try{pick=sessionStorage.getItem("ft-emp")}catch(x){}
+  const act=clients.filter(c=>c.ativo);
+  if(!clients.some(c=>c.id===pick)){pick=null;
+    const pr=act.find(c=>c.principal);
+    if(pr)pick=pr.id;else{pick=(act[0]||clients[0]).id;toList=act.length!==1}}
+  try{sessionStorage.setItem("ft-emp",pick)}catch(x){}
+  empId=pick;papel=(clients.find(c=>c.id===pick)||{}).papel||"leitura";
   const e=await sb.from("empresas").select("dados").eq("id",empId).single();
   const d=cleanDados((e.data&&e.data.dados)||{});
-  if(d.co){co=Object.assign({},DEF_CO,d.co)}
-  if(Array.isArray(d.stages)&&d.stages.length>1)stages=d.stages;
-  if(Array.isArray(d.events))events=d.events;
-  if(Array.isArray(d.links))links=d.links;
-  if(Array.isArray(d.camps))camps=d.camps;
-  if(Array.isArray(d.mcamps))mcamps=d.mcamps;
+  // Cada cliente começa do padrão: nada do cliente anterior fica na tela.
+  co=Object.assign({},DEF_CO,d.co||{});
+  stages=Array.isArray(d.stages)&&d.stages.length>1?d.stages:JSON.parse(JSON.stringify(DEF_STAGES));
+  events=Array.isArray(d.events)?d.events:[];
+  links=Array.isArray(d.links)?d.links:[];
+  camps=Array.isArray(d.camps)?d.camps:[];
+  mcamps=Array.isArray(d.mcamps)?d.mcamps:[];
   try{localStorage.setItem("ft-company",JSON.stringify(co));localStorage.setItem("ft-stages",JSON.stringify(stages));localStorage.setItem("ft-events",JSON.stringify(events));localStorage.setItem("ft-links",JSON.stringify(links));localStorage.setItem("ft-camps",JSON.stringify(camps));localStorage.setItem("ft-mcamps",JSON.stringify(mcamps))}catch(x){}
   cloudReady=true;if(!d.co)cloudSave();
-  userCard();board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
+  userCard();board();waUI();show(toList&&!location.hash.slice(1)?"clientes":location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
   document.documentElement.style.visibility="";
   checkPw().catch(()=>{});
   sb.auth.onAuthStateChange(ev=>{if(ev==="SIGNED_OUT")location.replace("/login")});
 }
+if(!/(^|\.)vercel\.app$/.test(location.hostname))demoInit();
 if(/(^|\.)vercel\.app$/.test(location.hostname))cloudInit().catch(x=>{console.error(x);document.documentElement.style.visibility=""});
 board();waUI();show(location.hash.slice(1)||(co.wa==="on"?"painel":"empresa"));
 })();
